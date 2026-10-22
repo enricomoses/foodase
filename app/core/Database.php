@@ -29,4 +29,32 @@ final class Database
         }
         return self::$pdo;
     }
+
+    /**
+     * Jalankan callback di dalam transaksi DB dengan commit/rollback otomatis.
+     */
+    public static function transaction(callable $callback): mixed
+    {
+        $pdo = self::connection();
+        $isNested = $pdo->inTransaction();
+
+        if (!$isNested) {
+            $pdo->beginTransaction();
+        }
+
+        try {
+            $result = $callback($pdo);
+
+            if (!$isNested) {
+                $pdo->commit();
+            }
+
+            return $result;
+        } catch (\Throwable $e) {
+            if (!$isNested && $pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw $e;
+        }
+    }
 }
