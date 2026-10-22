@@ -27,6 +27,14 @@ final class Request
     }
 
     /**
+     * Cek apakah method request saat ini adalah GET.
+     */
+    public static function isGet(): bool
+    {
+        return self::method() === 'GET';
+    }
+
+    /**
      * Ambil nilai dari $_GET, atau default jika tidak ada.
      */
     public static function get(?string $key = null, mixed $default = null): mixed

@@ -69,6 +69,31 @@ final class Order
     }
 
     /**
+     * Ambil banyak pesanan berdasarkan daftar kode pesanan.
+     * Diurutkan dari yang paling baru dibuat.
+     *
+     * @param string[] $codes
+     * @return array
+     */
+    public static function findManyByCodes(array $codes): array
+    {
+        $cleanCodes = array_values(array_filter(array_unique($codes)));
+        if (empty($cleanCodes)) {
+            return [];
+        }
+
+        $pdo = Database::connection();
+        $placeholders = implode(',', array_fill(0, count($cleanCodes), '?'));
+        $stmt = $pdo->prepare(
+            "SELECT * FROM orders
+             WHERE order_code IN ({$placeholders})
+             ORDER BY created_at DESC"
+        );
+        $stmt->execute($cleanCodes);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
      * Hasilkan kode pesanan FE-YYMMDD-NNN yang unik.
      * Harus dipanggil di dalam transaksi dengan SELECT ... FOR UPDATE.
      *
