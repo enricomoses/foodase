@@ -12,6 +12,7 @@ if ($currentRole === 'admin') {
     $menus = [
         ['key' => 'dashboard',  'label' => 'Dashboard',    'url' => url('admin/index.php')],
         ['key' => 'orders',     'label' => 'Pesanan',      'url' => url('admin/orders.php')],
+        ['key' => 'pos',        'label' => 'POS',          'url' => url('cashier/pos.php')],
         ['key' => 'menus',      'label' => 'Kelola Menu',  'url' => url('admin/menus.php')],
         ['key' => 'categories', 'label' => 'Kategori',     'url' => url('admin/categories.php')],
         ['key' => 'users',      'label' => 'Pengguna',     'url' => url('admin/users.php')],
@@ -21,7 +22,7 @@ if ($currentRole === 'admin') {
     // Role cashier atau default
     $menus = [
         ['key' => 'cashier', 'label' => 'Pesanan Masuk',   'url' => url('cashier/index.php')],
-        ['key' => 'pos',     'label' => 'POS Kasir',       'url' => url('cashier/pos.php')],
+        ['key' => 'pos',     'label' => 'POS',             'url' => url('cashier/pos.php')],
         ['key' => 'history', 'label' => 'Riwayat',         'url' => url('cashier/history.php')],
     ];
 }

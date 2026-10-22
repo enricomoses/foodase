@@ -80,6 +80,56 @@ final class OrderController
     }
 
     /**
+     * POST api/orders/create-pos.php
+     * Pembuatan pesanan langsung oleh kasir (POS) (kasir/admin, CSRF required).
+     *
+     * FR-POS-01..03, prd.md §6.10, §4.3.
+     */
+    public function createPos(): void
+    {
+        Auth::requireRole(['cashier', 'admin']);
+
+        $user = Auth::user();
+        $userId = (int) ($user['id'] ?? 0);
+
+        $input = Request::json();
+
+        try {
+            $result = OrderService::create(
+                input: $input,
+                createdBy: $userId > 0 ? $userId : null,
+                source: 'cashier'
+            );
+        } catch (\InvalidArgumentException $e) {
+            $decoded = json_decode($e->getMessage(), true);
+            if (is_array($decoded)) {
+                Response::error(
+                    $decoded['message'] ?? 'Data tidak valid.',
+                    422,
+                    $decoded['errors'] ?? []
+                );
+            }
+            Response::error($e->getMessage(), 422);
+        } catch (\Throwable $e) {
+            log_error($e);
+            Response::error('Terjadi kesalahan saat membuat pesanan.', 500);
+        }
+
+        Response::json(
+            [
+                'order_id'      => $result['order_id'],
+                'order_code'    => $result['order_code'],
+                'total'         => $result['total'],
+                'customer_name' => trim((string) ($input['customer_name'] ?? '')),
+                'order_type'    => trim((string) ($input['order_type'] ?? '')),
+                'table_number'  => !empty($input['table_number']) ? (int) $input['table_number'] : null,
+            ],
+            'Pesanan kasir berhasil dibuat.',
+            201
+        );
+    }
+
+    /**
      * GET api/orders/track.php?code=FE-YYMMDD-NNN&name=...
      * Pelacakan pesanan publik (FR-TRK-01, FR-TRK-04, BR-17).
      */
