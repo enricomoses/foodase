@@ -206,4 +206,44 @@ final class Order
             'pages'    => $total > 0 ? (int) ceil($total / $perPage) : 1,
         ];
     }
+
+    /**
+     * Cari pesanan dengan filter status, q, type, date, pagination (FR-COR-02).
+     */
+    public static function search(array $filters = []): array
+    {
+        if (isset($filters['type']) && !isset($filters['order_type'])) {
+            $filters['order_type'] = $filters['type'];
+        }
+        return self::list($filters);
+    }
+
+    /**
+     * Hitung jumlah pesanan per status tab kasir.
+     */
+    public static function tabCounts(array $filters = []): array
+    {
+        $pdo = Database::connection();
+        $date = $filters['date'] ?? null;
+        $where = [];
+        $params = [];
+
+        if ($date !== null && $date !== '') {
+            $where[] = 'DATE(created_at) = :date';
+            $params[':date'] = $date;
+        }
+
+        $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+        $stmt = $pdo->prepare("SELECT status, COUNT(*) as cnt FROM orders {$whereClause} GROUP BY status");
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        return [
+            'pending'    => (int) ($rows['pending'] ?? 0),
+            'processing' => (int) ($rows['processing'] ?? 0),
+            'ready'      => (int) ($rows['ready'] ?? 0),
+            'completed'  => (int) ($rows['completed'] ?? 0),
+            'cancelled'  => (int) ($rows['cancelled'] ?? 0),
+        ];
+    }
 }

@@ -6,13 +6,12 @@ require __DIR__ . '/../../app/bootstrap.php';
 use App\Core\Auth;
 use App\Core\View;
 
-Auth::requireRole(['cashier']);
+Auth::requireRole(['cashier', 'admin']);
 
-$user = Auth::user();
-$name = (string) ($user['name'] ?? 'Kasir');
+$activeMenu = Auth::role() === 'admin' ? 'orders' : 'cashier';
 
-echo View::render('cashier/index', [
-    'title'      => 'Panel Kasir',
-    'activeMenu' => 'cashier',
-    'name'       => $name,
+echo View::render('cashier/orders', [
+    'title'      => 'Pesanan Masuk',
+    'activeMenu' => $activeMenu,
+    'scripts'    => ['js/pages/cashier-orders.js?v=2'],
 ], 'cashier');

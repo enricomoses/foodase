@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\Auth;
 use App\Core\Request;
 use App\Core\Response;
 use App\Core\Session;
@@ -193,5 +194,123 @@ final class OrderController
         }
 
         Response::json($sorted, 'Daftar riwayat pesanan berhasil diambil.');
+    }
+
+    /**
+     * GET api/orders/list.php
+     * Daftar pesanan kasir/admin dengan filter status, q, type, date, pagination (FR-COR-01, FR-COR-02).
+     */
+    public function list(): void
+    {
+        Auth::requireRole(['cashier', 'admin']);
+
+        $status  = Request::get('status');
+        $q       = trim((string) Request::get('q', ''));
+        $type    = Request::get('type');
+        $date    = Request::get('date');
+        $page    = max(1, (int) Request::get('page', 1));
+        $perPage = max(1, min(100, (int) Request::get('per_page', 20)));
+
+        $filters = [
+            'q'        => $q,
+            'page'     => $page,
+            'per_page' => $perPage,
+        ];
+
+        if ($status !== null && $status !== '' && $status !== 'all') {
+            $filters['status'] = $status;
+        }
+
+        if ($type !== null && $type !== '' && $type !== 'all') {
+            $filters['order_type'] = $type;
+        }
+
+        if ($date !== null && $date !== '') {
+            $filters['date'] = $date;
+        }
+
+        $result = Order::search($filters);
+
+        // Tambahkan ringkasan item & item_count untuk tiap baris
+        foreach ($result['data'] as &$row) {
+            $details = OrderDetail::byOrder((int) $row['id']);
+            $row['total']        = (int) $row['total'];
+            $row['table_number'] = $row['table_number'] !== null ? (int) $row['table_number'] : null;
+            $row['items_count']  = array_sum(array_column($details, 'qty'));
+            $row['items_summary'] = implode(', ', array_map(static function (array $d): string {
+                return $d['menu_name'] . ' × ' . $d['qty'];
+            }, $details));
+        }
+        unset($row);
+
+        // Ambil jumlah per tab status kasir
+        $tabCounts = Order::tabCounts(['date' => $filters['date'] ?? null]);
+
+        Response::json([
+            'orders'     => $result['data'],
+            'pagination' => [
+                'total'    => $result['total'],
+                'page'     => $result['page'],
+                'per_page' => $result['per_page'],
+                'pages'    => $result['pages'],
+            ],
+            'tab_counts' => $tabCounts,
+        ], 'Daftar pesanan berhasil diambil.');
+    }
+
+    /**
+     * GET api/orders/detail.php?id=... atau ?code=...
+     * Detail pesanan untuk modal kasir/admin (FR-COR-04).
+     */
+    public function detail(): void
+    {
+        Auth::requireRole(['cashier', 'admin']);
+
+        $id   = (int) Request::get('id', 0);
+        $code = trim((string) Request::get('code', ''));
+
+        if ($id > 0) {
+            $order = Order::find($id);
+        } elseif ($code !== '') {
+            $order = Order::findByCode($code);
+        } else {
+            Response::error('Parameter id atau code wajib diisi.', 422);
+        }
+
+        if (!$order) {
+            Response::error('Pesanan tidak ditemukan.', 404);
+        }
+
+        $details = OrderDetail::byOrder((int) $order['id']);
+        $items = array_map(static function (array $d): array {
+            return [
+                'id'         => (int) $d['id'],
+                'menu_id'    => (int) $d['menu_id'],
+                'menu_name'  => (string) $d['menu_name'],
+                'price'      => (int) $d['price'],
+                'qty'        => (int) $d['qty'],
+                'subtotal'   => (int) $d['subtotal'],
+                'image_url'  => UploadService::imageUrl($d['image'] ?? null),
+            ];
+        }, $details);
+
+        Response::json([
+            'order' => [
+                'id'             => (int) $order['id'],
+                'order_code'     => (string) $order['order_code'],
+                'customer_name'  => (string) $order['customer_name'],
+                'order_type'     => (string) $order['order_type'],
+                'table_number'   => $order['table_number'] !== null ? (int) $order['table_number'] : null,
+                'notes'          => $order['notes'] !== null ? (string) $order['notes'] : null,
+                'source'         => (string) $order['source'],
+                'status'         => (string) $order['status'],
+                'payment_status' => (string) $order['payment_status'],
+                'total'          => (int) $order['total'],
+                'cancel_reason'  => $order['cancel_reason'] !== null ? (string) $order['cancel_reason'] : null,
+                'created_at'     => (string) $order['created_at'],
+                'updated_at'     => (string) $order['updated_at'],
+            ],
+            'items' => $items,
+        ], 'Detail pesanan berhasil diambil.');
     }
 }
