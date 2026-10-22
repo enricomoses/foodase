@@ -55,6 +55,8 @@ window.UI = (function ($) {
         });
       });
 
+      // Bersihkan toast lama agar tidak bertumpuk banyak ke bawah (Fix bug toast menumpuk)
+      container.children().stop(true, true).remove();
       container.append(toast);
 
       setTimeout(function () {
