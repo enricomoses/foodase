@@ -78,20 +78,11 @@ final class AuthController
     }
 
     /**
-     * Aksi Logout untuk Web Form POST biasa.
+     * Aksi Logout untuk Web Form (POST maupun GET) agar logout selalu berhasil tanpa gagal.
      */
     public static function logoutWeb(): void
     {
-        if (Request::isPost()) {
-            $token = Request::post('_token');
-            if (!is_string($token) || !Csrf::verify($token)) {
-                http_response_code(403);
-                echo 'Token CSRF tidak valid.';
-                exit;
-            }
-            Auth::logout();
-        }
-
+        Auth::logout();
         Response::redirect('login.php');
     }
 }

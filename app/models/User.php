@@ -155,12 +155,15 @@ final class User
     }
 
     /**
-     * Perbarui waktu login terakhir (last_login_at) ke waktu sekarang.
+     * Perbarui session_id aktif user (Single Active Session).
      */
-    public static function touchLastLogin(int $id): bool
+    public static function updateSessionId(int $id, ?string $sessionId): bool
     {
         $pdo = Database::connection();
-        $stmt = $pdo->prepare('UPDATE users SET last_login_at = NOW() WHERE id = :id');
-        return $stmt->execute([':id' => $id]);
+        $stmt = $pdo->prepare('UPDATE users SET session_id = :sid WHERE id = :id');
+        return $stmt->execute([
+            ':id'  => $id,
+            ':sid' => $sessionId,
+        ]);
     }
 }

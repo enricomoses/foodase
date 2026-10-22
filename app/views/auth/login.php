@@ -6,12 +6,27 @@ declare(strict_types=1);
  * Ditampilkan di dalam layouts/auth.php.
  */
 ?>
+<?php
+$flashError = \App\Core\Session::get('auth_flash_error');
+if ($flashError) {
+    \App\Core\Session::forget('auth_flash_error');
+}
+?>
 <div class="space-y-6">
   <!-- Header / Wordmark Identitas -->
   <div>
     <h1 class="text-2xl font-bold tracking-tight text-ink">Masuk</h1>
     <p class="mt-1 text-sm text-subtle">Gunakan akun staf atau administrator kafe Anda.</p>
   </div>
+
+  <?php if ($flashError): ?>
+    <div class="rounded-xl bg-danger-light p-3.5 text-xs font-medium text-danger" role="alert">
+      <div class="flex items-start gap-2.5">
+        <span class="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-danger"></span>
+        <span class="leading-snug"><?= e($flashError) ?></span>
+      </div>
+    </div>
+  <?php endif; ?>
 
   <!-- Alert Error Global (Kredensial salah / Throttle) -->
   <div id="login-alert" class="hidden rounded-xl bg-danger-light p-3.5 text-xs font-medium text-danger" role="alert">

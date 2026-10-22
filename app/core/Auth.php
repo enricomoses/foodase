@@ -47,11 +47,17 @@ final class Auth
         }
 
         Session::regenerate(true);
+        $sid = session_id();
+
+        // One Session: Simpan session_id ke database agar sesi perangkat lama otomatis kedaluwarsa
+        User::updateSessionId((int) $user['id'], $sid);
+
         Session::set('auth_user', [
-            'id'       => (int) $user['id'],
-            'name'     => (string) $user['name'],
-            'username' => (string) $user['username'],
-            'role'     => (string) $user['role'],
+            'id'         => (int) $user['id'],
+            'name'       => (string) $user['name'],
+            'username'   => (string) $user['username'],
+            'role'       => (string) $user['role'],
+            'session_id' => $sid,
         ]);
     }
 
@@ -60,6 +66,10 @@ final class Auth
      */
     public static function logout(): void
     {
+        $user = Session::get('auth_user');
+        if (is_array($user) && isset($user['id'])) {
+            User::updateSessionId((int) $user['id'], null);
+        }
         Session::forget('auth_user');
         Session::regenerate(true);
     }
@@ -78,7 +88,26 @@ final class Auth
     public static function user(): ?array
     {
         $user = Session::get('auth_user');
-        return is_array($user) ? $user : null;
+        if (!is_array($user) || empty($user['id'])) {
+            return null;
+        }
+
+        // Validasi Single Active Session terhadap database
+        $dbUser = User::findById((int) $user['id']);
+        if (!$dbUser || (int) ($dbUser['is_active'] ?? 0) !== 1) {
+            self::logout();
+            return null;
+        }
+
+        $currentSid = session_id();
+        if ($dbUser['session_id'] !== null && $dbUser['session_id'] !== '' && $dbUser['session_id'] !== $currentSid) {
+            // Sesi telah diambil alih oleh login baru di perangkat/browser lain
+            self::logout();
+            Session::set('auth_flash_error', 'Sesi Anda telah berakhir karena akun ini telah masuk di perangkat lain.');
+            return null;
+        }
+
+        return $user;
     }
 
     /**
