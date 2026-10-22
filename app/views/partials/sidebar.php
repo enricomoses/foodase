@@ -53,8 +53,33 @@ if ($currentRole === 'admin') {
     <?php endforeach; ?>
   </nav>
 
-  <!-- Footer Sidebar -->
-  <div class="border-t border-line p-4 text-[11px] text-subtle">
-    FoodEase v1.0
+  <!-- Footer Sidebar: Versi + Tombol Dark Mode -->
+  <div class="border-t border-line p-4 flex items-center justify-between">
+    <span class="text-[11px] text-subtle">FoodEase v1.0</span>
+    <!-- Tombol Toggle Tema -->
+    <button
+      type="button"
+      id="btn-theme-toggle"
+      class="btn-theme-toggle h-8 w-8 rounded-full bg-surface hover:bg-neutral-200 transition-colors flex items-center justify-center text-subtle hover:text-ink"
+      title="Beralih ke Mode Gelap"
+      aria-label="Ganti tema"
+    >
+      <!-- Ikon Bulan (Light Mode aktif) -->
+      <svg class="icon-moon h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <!-- Ikon Matahari (Dark Mode aktif) -->
+      <svg class="icon-sun h-4 w-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
   </div>
 </aside>
