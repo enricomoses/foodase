@@ -19,5 +19,5 @@ echo View::render('admin/dashboard', [
     'title'      => 'Dashboard Admin',
     'activeMenu' => 'dashboard',
     'name'       => $name,
-    'scripts'    => ['js/pages/admin-dashboard.js?v=1'],
+    'scripts'    => ['js/pages/admin-dashboard.js?v=2'],
 ], 'admin');
