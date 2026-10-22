@@ -1,0 +1,19 @@
+# config lokal
+app/config/config.local.php
+
+# runtime
+storage/logs/*
+!storage/logs/.gitkeep
+public/uploads/menus/*
+!public/uploads/menus/.gitkeep
+
+# file uji sementara
+public/_*.php
+
+# editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+node_modules/
+tailwindcss.exe
