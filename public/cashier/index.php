@@ -13,5 +13,5 @@ $activeMenu = Auth::role() === 'admin' ? 'orders' : 'cashier';
 echo View::render('cashier/orders', [
     'title'      => 'Pesanan Masuk',
     'activeMenu' => $activeMenu,
-    'scripts'    => ['js/pages/cashier-orders.js?v=2'],
+    'scripts'    => ['js/pages/payment.js?v=1', 'js/pages/cashier-orders.js?v=3'],
 ], 'cashier');

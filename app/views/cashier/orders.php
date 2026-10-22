@@ -299,13 +299,10 @@ declare(strict_types=1);
           <span id="modal-total-amount" class="text-lg font-bold text-ink tabular-nums">Rp 0</span>
         </div>
 
-        <!-- ── Tempat Tombol Aksi (Extensible untuk P12-P13) ── -->
+        <!-- ── Tempat Tombol Aksi (dikelola oleh cashier-orders.js) ── -->
         <div class="pt-2">
-          <div class="p-3 bg-surface rounded-xl text-xs text-subtle text-center mb-3">
-            Aksi pesanan (Bayar di kasir, Siap, Selesai, Batal) akan diaktifkan pada modul berikutnya (P12–P13).
-          </div>
           <div id="modal-action-buttons" class="flex flex-wrap gap-2">
-            <!-- Tombol aksi spesifik status akan diisi di sini pada P12/P13 -->
+            <!-- Tombol aksi diisi JS sesuai status pesanan -->
           </div>
         </div>
 

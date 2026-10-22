@@ -1,13 +1,14 @@
 /**
  * Script Halaman Pesanan Masuk Kasir.
- * FR-COR-01..04, prd.md §6.9, §12.3, §12.4.
+ * FR-COR-01..04, FR-PAY-01..04, prd.md §6.9, §6.11, §12.3, §12.4.
  *
  * Fitur:
  * 1. Tab status (Belum dibayar, Diproses, Siap, Selesai, Batal) + jumlah pesanan per tab.
  * 2. Pencarian kode/nama (debounce 300 ms), filter tipe, dan filter tanggal.
  * 3. Tabel pesanan dengan klik baris untuk membuka modal detail.
- * 4. Modal detail pesanan (item, catatan, status, total, tempat tombol aksi P12/P13).
+ * 4. Modal detail pesanan (item, catatan, status, total, tombol aksi per status).
  * 5. Auto-refresh tiap 8 detik (berhenti saat document.hidden) + indikator pesanan baru.
+ * 6. Integrasi payment.js — tombol Bayar membuka PaymentModal; setelah sukses refresh + tawaran struk.
  */
 $(function () {
   'use strict';
@@ -484,32 +485,87 @@ $(function () {
 
   function renderActionButtons(order) {
     const $actions = $('#modal-action-buttons').empty();
-
-    // Komponen placeholder yang bersih dan mudah diperluas pada modul berikutnya
-    const btnClass = 'flex-1 h-10 rounded-full text-xs font-medium inline-flex items-center justify-center transition-colors';
+    const btnClass = 'flex-1 h-10 rounded-full text-xs font-medium inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer';
 
     if (order.status === 'pending' && order.payment_status === 'unpaid') {
-      $actions.append(`
-        <button type="button" disabled class="${btnClass} bg-black/40 text-white cursor-not-allowed" title="Aktif di modul P12">
-          Bayar di Kasir (P12)
-        </button>
-        <button type="button" disabled class="${btnClass} bg-danger-light text-danger/60 cursor-not-allowed" title="Aktif di modul P13">
-          Batalkan (P13)
-        </button>
-      `);
-    } else if (order.status === 'processing') {
-      $actions.append(`
-        <button type="button" disabled class="${btnClass} bg-accent-light text-accent-dark/60 cursor-not-allowed" title="Aktif di modul P13">
-          Tandai Siap (P13)
+      // Tombol Bayar
+      const $btnPay = $(`
+        <button type="button" id="btn-modal-pay"
+          class="${btnClass} bg-black text-white hover:bg-neutral-800"
+        >
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+            <line x1="1" y1="10" x2="23" y2="10"/>
+          </svg>
+          Bayar
         </button>
       `);
-    } else if (order.status === 'ready') {
-      $actions.append(`
-        <button type="button" disabled class="${btnClass} bg-black/40 text-white cursor-not-allowed" title="Aktif di modul P13">
-          Tandai Selesai (P13)
-        </button>
+
+      $btnPay.on('click', function () {
+        // Tutup modal detail sebelum buka modal pembayaran
+        if (window.UI && typeof window.UI.closeModal === 'function') {
+          window.UI.closeModal('modal-order-detail');
+        } else {
+          $('#modal-order-detail').addClass('hidden');
+        }
+
+        // Buka PaymentModal
+        if (window.PaymentModal) {
+          window.PaymentModal.open(order, {
+            onSuccess: function (result) {
+              // Refresh daftar pesanan
+              fetchOrders(false);
+
+              // Tawaran cetak struk
+              offerPrintReceipt(order.order_code, result);
+            }
+          });
+        }
+      });
+
+      $actions.append($btnPay);
+
+    } else if (order.status === 'processing' || order.status === 'ready' || order.status === 'completed') {
+      // Tombol Cetak Struk (untuk pesanan yang sudah dibayar)
+      const $btnReceipt = $(`
+        <a href="${getBaseUrl()}cashier/receipt.php?code=${encodeURIComponent(order.order_code)}"
+           target="_blank"
+           class="${btnClass} bg-surface text-ink hover:bg-neutral-200"
+        >
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 6 2 18 2 18 9"/>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+            <rect x="6" y="14" width="12" height="8"/>
+          </svg>
+          Cetak Struk
+        </a>
       `);
+      $actions.append($btnReceipt);
     }
+  }
+
+  /* ── Tawaran Cetak Struk setelah bayar ──────────────────────── */
+  function offerPrintReceipt(orderCode, paymentResult) {
+    // Toast dengan tautan cetak struk
+    const receiptUrl = getBaseUrl() + 'cashier/receipt.php?code=' + encodeURIComponent(orderCode);
+
+    // Buka struk di tab baru (opsional — user bisa cetak dari sana)
+    // Hanya tampilkan toast; user bisa klik dari modal atau langsung
+    const $toast = $('<div>')
+      .css({
+        position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
+        background: '#000', color: '#fff', padding: '12px 18px',
+        borderRadius: '9999px', fontSize: '13px', fontWeight: '500',
+        zIndex: 9999, whiteSpace: 'nowrap', boxShadow: '0 4px 24px rgba(0,0,0,.18)',
+        display: 'flex', alignItems: 'center', gap: '12px'
+      })
+      .html(
+        '<span>Pembayaran berhasil!</span>' +
+        '<a href="' + receiptUrl + '" target="_blank" style="color:#fff;text-decoration:underline;font-weight:700;">Cetak Struk</a>'
+      );
+
+    $('body').append($toast);
+    setTimeout(function () { $toast.fadeOut(400, function () { $(this).remove(); }); }, 5000);
   }
 
   /* ============================================================
