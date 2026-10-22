@@ -9,6 +9,35 @@
     scrollbar-width: none;
 }
 
+/* Floating label pattern untuk form password */
+.floating-group {
+    position: relative;
+}
+.floating-input {
+    padding-top: 1.25rem !important;
+    padding-bottom: 0.35rem !important;
+}
+.floating-label {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #545454;
+    font-size: 0.875rem;
+    line-height: 1;
+}
+.floating-input:focus ~ .floating-label,
+.floating-input:not(:placeholder-shown) ~ .floating-label,
+.floating-input.has-value ~ .floating-label {
+    top: 0.55rem;
+    transform: translateY(0);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #000000;
+}
+
 /* Transisi dan penyesuaian modal menjadi bottom sheet di mobile */
 @media (max-width: 639px) {
     .modal-sheet-container {
