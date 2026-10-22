@@ -13,6 +13,7 @@ if ($currentRole === 'admin') {
         ['key' => 'dashboard',  'label' => 'Dashboard',    'url' => url('admin/index.php')],
         ['key' => 'orders',     'label' => 'Pesanan',      'url' => url('admin/orders.php')],
         ['key' => 'pos',        'label' => 'POS',          'url' => url('cashier/pos.php')],
+        ['key' => 'history',    'label' => 'Riwayat',      'url' => url('cashier/history.php')],
         ['key' => 'menus',      'label' => 'Kelola Menu',  'url' => url('admin/menus.php')],
         ['key' => 'categories', 'label' => 'Kategori',     'url' => url('admin/categories.php')],
         ['key' => 'users',      'label' => 'Pengguna',     'url' => url('admin/users.php')],

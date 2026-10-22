@@ -160,6 +160,72 @@ final class PaymentController
     }
 
     /**
+     * GET api/payments/list.php
+     * Riwayat transaksi dengan semua status (paid + void).
+     * Kasir hanya miliknya; admin semua — scope dipaksa di server (BR-12, FR-HIS-01..02).
+     */
+    public function history(): void
+    {
+        Auth::requireRole(['cashier', 'admin']);
+
+        $user = Auth::user();
+        $role = (string) ($user['role'] ?? 'cashier');
+
+        $status   = Request::get('status', '');   // '' = semua, 'paid', 'void'
+        $method   = Request::get('method');
+        $q        = trim((string) Request::get('q', ''));
+        $dateFrom = Request::get('date_from');
+        $dateTo   = Request::get('date_to');
+        $page     = max(1, (int) Request::get('page', 1));
+        $perPage  = max(1, min(100, (int) Request::get('per_page', 20)));
+
+        $filters = [
+            'q'        => $q,
+            'status'   => in_array($status, ['paid', 'void'], true) ? $status : '',
+            'page'     => $page,
+            'per_page' => $perPage,
+        ];
+
+        // Paksa scope kasir di server (BR-12)
+        if ($role === 'cashier') {
+            $filters['cashier_id'] = (int) ($user['id'] ?? 0);
+        }
+
+        if ($method !== null && $method !== '') {
+            $filters['method'] = $method;
+        }
+
+        if ($dateFrom !== null && $dateFrom !== '') {
+            $filters['date_from'] = $dateFrom;
+        }
+
+        if ($dateTo !== null && $dateTo !== '') {
+            $filters['date_to'] = $dateTo;
+        }
+
+        $result = \App\Models\Payment::search($filters);
+
+        foreach ($result['data'] as &$row) {
+            $row['total']         = (int) $row['total'];
+            $row['amount_paid']   = (int) $row['amount_paid'];
+            $row['change_amount'] = (int) $row['change_amount'];
+        }
+        unset($row);
+
+        Response::json([
+            'payments'   => $result['data'],
+            'paid_total' => $result['paid_total'],
+            'pagination' => [
+                'total'    => $result['total'],
+                'page'     => $result['page'],
+                'per_page' => $result['per_page'],
+                'pages'    => $result['pages'],
+            ],
+            'is_admin'   => $role === 'admin',
+        ], 'Riwayat transaksi berhasil diambil.');
+    }
+
+    /**
      * POST api/payments/void.php
      * Void pembayaran (FR-STS-03, BR-10). Hanya boleh dilakukan oleh admin.
      * Body JSON: { "order_id": int, "reason": string }

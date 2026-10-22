@@ -130,30 +130,51 @@ final class Payment
 
     /**
      * Daftar pembayaran dengan filter dan paginasi.
-     * Kasir hanya dapat melihat pembayaran miliknya (cashier_id).
+     * Kasir hanya dapat melihat pembayaran miliknya (cashier_id) — dipaksa dari luar.
+     *
+     * Filter tambahan:
+     *   status        string  'paid' | 'void' | '' (semua, default)
+     *   cashier_id    int     Batasi ke kasir tertentu
+     *   method        string  'cash' | 'qris'
+     *   q             string  Cari kode bayar, kode pesanan, nama pelanggan
+     *   date_from     string  YYYY-MM-DD
+     *   date_to       string  YYYY-MM-DD
+     *   page          int     Halaman (default 1)
+     *   per_page      int     Baris per halaman (default 20, maks 100)
+     *
+     * Return:
+     *   data, total, page, per_page, pages, paid_total (sum total baris paid dalam filter)
      */
-    public static function list(array $filters = []): array
+    public static function search(array $filters = []): array
     {
         $pdo = Database::connection();
 
-        $cashierId = isset($filters['cashier_id']) ? (int) $filters['cashier_id'] : null;
-        $method    = $filters['method'] ?? null;
-        $q         = trim((string) ($filters['q'] ?? ''));
-        $dateFrom  = $filters['date_from'] ?? null;
-        $dateTo    = $filters['date_to'] ?? null;
-        $page      = max(1, (int) ($filters['page'] ?? 1));
-        $perPage   = max(1, min(100, (int) ($filters['per_page'] ?? 20)));
+        $cashierId  = isset($filters['cashier_id']) ? (int) $filters['cashier_id'] : null;
+        $method     = $filters['method'] ?? null;
+        $statusFilt = $filters['status'] ?? '';   // '' = semua status
+        $q          = trim((string) ($filters['q'] ?? ''));
+        $dateFrom   = $filters['date_from'] ?? null;
+        $dateTo     = $filters['date_to'] ?? null;
+        $page       = max(1, (int) ($filters['page'] ?? 1));
+        $perPage    = max(1, min(100, (int) ($filters['per_page'] ?? 20)));
 
-        $where  = ['p.status = \'paid\''];
+        $where  = [];
         $params = [];
 
+        // Filter status — jika tidak diisi, ambil semua status
+        if ($statusFilt !== '' && in_array($statusFilt, ['paid', 'void'], true)) {
+            $where[]            = 'p.status = :status';
+            $params[':status']  = $statusFilt;
+        }
+
+        // Scope kasir
         if ($cashierId !== null) {
-            $where[]             = 'p.cashier_id = :cashier_id';
+            $where[]              = 'p.cashier_id = :cashier_id';
             $params[':cashier_id'] = $cashierId;
         }
 
         if ($method !== null && $method !== '') {
-            $where[]         = 'p.method = :method';
+            $where[]           = 'p.method = :method';
             $params[':method'] = $method;
         }
 
@@ -165,17 +186,18 @@ final class Payment
         }
 
         if ($dateFrom !== null && $dateFrom !== '') {
-            $where[]            = 'DATE(p.paid_at) >= :date_from';
+            $where[]              = 'DATE(p.paid_at) >= :date_from';
             $params[':date_from'] = $dateFrom;
         }
 
         if ($dateTo !== null && $dateTo !== '') {
-            $where[]          = 'DATE(p.paid_at) <= :date_to';
+            $where[]            = 'DATE(p.paid_at) <= :date_to';
             $params[':date_to'] = $dateTo;
         }
 
-        $whereClause = 'WHERE ' . implode(' AND ', $where);
+        $whereClause = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
 
+        // Total baris (untuk pagination)
         $countStmt = $pdo->prepare(
             "SELECT COUNT(*) FROM payments p
              JOIN orders o ON o.id = p.order_id
@@ -184,13 +206,42 @@ final class Payment
         $countStmt->execute($params);
         $total = (int) $countStmt->fetchColumn();
 
+        // Jumlah total Rupiah yang sudah paid pada filter yang sama
+        // Selalu gunakan kondisi paid (tanpa menimpa filter status di atas)
+        $paidWhere = $where;
+        $paidParams = $params;
+        // Pastikan kita menghitung SUM hanya untuk baris paid
+        if (!isset($paidParams[':status'])) {
+            $paidWhere[]            = 'p.status = :paid_status';
+            $paidParams[':paid_status'] = 'paid';
+        } elseif ($paidParams[':status'] !== 'paid') {
+            // Filter status = void → paid_total pasti 0
+            $paidParams = [':zero' => 1]; // Tidak ada baris paid
+            $paidWhere  = ['1 = 0'];
+        }
+        $paidWhereClause = $paidWhere ? ('WHERE ' . implode(' AND ', $paidWhere)) : '';
+
+        $sumStmt = $pdo->prepare(
+            "SELECT COALESCE(SUM(p.total), 0) FROM payments p
+             JOIN orders o ON o.id = p.order_id
+             {$paidWhereClause}"
+        );
+        $sumStmt->execute($paidParams);
+        $paidTotal = (int) $sumStmt->fetchColumn();
+
+        // Ambil baris dengan paginasi
         $offset = ($page - 1) * $perPage;
         $stmt = $pdo->prepare(
-            "SELECT p.*, o.order_code, o.customer_name, o.order_type, o.table_number,
-                    u.name AS cashier_name
+            "SELECT p.id, p.payment_code, p.order_id, p.method, p.total,
+                    p.amount_paid, p.change_amount, p.status,
+                    p.cashier_id, p.paid_at, p.voided_at, p.void_reason,
+                    o.order_code, o.customer_name, o.order_type, o.table_number,
+                    u.name AS cashier_name,
+                    vu.name AS voided_by_name
              FROM payments p
              JOIN orders o ON o.id = p.order_id
-             LEFT JOIN users u ON u.id = p.cashier_id
+             LEFT JOIN users u  ON u.id  = p.cashier_id
+             LEFT JOIN users vu ON vu.id = p.voided_by
              {$whereClause}
              ORDER BY p.paid_at DESC
              LIMIT :limit OFFSET :offset"
@@ -205,11 +256,25 @@ final class Payment
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return [
-            'data'     => $rows,
-            'total'    => $total,
-            'page'     => $page,
-            'per_page' => $perPage,
-            'pages'    => $total > 0 ? (int) ceil($total / $perPage) : 1,
+            'data'       => $rows,
+            'total'      => $total,
+            'paid_total' => $paidTotal,
+            'page'       => $page,
+            'per_page'   => $perPage,
+            'pages'      => $total > 0 ? (int) ceil($total / $perPage) : 1,
         ];
+    }
+
+    /**
+     * Alias backward-compatible untuk Payment::search() dengan status default 'paid'.
+     * Dipanggil oleh PaymentController::list() lama (report, dll).
+     */
+    public static function list(array $filters = []): array
+    {
+        // Default ke paid saja agar tidak memutus caller yang sudah ada
+        if (!isset($filters['status'])) {
+            $filters['status'] = 'paid';
+        }
+        return self::search($filters);
     }
 }
