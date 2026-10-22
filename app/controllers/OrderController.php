@@ -306,11 +306,99 @@ final class OrderController
                 'status'         => (string) $order['status'],
                 'payment_status' => (string) $order['payment_status'],
                 'total'          => (int) $order['total'],
-                'cancel_reason'  => $order['cancel_reason'] !== null ? (string) $order['cancel_reason'] : null,
-                'created_at'     => (string) $order['created_at'],
-                'updated_at'     => (string) $order['updated_at'],
+                'cancel_reason'     => $order['cancel_reason'] !== null ? (string) $order['cancel_reason'] : null,
+                'cancelled_by'      => isset($order['cancelled_by']) && $order['cancelled_by'] !== null ? (int) $order['cancelled_by'] : null,
+                'cancelled_by_name' => isset($order['cancelled_by_name']) && $order['cancelled_by_name'] !== null ? (string) $order['cancelled_by_name'] : null,
+                'created_at'        => (string) $order['created_at'],
+                'updated_at'        => (string) $order['updated_at'],
             ],
             'items' => $items,
         ], 'Detail pesanan berhasil diambil.');
+    }
+
+    /**
+     * POST api/orders/update-status.php
+     * Perbarui status pesanan (FR-STS-01, BR-06).
+     * Body JSON: { "order_id": int, "next_status": string }
+     */
+    public function updateStatus(): void
+    {
+        Auth::requireRole(['cashier', 'admin']);
+
+        $input = Request::json();
+        $orderId = isset($input['order_id']) ? (int) $input['order_id'] : 0;
+        if ($orderId <= 0 && isset($input['id'])) {
+            $orderId = (int) $input['id'];
+        }
+        $nextStatus = trim((string) ($input['next_status'] ?? $input['status'] ?? $input['next'] ?? ''));
+
+        if ($orderId <= 0) {
+            Response::error('ID pesanan tidak valid.', 422, ['order_id' => 'ID pesanan wajib diisi.']);
+        }
+
+        if ($nextStatus === '') {
+            Response::error('Status tujuan wajib diisi.', 422, ['next_status' => 'Status tujuan wajib diisi.']);
+        }
+
+        try {
+            $result = OrderService::updateStatus($orderId, $nextStatus);
+            Response::json($result, 'Status pesanan berhasil diperbarui.');
+        } catch (\RuntimeException $e) {
+            $decoded = json_decode($e->getMessage(), true);
+            if (is_array($decoded)) {
+                $status = isset($decoded['status']) ? (int) $decoded['status'] : 409;
+                Response::error($decoded['message'] ?? 'Konflik status.', $status);
+            }
+            Response::error($e->getMessage(), 409);
+        } catch (\Throwable $e) {
+            log_error($e);
+            Response::error('Terjadi kesalahan saat memperbarui status pesanan.', 500);
+        }
+    }
+
+    /**
+     * POST api/orders/cancel.php
+     * Batalkan pesanan (FR-STS-02, FR-STS-03, BR-10).
+     * Body JSON: { "order_id": int, "reason": ?string }
+     */
+    public function cancel(): void
+    {
+        Auth::requireRole(['cashier', 'admin']);
+
+        $user = Auth::user();
+        $userId = (int) ($user['id'] ?? 0);
+        $role = (string) ($user['role'] ?? 'cashier');
+
+        $input = Request::json();
+        $orderId = isset($input['order_id']) ? (int) $input['order_id'] : 0;
+        if ($orderId <= 0 && isset($input['id'])) {
+            $orderId = (int) $input['id'];
+        }
+        $reason = isset($input['reason']) ? (string) $input['reason'] : null;
+
+        if ($orderId <= 0) {
+            Response::error('ID pesanan tidak valid.', 422, ['order_id' => 'ID pesanan wajib diisi.']);
+        }
+
+        try {
+            $result = OrderService::cancel($orderId, $userId, $role, $reason);
+            Response::json($result, 'Pesanan berhasil dibatalkan.');
+        } catch (\InvalidArgumentException $e) {
+            $decoded = json_decode($e->getMessage(), true);
+            if (is_array($decoded)) {
+                Response::error($decoded['message'] ?? 'Data tidak valid.', 422, $decoded['errors'] ?? []);
+            }
+            Response::error($e->getMessage(), 422);
+        } catch (\RuntimeException $e) {
+            $decoded = json_decode($e->getMessage(), true);
+            if (is_array($decoded)) {
+                $status = isset($decoded['status']) ? (int) $decoded['status'] : 409;
+                Response::error($decoded['message'] ?? 'Gagal membatalkan pesanan.', $status);
+            }
+            Response::error($e->getMessage(), 409);
+        } catch (\Throwable $e) {
+            log_error($e);
+            Response::error('Terjadi kesalahan saat membatalkan pesanan.', 500);
+        }
     }
 }

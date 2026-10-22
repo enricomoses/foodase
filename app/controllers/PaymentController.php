@@ -158,4 +158,57 @@ final class PaymentController
             ],
         ], 'Riwayat pembayaran berhasil diambil.');
     }
+
+    /**
+     * POST api/payments/void.php
+     * Void pembayaran (FR-STS-03, BR-10). Hanya boleh dilakukan oleh admin.
+     * Body JSON: { "order_id": int, "reason": string }
+     */
+    public function void(): void
+    {
+        Auth::requireRole(['admin']);
+
+        $user = Auth::user();
+        $userId = (int) ($user['id'] ?? 0);
+
+        $input = Request::json();
+        $orderId = isset($input['order_id']) ? (int) $input['order_id'] : 0;
+        if ($orderId <= 0 && isset($input['id'])) {
+            $orderId = (int) $input['id'];
+        }
+        $reason = trim((string) ($input['reason'] ?? ''));
+
+        $errors = [];
+        if ($orderId <= 0) {
+            $errors['order_id'] = 'ID pesanan tidak valid.';
+        }
+        if (mb_strlen($reason) < 5) {
+            $errors['reason'] = 'Alasan void wajib diisi minimal 5 karakter.';
+        }
+
+        if (!empty($errors)) {
+            Response::error('Data tidak valid.', 422, $errors);
+        }
+
+        try {
+            $result = PaymentService::void($orderId, $userId, $reason);
+            Response::json($result, 'Pembayaran berhasil di-void.');
+        } catch (\InvalidArgumentException $e) {
+            $decoded = json_decode($e->getMessage(), true);
+            if (is_array($decoded)) {
+                Response::error($decoded['message'] ?? 'Data tidak valid.', 422, $decoded['errors'] ?? []);
+            }
+            Response::error($e->getMessage(), 422);
+        } catch (\RuntimeException $e) {
+            $decoded = json_decode($e->getMessage(), true);
+            if (is_array($decoded)) {
+                $status = isset($decoded['status']) ? (int) $decoded['status'] : 409;
+                Response::error($decoded['message'] ?? 'Gagal melakukan void.', $status);
+            }
+            Response::error($e->getMessage(), 409);
+        } catch (\Throwable $e) {
+            log_error($e);
+            Response::error('Terjadi kesalahan saat memproses void pembayaran.', 500);
+        }
+    }
 }

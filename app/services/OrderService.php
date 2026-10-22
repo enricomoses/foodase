@@ -223,4 +223,179 @@ final class OrderService
             ];
         });
     }
+
+    /**
+     * Perbarui status alur pesanan (FR-STS-01, BR-06).
+     *
+     * State machine ketat:
+     * - processing -> ready
+     * - ready -> completed
+     * Selain transisi di atas akan memicu 409 Conflict.
+     * Mengunci baris pesanan dalam transaksi dengan FOR UPDATE.
+     *
+     * @param int    $orderId
+     * @param string $next
+     *
+     * @return array Data pesanan setelah update
+     *
+     * @throws \RuntimeException
+     */
+    public static function updateStatus(int $orderId, string $next): array
+    {
+        return Database::transaction(function (\PDO $pdo) use ($orderId, $next): array {
+            $stmt = $pdo->prepare('SELECT * FROM orders WHERE id = :id FOR UPDATE');
+            $stmt->execute([':id' => $orderId]);
+            $order = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$order) {
+                throw new \RuntimeException(json_encode([
+                    'message' => 'Pesanan tidak ditemukan.',
+                    'status'  => 404,
+                ]));
+            }
+
+            $current = (string) $order['status'];
+
+            $allowed = ($current === 'processing' && $next === 'ready')
+                    || ($current === 'ready' && $next === 'completed');
+
+            if (!$allowed) {
+                throw new \RuntimeException(json_encode([
+                    'message' => "Transisi status dari '{$current}' ke '{$next}' tidak diizinkan (BR-06).",
+                    'status'  => 409,
+                ]));
+            }
+
+            Order::updateStatus($orderId, $next, $pdo);
+
+            return [
+                'id'              => $orderId,
+                'order_code'      => (string) $order['order_code'],
+                'previous_status' => $current,
+                'status'          => $next,
+            ];
+        });
+    }
+
+    /**
+     * Batalkan pesanan (FR-STS-02, FR-STS-03, BR-10).
+     *
+     * Aturan BR-10:
+     * - pending + unpaid: boleh dibatalkan oleh kasir atau admin.
+     * - sudah dibayar (paid) dan belum completed: HANYA boleh oleh admin, alasan wajib minimal 5 karakter,
+     *   memanggil PaymentService::void() untuk void pembayaran lalu pesanan menjadi cancelled.
+     * - completed: TIDAK BISA dibatalkan (409 Conflict).
+     * - Menyimpan cancel_reason dan cancelled_by.
+     *
+     * @param int         $orderId
+     * @param int         $userId
+     * @param string      $role     'cashier' | 'admin'
+     * @param string|null $reason
+     *
+     * @return array
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     */
+    public static function cancel(
+        int $orderId,
+        int $userId,
+        string $role,
+        ?string $reason = null
+    ): array {
+        $cleanReason = trim((string) $reason);
+
+        return Database::transaction(function (\PDO $pdo) use (
+            $orderId,
+            $userId,
+            $role,
+            $cleanReason
+        ): array {
+            $stmt = $pdo->prepare('SELECT * FROM orders WHERE id = :id FOR UPDATE');
+            $stmt->execute([':id' => $orderId]);
+            $order = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$order) {
+                throw new \RuntimeException(json_encode([
+                    'message' => 'Pesanan tidak ditemukan.',
+                    'status'  => 404,
+                ]));
+            }
+
+            $status    = (string) $order['status'];
+            $payStatus = (string) $order['payment_status'];
+
+            // 1. Cek jika sudah pernah dibatalkan
+            if ($status === 'cancelled') {
+                throw new \RuntimeException(json_encode([
+                    'message' => 'Pesanan ini sudah dibatalkan sebelumnya.',
+                    'status'  => 409,
+                ]));
+            }
+
+            // 2. Completed tidak bisa dibatalkan
+            if ($status === 'completed') {
+                throw new \RuntimeException(json_encode([
+                    'message' => 'Pesanan yang sudah selesai tidak dapat dibatalkan (BR-10).',
+                    'status'  => 409,
+                ]));
+            }
+
+            // 3. Cek apakah pesanan belum dibayar (pending + unpaid)
+            $isUnpaidPending = ($status === 'pending' && $payStatus === 'unpaid');
+
+            if ($isUnpaidPending) {
+                // Kasir atau admin boleh membatalkan
+                if (!in_array($role, ['cashier', 'admin'], true)) {
+                    throw new \RuntimeException(json_encode([
+                        'message' => 'Akses ditolak. Anda tidak berhak membatalkan pesanan ini.',
+                        'status'  => 403,
+                    ]));
+                }
+
+                $saveReason = $cleanReason !== '' ? $cleanReason : 'Dibatalkan oleh ' . $role;
+                Order::cancel($orderId, $saveReason, $userId, $pdo);
+
+                return [
+                    'id'            => $orderId,
+                    'order_code'    => (string) $order['order_code'],
+                    'status'        => 'cancelled',
+                    'cancel_reason' => $saveReason,
+                    'cancelled_by'  => $userId,
+                ];
+            }
+
+            // 4. Pesanan sudah dibayar (paid) dan belum completed
+            // HANYA admin yang berhak
+            if ($role !== 'admin') {
+                throw new \RuntimeException(json_encode([
+                    'message' => 'Hanya admin yang memiliki wewenang untuk membatalkan pesanan yang sudah dibayar (BR-10).',
+                    'status'  => 403,
+                ]));
+            }
+
+            // Alasan wajib minimal 5 karakter
+            if (mb_strlen($cleanReason) < 5) {
+                throw new \InvalidArgumentException(json_encode([
+                    'message' => 'Alasan pembatalan pesanan yang sudah dibayar wajib diisi minimal 5 karakter.',
+                    'errors'  => ['reason' => 'Alasan pembatalan minimal 5 karakter.'],
+                ]));
+            }
+
+            // Memanggil PaymentService::void()
+            PaymentService::void($orderId, $userId, $cleanReason, $pdo);
+
+            // Tandai pesanan sebagai cancelled
+            Order::cancel($orderId, $cleanReason, $userId, $pdo);
+
+            return [
+                'id'            => $orderId,
+                'order_code'    => (string) $order['order_code'],
+                'status'        => 'cancelled',
+                'cancel_reason' => $cleanReason,
+                'cancelled_by'  => $userId,
+                'voided'        => true,
+            ];
+        });
+    }
 }

@@ -57,6 +57,27 @@ final class Payment
     }
 
     /**
+     * Tandai pembayaran sebagai void.
+     */
+    public static function void(int $orderId, int $userId, string $reason, ?\PDO $pdo = null): bool
+    {
+        $pdo = $pdo ?? Database::connection();
+        $stmt = $pdo->prepare(
+            'UPDATE payments
+             SET status = \'void\',
+                 voided_at = NOW(),
+                 voided_by = :voided_by,
+                 void_reason = :void_reason
+             WHERE order_id = :order_id'
+        );
+        return $stmt->execute([
+            ':voided_by'   => $userId,
+            ':void_reason' => $reason,
+            ':order_id'    => $orderId,
+        ]);
+    }
+
+    /**
      * Cari pembayaran berdasarkan payment_code (PAY-YYMMDD-NNN).
      */
     public static function findByCode(string $code): ?array

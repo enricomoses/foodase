@@ -7,7 +7,7 @@ declare(strict_types=1);
  */
 ?>
 
-<div id="cashier-orders-page" class="space-y-6">
+<div id="cashier-orders-page" class="space-y-6" data-user-role="<?= e(\App\Core\Auth::role() ?? 'cashier') ?>">
 
   <!-- ── BARIS JUDUL & INDIKATOR REFRESH ── -->
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -319,6 +319,69 @@ declare(strict_types=1);
         </button>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL KONFIRMASI PEMBATALAN PESANAN (FR-STS-02, FR-STS-03)
+     ============================================================ -->
+<div id="modal-cancel-order" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
+  <div class="fixed inset-0 bg-black/50 transition-opacity" data-modal-dismiss></div>
+
+  <div class="flex min-h-full items-center justify-center p-4">
+    <div class="relative w-full max-w-md rounded-2xl bg-white shadow-xl overflow-hidden p-6 space-y-4">
+      <div class="flex items-start justify-between">
+        <div>
+          <h3 class="text-base font-bold text-ink flex items-center gap-2">
+            <span>Batalkan Pesanan</span>
+            <span id="cancel-modal-order-code" class="font-mono text-danger"></span>
+          </h3>
+          <p id="cancel-modal-description" class="text-xs text-subtle mt-1"></p>
+        </div>
+        <button type="button" data-modal-dismiss class="p-1 rounded-full text-subtle hover:text-ink cursor-pointer">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Warning Box jika Paid (Void) -->
+      <div id="cancel-modal-void-warning" class="hidden rounded-xl border border-danger-light bg-danger-light/30 p-3 text-xs text-danger">
+        <p class="font-bold">Perhatian: Pembayaran akan di-void!</p>
+        <p class="mt-0.5 text-danger/90">Pesanan ini sudah dibayar. Pembayaran akan dibatalkan/void dan pesanan tidak dapat diproses lagi.</p>
+      </div>
+
+      <!-- Input Alasan -->
+      <div id="cancel-reason-container" class="space-y-1.5">
+        <label for="cancel-reason-input" class="block text-xs font-medium text-ink">
+          Alasan Pembatalan <span id="cancel-reason-required-badge" class="text-danger font-bold">*</span>
+        </label>
+        <textarea
+          id="cancel-reason-input"
+          rows="3"
+          placeholder="Tulis alasan pembatalan..."
+          class="w-full rounded-lg bg-surface p-3 text-xs text-ink placeholder-subtle border border-line focus:bg-white focus:border-ink focus:outline-none transition-colors resize-none"
+        ></textarea>
+        <p id="cancel-reason-error" class="hidden text-[11px] text-danger"></p>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-line">
+        <button
+          type="button"
+          data-modal-dismiss
+          class="h-9 px-4 rounded-full bg-surface text-ink text-xs font-medium hover:bg-neutral-200 transition-colors cursor-pointer"
+        >
+          Kembali
+        </button>
+        <button
+          type="button"
+          id="btn-confirm-cancel-submit"
+          class="h-9 px-4 rounded-full bg-danger text-white text-xs font-bold hover:bg-red-700 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+        >
+          Konfirmasi Batalkan
+        </button>
+      </div>
     </div>
   </div>
 </div>

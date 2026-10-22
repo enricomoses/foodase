@@ -156,4 +156,71 @@ final class PaymentService
             ];
         });
     }
+
+    /**
+     * Void pembayaran pesanan (FR-STS-03, BR-10).
+     *
+     * @param int       $orderId
+     * @param int       $userId  ID admin yang memproses void
+     * @param string    $reason  Alasan pembatalan/void (min 5 karakter)
+     * @param \PDO|null $pdo     Instance PDO jika sudah di dalam transaksi
+     *
+     * @return array    Data payment yang di-void
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     */
+    public static function void(
+        int $orderId,
+        int $userId,
+        string $reason,
+        ?\PDO $pdo = null
+    ): array {
+        $cleanReason = trim($reason);
+        if (mb_strlen($cleanReason) < 5) {
+            throw new \InvalidArgumentException(json_encode([
+                'message' => 'Alasan pembatalan/void wajib diisi minimal 5 karakter.',
+                'errors'  => ['reason' => 'Alasan minimal 5 karakter.'],
+            ]));
+        }
+
+        $execute = function (\PDO $activePdo) use ($orderId, $userId, $cleanReason): array {
+            $stmt = $activePdo->prepare(
+                'SELECT * FROM payments WHERE order_id = :order_id FOR UPDATE'
+            );
+            $stmt->execute([':order_id' => $orderId]);
+            $payment = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$payment) {
+                throw new \RuntimeException(json_encode([
+                    'message' => 'Data pembayaran untuk pesanan ini tidak ditemukan.',
+                    'status'  => 404,
+                ]));
+            }
+
+            if ($payment['status'] === 'void') {
+                throw new \RuntimeException(json_encode([
+                    'message' => 'Pembayaran untuk pesanan ini sudah pernah di-void.',
+                    'status'  => 409,
+                ]));
+            }
+
+            Payment::void($orderId, $userId, $cleanReason, $activePdo);
+
+            return [
+                'id'           => (int) $payment['id'],
+                'payment_code' => (string) $payment['payment_code'],
+                'order_id'     => $orderId,
+                'status'       => 'void',
+                'void_reason'  => $cleanReason,
+                'voided_by'    => $userId,
+            ];
+        };
+
+        if ($pdo !== null) {
+            return $execute($pdo);
+        }
+
+        return Database::transaction($execute);
+    }
 }

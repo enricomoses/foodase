@@ -48,6 +48,8 @@ $(function () {
   let isRequestPending  = false;
   let knownOrderCodes   = new Set();
   let isInitialLoad     = true;
+  let pendingCancelOrder = null;
+  const userRole        = $('#cashier-orders-page').data('user-role') || 'cashier';
 
   /* ============================================================
      INISIALISASI
@@ -156,20 +158,19 @@ $(function () {
       }
     });
 
-    // 11. Tutup Modal
     $(document).on('click', '[data-modal-dismiss]', function () {
+      const modal = $(this).closest('.fixed[role="dialog"]');
+      const modalId = modal.length ? modal.attr('id') : 'modal-order-detail';
       if (window.UI && typeof window.UI.closeModal === 'function') {
-        window.UI.closeModal('modal-order-detail');
+        window.UI.closeModal(modalId);
       } else {
-        $('#modal-order-detail').addClass('hidden');
+        $('#' + modalId).addClass('hidden');
       }
     });
 
-    // Tutup modal dengan tombol Escape
-    $(document).on('keydown', function (e) {
-      if (e.key === 'Escape' && !$('#modal-order-detail').hasClass('hidden')) {
-        $('#modal-order-detail').addClass('hidden');
-      }
+    // 12. Konfirmasi Pembatalan Pesanan Submit
+    $('#btn-confirm-cancel-submit').on('click', function () {
+      handleCancelSubmit($(this));
     });
   }
 
@@ -444,7 +445,11 @@ $(function () {
 
     // Alasan pembatalan
     if (order.status === 'cancelled') {
-      $('#modal-cancel-reason').text(order.cancel_reason || 'Tidak ada keterangan pembatalan.');
+      let cancelText = order.cancel_reason || 'Tidak ada keterangan pembatalan.';
+      if (order.cancelled_by_name) {
+        cancelText += ' (Dibatalkan oleh: ' + order.cancelled_by_name + ')';
+      }
+      $('#modal-cancel-reason').text(cancelText);
       $('#modal-cancel-box').removeClass('hidden');
     } else {
       $('#modal-cancel-box').addClass('hidden');
@@ -485,14 +490,13 @@ $(function () {
 
   function renderActionButtons(order) {
     const $actions = $('#modal-action-buttons').empty();
-    const btnClass = 'flex-1 h-10 rounded-full text-xs font-medium inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer';
+    const btnBase = 'flex-1 h-10 rounded-full text-xs font-bold inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer';
 
+    // 1. Pending (Belum Dibayar)
     if (order.status === 'pending' && order.payment_status === 'unpaid') {
       // Tombol Bayar
       const $btnPay = $(`
-        <button type="button" id="btn-modal-pay"
-          class="${btnClass} bg-black text-white hover:bg-neutral-800"
-        >
+        <button type="button" id="btn-modal-pay" class="${btnBase} bg-black text-white hover:bg-neutral-800">
           <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
             <line x1="1" y1="10" x2="23" y2="10"/>
@@ -502,46 +506,269 @@ $(function () {
       `);
 
       $btnPay.on('click', function () {
-        // Tutup modal detail sebelum buka modal pembayaran
         if (window.UI && typeof window.UI.closeModal === 'function') {
           window.UI.closeModal('modal-order-detail');
         } else {
           $('#modal-order-detail').addClass('hidden');
         }
 
-        // Buka PaymentModal
         if (window.PaymentModal) {
           window.PaymentModal.open(order, {
             onSuccess: function (result) {
-              // Refresh daftar pesanan
               fetchOrders(false);
-
-              // Tawaran cetak struk
               offerPrintReceipt(order.order_code, result);
             }
           });
         }
       });
-
       $actions.append($btnPay);
 
-    } else if (order.status === 'processing' || order.status === 'ready' || order.status === 'completed') {
-      // Tombol Cetak Struk (untuk pesanan yang sudah dibayar)
-      const $btnReceipt = $(`
-        <a href="${getBaseUrl()}cashier/receipt.php?code=${encodeURIComponent(order.order_code)}"
-           target="_blank"
-           class="${btnClass} bg-surface text-ink hover:bg-neutral-200"
-        >
+      // Tombol Batalkan (kasir & admin boleh)
+      const $btnCancel = $(`
+        <button type="button" class="${btnBase} bg-surface text-danger hover:bg-neutral-200">
           <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <polyline points="6 9 6 2 18 2 18 9"/>
-            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-            <rect x="6" y="14" width="12" height="8"/>
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
-          Cetak Struk
-        </a>
+          Batalkan
+        </button>
       `);
-      $actions.append($btnReceipt);
+      $btnCancel.on('click', function () {
+        openCancelModal(order);
+      });
+      $actions.append($btnCancel);
+
+      return;
     }
+
+    // 2. Processing (Diproses)
+    if (order.status === 'processing') {
+      // Tombol Tandai Siap
+      const $btnReady = $(`
+        <button type="button" id="btn-mark-ready" class="${btnBase} bg-black text-white hover:bg-neutral-800">
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Tandai Siap
+        </button>
+      `);
+      $btnReady.on('click', function () {
+        handleUpdateStatus(order, 'ready', 'Siap Saji', $btnReady);
+      });
+      $actions.append($btnReady);
+
+      // Tombol Cetak Struk
+      $actions.append(buildReceiptButton(order));
+
+      // Tombol Batalkan (Hanya Admin)
+      if (userRole === 'admin') {
+        const $btnCancel = $(`
+          <button type="button" class="${btnBase} bg-surface text-danger hover:bg-neutral-200">
+            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+            Batalkan
+          </button>
+        `);
+        $btnCancel.on('click', function () {
+          openCancelModal(order);
+        });
+        $actions.append($btnCancel);
+      }
+
+      return;
+    }
+
+    // 3. Ready (Siap Saji)
+    if (order.status === 'ready') {
+      // Tombol Tandai Selesai
+      const $btnCompleted = $(`
+        <button type="button" id="btn-mark-completed" class="${btnBase} bg-black text-white hover:bg-neutral-800">
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M5 13l4 4L19 7"/>
+          </svg>
+          Tandai Selesai
+        </button>
+      `);
+      $btnCompleted.on('click', function () {
+        handleUpdateStatus(order, 'completed', 'Selesai', $btnCompleted);
+      });
+      $actions.append($btnCompleted);
+
+      // Tombol Cetak Struk
+      $actions.append(buildReceiptButton(order));
+
+      // Tombol Batalkan (Hanya Admin)
+      if (userRole === 'admin') {
+        const $btnCancel = $(`
+          <button type="button" class="${btnBase} bg-surface text-danger hover:bg-neutral-200">
+            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+            Batalkan
+          </button>
+        `);
+        $btnCancel.on('click', function () {
+          openCancelModal(order);
+        });
+        $actions.append($btnCancel);
+      }
+
+      return;
+    }
+
+    // 4. Completed (Selesai)
+    if (order.status === 'completed') {
+      // Struk saja, tidak bisa dibatalkan
+      $actions.append(buildReceiptButton(order));
+      return;
+    }
+  }
+
+  function buildReceiptButton(order) {
+    const btnBase = 'flex-1 h-10 rounded-full text-xs font-bold inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer';
+    return $(`
+      <a href="${getBaseUrl()}cashier/receipt.php?code=${encodeURIComponent(order.order_code)}"
+         target="_blank"
+         class="${btnBase} bg-surface text-ink hover:bg-neutral-200"
+      >
+        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 6 2 18 2 18 9"/>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+          <rect x="6" y="14" width="12" height="8"/>
+        </svg>
+        Cetak Struk
+      </a>
+    `);
+  }
+
+  function handleUpdateStatus(order, nextStatus, nextLabel, $btn) {
+    const confirmMsg = 'Ubah status pesanan ' + order.order_code + ' menjadi ' + nextLabel + '?';
+    const confirmPromise = (window.UI && typeof window.UI.confirm === 'function')
+      ? window.UI.confirm(confirmMsg)
+      : Promise.resolve(window.confirm(confirmMsg));
+
+    confirmPromise.then(function (yes) {
+      if (!yes) return;
+
+      if (window.UI && typeof window.UI.setLoading === 'function') {
+        window.UI.setLoading($btn, true);
+      } else {
+        $btn.prop('disabled', true);
+      }
+
+      window.Api.post(getBaseUrl() + 'api/orders/update-status.php', {
+        order_id: order.id,
+        next_status: nextStatus
+      })
+      .then(function (res) {
+        if (window.UI && typeof window.UI.toast === 'function') {
+          window.UI.toast('success', 'Status pesanan ' + order.order_code + ' diubah ke ' + nextLabel + '.');
+        }
+        if (window.UI && typeof window.UI.closeModal === 'function') {
+          window.UI.closeModal('modal-order-detail');
+        } else {
+          $('#modal-order-detail').addClass('hidden');
+        }
+        fetchOrders(false);
+      })
+      .catch(function (err) {
+        if (window.UI && typeof window.UI.toast === 'function') {
+          window.UI.toast('error', err.message || 'Gagal mengubah status pesanan.');
+        } else {
+          alert(err.message || 'Gagal mengubah status pesanan.');
+        }
+      })
+      .finally(function () {
+        if (window.UI && typeof window.UI.setLoading === 'function') {
+          window.UI.setLoading($btn, false);
+        } else {
+          $btn.prop('disabled', false);
+        }
+      });
+    });
+  }
+
+  function openCancelModal(order) {
+    pendingCancelOrder = order;
+    $('#cancel-modal-order-code').text(order.order_code);
+    $('#cancel-reason-input').val('');
+    $('#cancel-reason-error').addClass('hidden').text('');
+
+    const isPaid = (order.payment_status === 'paid');
+    if (isPaid) {
+      $('#cancel-modal-void-warning').removeClass('hidden');
+      $('#cancel-modal-description').text(
+        'Pesanan ini sudah dibayar (' + window.Fmt.rupiah(order.total) + '). Pembatalan akan otomatis membatalkan/void transaksi pembayaran.'
+      );
+      $('#cancel-reason-required-badge').removeClass('hidden').text('* (wajib min. 5 karakter)');
+    } else {
+      $('#cancel-modal-void-warning').addClass('hidden');
+      $('#cancel-modal-description').text(
+        'Pesanan ini belum dibayar. Apakah Anda yakin ingin membatalkannya?'
+      );
+      $('#cancel-reason-required-badge').removeClass('hidden').text('(opsional)');
+    }
+
+    if (window.UI && typeof window.UI.openModal === 'function') {
+      window.UI.openModal('modal-cancel-order');
+    } else {
+      $('#modal-cancel-order').removeClass('hidden');
+    }
+  }
+
+  function handleCancelSubmit($btn) {
+    if (!pendingCancelOrder) return;
+
+    const order = pendingCancelOrder;
+    const reason = $('#cancel-reason-input').val().trim();
+    const isPaid = (order.payment_status === 'paid');
+
+    if (isPaid && reason.length < 5) {
+      $('#cancel-reason-error')
+        .removeClass('hidden')
+        .text('Alasan pembatalan wajib diisi minimal 5 karakter.');
+      $('#cancel-reason-input').focus();
+      return;
+    }
+
+    if (window.UI && typeof window.UI.setLoading === 'function') {
+      window.UI.setLoading($btn, true);
+    } else {
+      $btn.prop('disabled', true);
+    }
+
+    window.Api.post(getBaseUrl() + 'api/orders/cancel.php', {
+      order_id: order.id,
+      reason: reason
+    })
+    .then(function (res) {
+      if (window.UI && typeof window.UI.toast === 'function') {
+        window.UI.toast('success', res.message || ('Pesanan ' + order.order_code + ' berhasil dibatalkan.'));
+      }
+      if (window.UI && typeof window.UI.closeModal === 'function') {
+        window.UI.closeModal('modal-cancel-order');
+        window.UI.closeModal('modal-order-detail');
+      } else {
+        $('#modal-cancel-order').addClass('hidden');
+        $('#modal-order-detail').addClass('hidden');
+      }
+      fetchOrders(false);
+    })
+    .catch(function (err) {
+      $('#cancel-reason-error')
+        .removeClass('hidden')
+        .text(err.message || 'Gagal membatalkan pesanan.');
+      if (window.UI && typeof window.UI.toast === 'function') {
+        window.UI.toast('error', err.message || 'Gagal membatalkan pesanan.');
+      }
+    })
+    .finally(function () {
+      if (window.UI && typeof window.UI.setLoading === 'function') {
+        window.UI.setLoading($btn, false);
+      } else {
+        $btn.prop('disabled', false);
+      }
+    });
   }
 
   /* ── Tawaran Cetak Struk setelah bayar ──────────────────────── */

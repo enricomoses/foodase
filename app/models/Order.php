@@ -49,7 +49,10 @@ final class Order
     {
         $pdo  = Database::connection();
         $stmt = $pdo->prepare(
-            'SELECT * FROM orders WHERE order_code = :code LIMIT 1'
+            'SELECT o.*, u_c.name AS cancelled_by_name
+             FROM orders o
+             LEFT JOIN users u_c ON u_c.id = o.cancelled_by
+             WHERE o.order_code = :code LIMIT 1'
         );
         $stmt->execute([':code' => $code]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -62,7 +65,12 @@ final class Order
     public static function find(int $id): ?array
     {
         $pdo  = Database::connection();
-        $stmt = $pdo->prepare('SELECT * FROM orders WHERE id = :id LIMIT 1');
+        $stmt = $pdo->prepare(
+            'SELECT o.*, u_c.name AS cancelled_by_name
+             FROM orders o
+             LEFT JOIN users u_c ON u_c.id = o.cancelled_by
+             WHERE o.id = :id LIMIT 1'
+        );
         $stmt->execute([':id' => $id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ?: null;
@@ -245,5 +253,39 @@ final class Order
             'completed'  => (int) ($rows['completed'] ?? 0),
             'cancelled'  => (int) ($rows['cancelled'] ?? 0),
         ];
+    }
+
+    /**
+     * Perbarui status pesanan.
+     */
+    public static function updateStatus(int $id, string $status, ?\PDO $pdo = null): bool
+    {
+        $pdo = $pdo ?? Database::connection();
+        $stmt = $pdo->prepare('UPDATE orders SET status = :status, updated_at = NOW() WHERE id = :id');
+        return $stmt->execute([
+            ':status' => $status,
+            ':id'     => $id,
+        ]);
+    }
+
+    /**
+     * Tandai pesanan sebagai dibatalkan (cancelled).
+     */
+    public static function cancel(int $id, ?string $reason = null, ?int $cancelledBy = null, ?\PDO $pdo = null): bool
+    {
+        $pdo = $pdo ?? Database::connection();
+        $stmt = $pdo->prepare(
+            'UPDATE orders
+             SET status = \'cancelled\',
+                 cancel_reason = :reason,
+                 cancelled_by = :cancelled_by,
+                 updated_at = NOW()
+             WHERE id = :id'
+        );
+        return $stmt->execute([
+            ':reason'       => $reason,
+            ':cancelled_by' => $cancelledBy,
+            ':id'           => $id,
+        ]);
     }
 }
