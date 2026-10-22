@@ -55,11 +55,12 @@ final class User
             return $stmt->fetchAll();
         }
 
-        $stmt = $pdo->query(
+        $stmt = $pdo->prepare(
             'SELECT id, name, username, role, is_active, last_login_at, created_at, updated_at
              FROM users
              ORDER BY name ASC'
         );
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 

@@ -27,7 +27,8 @@ final class Category
                 GROUP BY c.id
                 ORDER BY c.sort_order ASC, c.name ASC';
 
-        $stmt = $pdo->query($sql);
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
