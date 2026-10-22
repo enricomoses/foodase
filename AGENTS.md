@@ -34,10 +34,14 @@ Aplikasi pemesanan makanan + kasir untuk kafe. Spesifikasi lengkap ada di `prd.m
 - Password: `password_hash`/`password_verify`. Upload: cek MIME dengan `finfo`, whitelist, nama random.
 - Error detail hanya ke `storage/logs/app.log`; response ke client generik.
 
-## UI (lihat prd.md §12)
-- Sederhana dan datar: netral `stone` + satu aksen `brand` (amber-700). Hijau/merah hanya untuk status dan error.
-- Tanpa gradient, glassmorphism, emoji dekoratif, bayangan tebal, atau animasi dekoratif. `rounded-md`, font system, teks UI bahasa Indonesia.
-- Setiap tampilan data punya state loading, kosong, dan error.
+## UI (lihat prd.md §12 — gaya Uber Eats)
+- Dominan hitam-putih: `ink` #000, putih, `surface` #F6F6F6, `line` #E2E2E2, `subtle` #545454. Hijau (`accent`) hanya untuk status sukses dan centang, merah (`danger`) hanya untuk error/batal/hapus.
+- Tombol utama selalu hitam berbentuk pil (`rounded-full`), sekunder abu `surface`. Input `rounded-lg bg-surface`, fokus border hitam. Kartu `rounded-xl border-line`. Target sentuh minimal 44 px.
+- Foto menu jadi fokus; kartu menu horizontal (teks kiri, foto kanan, tombol "+" bulat). Modal di mobile menjadi bottom sheet. Toast kapsul hitam.
+- Font sistem, bobot hanya 500 dan 700, judul tebal dengan tracking-tight. Ikon: SVG inline outline seragam, tanpa emoji.
+- Tanpa gradient, glassmorphism, bayangan tebal, animasi dekoratif; jangan memakai logo, nama, atau font milik Uber.
+- Mobile-first untuk halaman pelanggan. Setiap tampilan data punya state loading (skeleton), kosong, dan error.
+- Bila prompt tugas menyebut bentuk tampilan yang berbeda dari prd.md §12.3-12.4, yang berlaku adalah prd.md §12.
 
 ## Cara kerja
 - Kerjakan HANYA fitur yang diminta. Jangan refactor atau mengubah file di luar scope kecuali perlu, dan jelaskan alasannya.

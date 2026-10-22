@@ -1,4 +1,5 @@
 /* Hanya untuk hal kecil di luar Tailwind. Jangan duplikasi utility. */
+
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
@@ -6,6 +7,25 @@
 .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+/* Transisi dan penyesuaian modal menjadi bottom sheet di mobile */
+@media (max-width: 639px) {
+    .modal-sheet-container {
+        align-items: flex-end !important;
+        padding: 0 !important;
+    }
+
+    .modal-sheet-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        border-top-left-radius: 1.25rem !important; /* 20px / rounded-2xl */
+        border-top-right-radius: 1.25rem !important;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
 }
 
 /* Cetak struk kasir termal 80 mm */

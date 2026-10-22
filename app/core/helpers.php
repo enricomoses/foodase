@@ -66,3 +66,7 @@ function log_error(string|\Throwable $message): void
 
     @file_put_contents($logDir . '/app.log', $line, FILE_APPEND | LOCK_EX);
 }
+
+if (defined('APP_PATH') && is_file(APP_PATH . '/views/partials/icons.php')) {
+    require_once APP_PATH . '/views/partials/icons.php';
+}

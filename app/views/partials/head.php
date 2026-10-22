@@ -19,14 +19,22 @@ $pageTitle = isset($title) && $title !== ''
     theme: {
       extend: {
         colors: {
-          brand: {
-            DEFAULT: '#b45309',
-            dark: '#92400e',
-            light: '#fef3c7',
-          }
-        }
-      }
-    }
+          ink: '#000000',
+          surface: '#F6F6F6',
+          line: '#E2E2E2',
+          subtle: '#545454',
+          accent: {
+            DEFAULT: '#06C167',
+            dark: '#048848',
+            light: '#E6F8EF',
+          },
+          danger: {
+            DEFAULT: '#E11900',
+            light: '#FDECEA',
+          },
+        },
+      },
+    },
   };
 </script>
 

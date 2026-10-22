@@ -1,10 +1,10 @@
 /**
- * Komponen & Utility Antarmuka Pengguna (UI).
+ * Komponen & Utility Antarmuka Pengguna (UI) — Gaya Uber Eats sesuai prd.md §12.
  */
 window.UI = (function ($) {
   'use strict';
 
-  // Inisialisasi event listener global untuk menutup modal dengan tombol Escape dan klik latar
+  // Inisialisasi event listener global untuk menutup modal dengan Escape dan klik latar
   $(document).on('keydown', function (e) {
     if (e.key === 'Escape' || e.keyCode === 27) {
       $('.fixed[role="dialog"]:not(.hidden)').each(function () {
@@ -22,35 +22,30 @@ window.UI = (function ($) {
 
   return {
     /**
-     * Tampilkan notifikasi toast datar & bersih.
+     * Tampilkan notifikasi toast kapsul hitam di tengah bawah (prd.md §12.3).
      * @param {'success'|'error'|'info'|'warning'} type
      * @param {string} message
      */
     toast: function (type, message) {
       let container = $('#toast-container');
       if (!container.length) {
-        container = $('<div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none" aria-live="polite"></div>');
+        container = $('<div id="toast-container" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 w-auto max-w-sm px-4 pointer-events-none" aria-live="polite"></div>');
         $('body').append(container);
       }
 
-      let borderColor = 'border-stone-300';
-      let dotColor = 'bg-stone-400';
-
+      let dotColor = 'bg-white/60';
       if (type === 'success') {
-        borderColor = 'border-emerald-300';
-        dotColor = 'bg-emerald-600';
+        dotColor = 'bg-accent';
       } else if (type === 'error') {
-        borderColor = 'border-red-300';
-        dotColor = 'bg-red-600';
+        dotColor = 'bg-danger';
       } else if (type === 'warning') {
-        borderColor = 'border-amber-300';
-        dotColor = 'bg-amber-600';
+        dotColor = 'bg-white';
       }
 
       const toast = $(`
-        <div class="pointer-events-auto flex items-start gap-2.5 rounded-md border ${borderColor} bg-white p-3 shadow-sm text-sm text-stone-800 transition-opacity duration-200 cursor-pointer">
-          <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full ${dotColor}"></span>
-          <div class="flex-1 leading-snug">${UI.escape(message)}</div>
+        <div class="pointer-events-auto flex items-center gap-2.5 rounded-full bg-black text-white px-5 py-2.5 text-sm font-medium shadow-lg transition-all duration-200 cursor-pointer">
+          <span class="h-2 w-2 shrink-0 rounded-full ${dotColor}"></span>
+          <span class="leading-tight">${UI.escape(message)}</span>
         </div>
       `);
 
@@ -70,17 +65,23 @@ window.UI = (function ($) {
     },
 
     /**
-     * Dialog konfirmasi berbasis Promise.
+     * Dialog konfirmasi berbasis Promise (modal/bottom sheet).
      * @param {string} message
+     * @param {string} [title='Konfirmasi']
      * @returns {Promise<boolean>}
      */
-    confirm: function (message) {
+    confirm: function (message, title) {
       return new Promise(function (resolve) {
         const modal = $('#modal-confirm');
         if (!modal.length) {
-          // Fallback native jika markup modal belum terpasang
           resolve(window.confirm(message));
           return;
+        }
+
+        if (title) {
+          $('#modal-confirm-title').text(title);
+        } else {
+          $('#modal-confirm-title').text('Konfirmasi');
         }
 
         $('#modal-confirm-message').text(message);
@@ -153,11 +154,11 @@ window.UI = (function ($) {
           $btn.data('original-html', $btn.html());
         }
         $btn.prop('disabled', true);
-        $btn.addClass('opacity-75 cursor-not-allowed');
+        $btn.addClass('opacity-60 cursor-not-allowed');
         $btn.html(`
-          <span class="inline-flex items-center gap-1.5">
-            <svg class="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <span class="inline-flex items-center justify-center gap-2">
+            <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
             </svg>
             <span>Memproses...</span>
@@ -169,7 +170,7 @@ window.UI = (function ($) {
           $btn.html(orig);
         }
         $btn.prop('disabled', false);
-        $btn.removeClass('opacity-75 cursor-not-allowed');
+        $btn.removeClass('opacity-60 cursor-not-allowed');
       }
     },
 
@@ -186,18 +187,59 @@ window.UI = (function ($) {
     },
 
     /**
-     * Tampilkan state kosong (empty state) datar pada kontainer.
+     * Tampilkan state kosong (empty state) bersih sesuai prd.md §12.3.
      * @param {HTMLElement|string|jQuery} container
      * @param {string} [text='Tidak ada data.']
+     * @param {string} [actionHtml='']
      */
-    empty: function (container, text) {
+    empty: function (container, text, actionHtml) {
       const $el = $(container);
       const msg = text || 'Tidak ada data.';
+      const action = actionHtml ? `<div class="mt-4">${actionHtml}</div>` : '';
       $el.html(`
-        <div class="py-12 text-center text-stone-500 text-sm">
-          <p>${UI.escape(msg)}</p>
+        <div class="py-16 text-center">
+          <p class="text-sm font-medium text-subtle">${UI.escape(msg)}</p>
+          ${action}
         </div>
       `);
+    },
+
+    /**
+     * Tampilkan state error dengan pesan dan tombol aksi coba lagi.
+     * @param {HTMLElement|string|jQuery} container
+     * @param {string} [text='Terjadi kesalahan saat memuat data.']
+     * @param {Function} [retryFn=null]
+     */
+    error: function (container, text, retryFn) {
+      const $el = $(container);
+      const msg = text || 'Terjadi kesalahan saat memuat data.';
+      $el.html(`
+        <div class="py-16 text-center">
+          <p class="text-sm font-medium text-danger">${UI.escape(msg)}</p>
+          ${retryFn ? `<button type="button" class="btn-retry mt-4 h-9 px-4 rounded-full bg-surface text-ink text-xs font-medium hover:bg-neutral-200 transition-colors">Coba lagi</button>` : ''}
+        </div>
+      `);
+
+      if (retryFn) {
+        $el.find('.btn-retry').on('click', function () {
+          retryFn();
+        });
+      }
+    },
+
+    /**
+     * Hasilkan markup skeleton loader abu-abu (animate-pulse).
+     * @param {number} [count=3]
+     * @returns {string}
+     */
+    skeleton: function (count) {
+      const c = count || 3;
+      let html = '<div class="space-y-3 animate-pulse">';
+      for (let i = 0; i < c; i++) {
+        html += '<div class="h-16 rounded-xl bg-surface"></div>';
+      }
+      html += '</div>';
+      return html;
     }
   };
 })(jQuery);

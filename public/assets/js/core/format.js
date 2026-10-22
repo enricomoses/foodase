@@ -1,5 +1,5 @@
 /**
- * Formatter data (Rupiah, Waktu, Badge Status Netral).
+ * Formatter data (Rupiah, Waktu, Badge Status gaya Uber Eats sesuai prd.md §12.3).
  */
 window.Fmt = (function () {
   'use strict';
@@ -7,58 +7,58 @@ window.Fmt = (function () {
   const statusMap = {
     // Status Pesanan (Orders)
     pending: {
-      label: 'Menunggu',
-      cls: 'border-stone-300 bg-stone-100 text-stone-700'
+      label: 'Menunggu bayar',
+      cls: 'bg-surface text-black'
     },
     processing: {
       label: 'Diproses',
-      cls: 'border-stone-400 bg-stone-200 text-stone-800'
+      cls: 'bg-black text-white'
     },
     ready: {
-      label: 'Siap Saji',
-      cls: 'border-stone-400 bg-stone-200 text-stone-900 font-semibold'
+      label: 'Siap',
+      cls: 'bg-accent-light text-accent-dark'
     },
     completed: {
       label: 'Selesai',
-      cls: 'border-stone-300 bg-stone-100 text-stone-600'
+      cls: 'border border-line text-subtle'
     },
     cancelled: {
       label: 'Dibatalkan',
-      cls: 'border-stone-200 bg-stone-50 text-stone-400'
+      cls: 'bg-danger-light text-danger'
     },
 
     // Status Pembayaran (Payments)
     unpaid: {
-      label: 'Belum Bayar',
-      cls: 'border-stone-300 bg-stone-100 text-stone-700'
+      label: 'Belum bayar',
+      cls: 'bg-surface text-black'
     },
     paid: {
       label: 'Lunas',
-      cls: 'border-stone-400 bg-stone-200 text-stone-900 font-semibold'
+      cls: 'bg-accent-light text-accent-dark'
     },
     void: {
-      label: 'Batal / Void',
-      cls: 'border-stone-200 bg-stone-50 text-stone-400'
+      label: 'Batal',
+      cls: 'bg-danger-light text-danger'
     },
 
     // Ketersediaan Menu
     available: {
       label: 'Tersedia',
-      cls: 'border-stone-300 bg-stone-100 text-stone-700'
+      cls: 'bg-accent-light text-accent-dark'
     },
     unavailable: {
       label: 'Habis',
-      cls: 'border-stone-200 bg-stone-50 text-stone-400'
+      cls: 'bg-surface text-subtle'
     },
 
     // Tipe Pesanan
     dine_in: {
       label: 'Dine In',
-      cls: 'border-stone-300 bg-stone-100 text-stone-700'
+      cls: 'bg-surface text-black'
     },
     takeaway: {
       label: 'Takeaway',
-      cls: 'border-stone-300 bg-stone-100 text-stone-700'
+      cls: 'bg-surface text-black'
     }
   };
 
@@ -96,7 +96,7 @@ window.Fmt = (function () {
     },
 
     /**
-     * Hasilkan markup HTML badge status netral sesuai prd.md §12.3.
+     * Hasilkan markup HTML badge status pil kecil sesuai prd.md §12.3.
      * @param {string} status
      * @returns {string}
      */
@@ -104,11 +104,11 @@ window.Fmt = (function () {
       const key = String(status || '').toLowerCase();
       const meta = statusMap[key] || {
         label: status || '-',
-        cls: 'border-stone-200 bg-stone-100 text-stone-600'
+        cls: 'border border-line text-subtle'
       };
 
       const escapedLabel = $('<div>').text(meta.label).html();
-      return `<span class="inline-block rounded-md border px-2 py-0.5 text-xs ${meta.cls}">${escapedLabel}</span>`;
+      return `<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${meta.cls}">${escapedLabel}</span>`;
     }
   };
 })();

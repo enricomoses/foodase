@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * Layout halaman autentikasi (kartu tengah).
+ * Layout halaman autentikasi (Kartu Tengah Bersih — Gaya Uber Eats).
  * Variabel yang didukung: $title, $content, $scripts (array).
  */
 ?>
@@ -11,9 +11,9 @@ declare(strict_types=1);
 <head>
   <?php require APP_PATH . '/views/partials/head.php'; ?>
 </head>
-<body class="bg-stone-50 text-stone-900 min-h-screen flex items-center justify-center p-4 font-sans">
-  <!-- Kartu Tengah -->
-  <div class="w-full max-w-sm rounded-md border border-stone-200 bg-white p-6 shadow-sm">
+<body class="bg-surface text-ink min-h-screen flex items-center justify-center p-4 font-sans antialiased">
+  <!-- Kartu Tengah Bersih (rounded-2xl border-line bg-white) -->
+  <div class="w-full max-w-sm rounded-2xl border border-line bg-white p-8 shadow-sm">
     <?= $content ?? '' ?>
   </div>
 
@@ -24,6 +24,7 @@ declare(strict_types=1);
   <script src="<?= e(asset('vendor/jquery/jquery-3.7.1.min.js')) ?>"></script>
   <script src="<?= e(asset('js/core/app.js')) ?>"></script>
   <script src="<?= e(asset('js/core/api.js')) ?>"></script>
+  <script src="<?= e(asset('js/core/icons.js')) ?>"></script>
   <script src="<?= e(asset('js/core/ui.js')) ?>"></script>
   <script src="<?= e(asset('js/core/format.js')) ?>"></script>
 

@@ -2,8 +2,8 @@
 declare(strict_types=1);
 
 /**
- * Layout halaman cetak struk (80 mm receipt / blank print).
- * Variabel yang didukung: $title, $content, $scripts (array).
+ * Layout halaman cetak struk (Kosong / Minimal untuk cetak struk thermal 80 mm).
+ * Variabel yang didukung: $title, $content.
  */
 ?>
 <!DOCTYPE html>
@@ -16,19 +16,5 @@ declare(strict_types=1);
 </head>
 <body class="bg-white text-black p-0 m-0 font-mono text-xs">
   <?= $content ?? '' ?>
-
-  <!-- Script Bersama -->
-  <script src="<?= e(asset('vendor/jquery/jquery-3.7.1.min.js')) ?>"></script>
-  <script src="<?= e(asset('js/core/app.js')) ?>"></script>
-  <script src="<?= e(asset('js/core/api.js')) ?>"></script>
-  <script src="<?= e(asset('js/core/ui.js')) ?>"></script>
-  <script src="<?= e(asset('js/core/format.js')) ?>"></script>
-
-  <!-- Script Halaman -->
-  <?php if (!empty($scripts) && is_array($scripts)): ?>
-    <?php foreach ($scripts as $script): ?>
-      <script src="<?= e(asset($script)) ?>"></script>
-    <?php endforeach; ?>
-  <?php endif; ?>
 </body>
 </html>
