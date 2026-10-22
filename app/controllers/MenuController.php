@@ -30,9 +30,9 @@ final class MenuController
         $filters = [
             'q'                  => Request::get('q', ''),
             'category_id'        => Request::get('category_id', ''),
-            'include_unavailable'=> $isAdmin && Request::get('include_unavailable') === '1',
+            'include_unavailable'=> Request::get('include_unavailable', '1') === '1',
             'page'               => (int) Request::get('page', 1),
-            'per_page'           => (int) Request::get('per_page', 20),
+            'per_page'           => (int) Request::get('per_page', 100),
         ];
 
         // Mendukung filter ids[] untuk sinkronisasi keranjang

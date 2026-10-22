@@ -36,6 +36,7 @@ declare(strict_types=1);
   <script src="<?= e(asset('js/core/icons.js')) ?>"></script>
   <script src="<?= e(asset('js/core/ui.js')) ?>"></script>
   <script src="<?= e(asset('js/core/format.js')) ?>"></script>
+  <script src="<?= e(asset('js/core/cart-store.js')) ?>"></script>
 
   <!-- Script Halaman -->
   <?php if (!empty($scripts) && is_array($scripts)): ?>
