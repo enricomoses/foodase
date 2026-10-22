@@ -37,6 +37,16 @@ window.Api = (function ($) {
     };
   }
 
+  function resolveUrl(url) {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/')) {
+      return url;
+    }
+    const baseEl = document.querySelector('base');
+    const base = baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/foodease/';
+    return base + url.replace(/^\/+/, '');
+  }
+
   return {
     /**
      * HTTP GET request.
@@ -47,7 +57,7 @@ window.Api = (function ($) {
     get: function (url, params) {
       return new Promise(function (resolve, reject) {
         $.ajax({
-          url: url,
+          url: resolveUrl(url),
           type: 'GET',
           data: params || {},
           dataType: 'json'
@@ -70,7 +80,7 @@ window.Api = (function ($) {
     post: function (url, data) {
       return new Promise(function (resolve, reject) {
         $.ajax({
-          url: url,
+          url: resolveUrl(url),
           type: 'POST',
           data: JSON.stringify(data || {}),
           contentType: 'application/json; charset=utf-8',
@@ -94,7 +104,7 @@ window.Api = (function ($) {
     postForm: function (url, formData) {
       return new Promise(function (resolve, reject) {
         $.ajax({
-          url: url,
+          url: resolveUrl(url),
           type: 'POST',
           data: formData,
           processData: false,
