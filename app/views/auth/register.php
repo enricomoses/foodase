@@ -150,19 +150,12 @@ declare(strict_types=1);
       <p id="error-page-reg-password" class="hidden mt-1 text-xs font-medium text-danger"></p>
     </div>
 
-    <!-- Tombol Submit & Batal Pil Hitam/Abu -->
-    <div class="pt-2 flex items-center gap-2">
-      <a
-        href="<?= e(url('login.php')) ?>"
-        class="btn-cancel-login h-12 px-5 rounded-full bg-surface text-ink text-xs font-semibold hover:bg-neutral-200 transition-colors cursor-pointer flex items-center justify-center"
-        title="Batal dan kembali ke login"
-      >
-        Batal
-      </a>
+    <!-- Tombol Submit Pil Hitam Utama -->
+    <div class="pt-2">
       <button
         type="submit"
         id="btn-page-submit-register"
-        class="h-12 flex-1 rounded-full bg-black px-6 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-2 transition-colors cursor-pointer"
+        class="h-12 w-full rounded-full bg-black px-6 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-2 transition-colors cursor-pointer"
       >
         Daftar Sekarang
       </button>

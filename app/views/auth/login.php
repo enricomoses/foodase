@@ -131,20 +131,12 @@ if ($flashError) {
       <p id="error-password" class="hidden mt-1 text-xs font-medium text-danger"></p>
     </div>
 
-    <!-- Tombol Submit & Batal Pil Hitam/Abu -->
-    <div class="pt-2 flex items-center gap-2">
-      <button
-        type="button"
-        id="btn-clear-login"
-        class="btn-cancel-login h-12 px-5 rounded-full bg-surface text-ink text-xs font-semibold hover:bg-neutral-200 transition-colors cursor-pointer"
-        title="Batal dan kosongkan form"
-      >
-        Batal
-      </button>
+    <!-- Tombol Submit Pil Hitam Utama -->
+    <div class="pt-2">
       <button
         type="submit"
         id="btn-login"
-        class="h-12 flex-1 rounded-full bg-black px-6 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-2 transition-colors cursor-pointer"
+        class="h-12 w-full rounded-full bg-black px-6 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-2 transition-colors cursor-pointer"
       >
         Masuk
       </button>
@@ -176,26 +168,9 @@ if ($flashError) {
     <div class="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl bg-white p-6 shadow-lg border-t sm:border border-line max-h-[92vh] overflow-y-auto">
       <div class="w-10 h-1 bg-line rounded-full mx-auto mb-4 sm:hidden"></div>
 
-      <div class="flex items-center justify-between pb-4 border-b border-line">
-        <div>
-          <a
-            href="<?= e(url()) ?>"
-            class="inline-flex items-center gap-1 text-[11px] font-medium text-subtle hover:text-ink transition-colors mb-1.5"
-          >
-            <?= icon('arrow-left', 'h-3 w-3') ?>
-            <span>Kembali ke Beranda</span>
-          </a>
-          <h3 class="text-xl font-bold tracking-tight text-ink">Buat Akun Baru</h3>
-          <p class="text-xs text-subtle mt-0.5">Daftarkan akun kasir atau staf kafe baru.</p>
-        </div>
-        <button
-          type="button"
-          class="h-8 w-8 rounded-full flex items-center justify-center text-subtle hover:bg-surface hover:text-ink transition-colors"
-          data-modal-dismiss
-          aria-label="Tutup"
-        >
-          <?= icon('close', 'h-4 w-4') ?>
-        </button>
+      <div class="pb-4 border-b border-line">
+        <h3 class="text-xl font-bold tracking-tight text-ink">Buat Akun Baru</h3>
+        <p class="text-xs text-subtle mt-0.5">Daftarkan akun kasir atau staf kafe baru.</p>
       </div>
 
       <form id="form-register" action="<?= e(url('api/auth/register.php')) ?>" method="POST" novalidate autocomplete="off" class="mt-4 space-y-4">
@@ -357,19 +332,9 @@ if ($flashError) {
     <div class="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl bg-white p-6 shadow-lg border-t sm:border border-line max-h-[92vh] overflow-y-auto">
       <div class="w-10 h-1 bg-line rounded-full mx-auto mb-4 sm:hidden"></div>
 
-      <div class="flex items-center justify-between pb-4 border-b border-line">
-        <div>
-          <h3 class="text-xl font-bold tracking-tight text-ink">Reset Password</h3>
-          <p class="text-xs text-subtle mt-0.5">Atur ulang password untuk akun Anda.</p>
-        </div>
-        <button
-          type="button"
-          class="h-8 w-8 rounded-full flex items-center justify-center text-subtle hover:bg-surface hover:text-ink transition-colors"
-          data-modal-dismiss
-          aria-label="Tutup"
-        >
-          <?= icon('close', 'h-4 w-4') ?>
-        </button>
+      <div class="pb-4 border-b border-line">
+        <h3 class="text-xl font-bold tracking-tight text-ink">Reset Password</h3>
+        <p class="text-xs text-subtle mt-0.5">Atur ulang password untuk akun Anda.</p>
       </div>
 
       <form id="form-forgot" action="<?= e(url('api/auth/forgot-password.php')) ?>" method="POST" novalidate autocomplete="off" class="mt-4 space-y-4">

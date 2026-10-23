@@ -72,33 +72,6 @@ declare(strict_types=1);
           </div>
         </div>
 
-        <!-- Showcase Visual Card di Kanan (Layar Besar) -->
-        <div class="hidden md:flex relative z-10 mr-8 lg:mr-12 items-center gap-4">
-          <!-- Mini Promo Menu Card -->
-          <div class="w-56 p-3.5 rounded-2xl bg-black/70 backdrop-blur-md border border-white/20 shadow-2xl transition-transform hover:scale-105 duration-300">
-            <div class="relative h-28 w-full rounded-xl overflow-hidden mb-2.5">
-              <img src="<?= e(url('uploads/menus/espresso.jpg')) ?>" alt="Espresso" class="w-full h-full object-cover">
-              <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-accent text-white text-[10px] font-bold">Favorit</span>
-            </div>
-            <div class="text-white">
-              <span class="text-[10px] text-neutral-300 uppercase tracking-wide font-semibold">Paling Diminati</span>
-              <h4 class="text-xs font-bold truncate">Espresso Double Shot</h4>
-              <div class="mt-1 flex items-center justify-between">
-                <span class="text-xs font-extrabold text-accent">Rp 18.000</span>
-                <span class="text-[10px] text-neutral-400">Siap Saji</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Rating Box -->
-          <div class="flex flex-col items-center p-4 rounded-2xl bg-black/70 backdrop-blur-md border border-white/20 shadow-2xl text-center shrink-0">
-            <div class="w-11 h-11 rounded-full bg-accent-light flex items-center justify-center text-accent mb-1.5">
-              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-            </div>
-            <span class="text-base font-extrabold text-white">4.9 / 5.0</span>
-            <span class="text-[10px] text-neutral-300 mt-0.5">1.200+ Ulasan</span>
-          </div>
-        </div>
       </div>
 
       <!-- Slide 2: Promo Sarapan & Cold Brew -->
@@ -131,23 +104,6 @@ declare(strict_types=1);
           </div>
         </div>
 
-        <!-- Showcase Visual Card di Kanan Slide 2 -->
-        <div class="hidden md:flex relative z-10 mr-8 lg:mr-12 items-center gap-4">
-          <div class="w-56 p-3.5 rounded-2xl bg-black/70 backdrop-blur-md border border-white/20 shadow-2xl transition-transform hover:scale-105 duration-300">
-            <div class="relative h-28 w-full rounded-xl overflow-hidden mb-2.5">
-              <img src="<?= e(url('uploads/menus/cold_brew.jpg')) ?>" alt="Cold Brew" class="w-full h-full object-cover">
-              <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-bold">Diskon 15%</span>
-            </div>
-            <div class="text-white">
-              <span class="text-[10px] text-amber-300 uppercase tracking-wide font-semibold">Specialty Brew</span>
-              <h4 class="text-xs font-bold truncate">Cold Brew Klasik</h4>
-              <div class="mt-1 flex items-center justify-between">
-                <span class="text-xs font-extrabold text-accent">Rp 22.000</span>
-                <span class="text-[10px] text-neutral-400">Es Segar</span>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- Slide 3: Makan Siang & Rice Bowl -->
@@ -180,23 +136,6 @@ declare(strict_types=1);
           </div>
         </div>
 
-        <!-- Showcase Visual Card di Kanan Slide 3 -->
-        <div class="hidden md:flex relative z-10 mr-8 lg:mr-12 items-center gap-4">
-          <div class="w-56 p-3.5 rounded-2xl bg-black/70 backdrop-blur-md border border-white/20 shadow-2xl transition-transform hover:scale-105 duration-300">
-            <div class="relative h-28 w-full rounded-xl overflow-hidden mb-2.5">
-              <img src="<?= e(url('uploads/menus/ayam_geprek.jpg')) ?>" alt="Ayam Geprek" class="w-full h-full object-cover">
-              <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-bold">Best Seller</span>
-            </div>
-            <div class="text-white">
-              <span class="text-[10px] text-rose-300 uppercase tracking-wide font-semibold">Makanan Berat</span>
-              <h4 class="text-xs font-bold truncate">Nasi Ayam Geprek</h4>
-              <div class="mt-1 flex items-center justify-between">
-                <span class="text-xs font-extrabold text-accent">Rp 28.000</span>
-                <span class="text-[10px] text-neutral-400">Paling Laris</span>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
     </div>
