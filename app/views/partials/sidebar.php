@@ -29,7 +29,7 @@ if ($currentRole === 'admin') {
 }
 ?>
 <!-- Sidebar Putih Berborder Kanan (Gaya Uber Eats) -->
-<aside class="flex w-64 flex-col border-r border-line bg-white shrink-0 min-h-screen">
+<aside class="flex w-64 flex-col border-r border-line bg-white shrink-0 h-screen sticky top-0">
   <!-- Brand Header -->
   <div class="flex h-16 items-center justify-between border-b border-line px-5">
     <a href="<?= e(url()) ?>" class="font-bold text-ink text-lg tracking-tight hover:opacity-80 transition-opacity">

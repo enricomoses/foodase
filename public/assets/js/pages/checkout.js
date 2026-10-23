@@ -336,6 +336,7 @@ $(function () {
   function onOrderSuccess(orderCode, total) {
     // Kosongkan keranjang
     CartStore.clear();
+    try { localStorage.setItem('foodease_last_order', orderCode); } catch (e) {}
 
     // Tampilkan kode pesanan dan total
     $('#success-order-code').text(orderCode);

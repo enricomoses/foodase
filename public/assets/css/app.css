@@ -182,13 +182,46 @@ html.dark .btn-theme-toggle {
 }
 html.dark .btn-theme-toggle:hover { background-color: #363636 !important; color: #ffffff !important; }
 
+/* Tombol add (+) kartu menu & foto placeholder di mode dark */
+html.dark .btn-card-add {
+    background-color: #2a2a2a !important;
+    color: #ffffff !important;
+    border-color: #383838 !important;
+}
+html.dark .btn-card-add:hover {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-color: #ffffff !important;
+}
+html.dark img[src*="placeholder-menu"] {
+    opacity: 0.7;
+    filter: invert(0.88) hue-rotate(180deg);
+}
+
+/* Hero banner & active order */
+html.dark .hero-banner {
+    background-color: #1a1a1a !important;
+    border-color: #2a2a2a !important;
+}
+html.dark #active-order-banner {
+    background-color: #1c1c1c !important;
+    border-color: #2a2a2a !important;
+}
+html.dark #account-dropdown-menu {
+    background-color: #1a1a1a !important;
+    border-color: #2a2a2a !important;
+    color: #f3f3f3 !important;
+}
+
 /* Modal backdrop */
-html.dark [class~="bg-black\/40"] { background-color: rgba(0,0,0,0.8) !important; }
+html.dark [class~="bg-black\/40"],
+html.dark [class~="bg-black\/50"] { background-color: rgba(0,0,0,0.8) !important; }
 
 /* Shadow override */
 html.dark [class~="shadow-sm"] {
     box-shadow: 0 1px 3px 0 rgba(0,0,0,0.5), 0 1px 2px -1px rgba(0,0,0,0.5) !important;
 }
+
 
 /* Smooth transition */
 body, aside, header, main,

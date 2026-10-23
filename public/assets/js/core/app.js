@@ -170,6 +170,19 @@
       e.preventDefault();
       window.Theme.toggle();
     });
+
+    // Handler Dropdown Akun Navbar
+    $(document).on('click', '#btn-account-menu', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      $('#account-dropdown-menu').toggleClass('hidden');
+    });
+
+    $(document).on('click', function (e) {
+      if (!$(e.target).closest('#account-dropdown-wrapper').length) {
+        $('#account-dropdown-menu').addClass('hidden');
+      }
+    });
   });
 
 })(jQuery);
@@ -184,10 +197,13 @@
     'html.dark body{background-color:#111111!important;color:#f3f3f3!important}',
     'html.dark aside{background-color:#161616!important;border-right-color:#2a2a2a!important;border-color:#2a2a2a!important}',
     'html.dark header{background-color:#161616!important;border-bottom-color:#2a2a2a!important;border-color:#2a2a2a!important}',
+    'html.dark footer{background-color:#161616!important;border-color:#2a2a2a!important;color:#909090!important}',
     'html.dark main{background-color:#111111!important}',
     'html.dark .bg-white{background-color:#161616!important;color:#f3f3f3!important}',
     'html.dark .bg-surface{background-color:#1e1e1e!important;color:#e0e0e0!important}',
     'html.dark .border-line{border-color:#2a2a2a!important}',
+    'html.dark .border-t{border-top-color:#2a2a2a!important}',
+    'html.dark .border-b{border-bottom-color:#2a2a2a!important}',
     'html.dark .divide-line>:not([hidden])~:not([hidden]){border-color:#2a2a2a!important}',
     'html.dark .text-ink{color:#f3f3f3!important}',
     'html.dark .text-subtle{color:#909090!important}',
@@ -205,14 +221,20 @@
     'html.dark .bg-danger-light{background-color:rgba(225,25,0,.15)!important;color:#fca5a5!important}',
     'html.dark .text-danger{color:#fca5a5!important}',
     'html.dark .border-danger{border-color:rgba(225,25,0,.4)!important}',
-    'html.dark .btn-theme-toggle{background-color:#2a2a2a!important;color:#aaa!important}',
+    'html.dark .btn-theme-toggle{background-color:#2a2a2a!important;color:#aaa!important;border-color:#333!important}',
     'html.dark .btn-theme-toggle:hover{background-color:#383838!important;color:#fff!important}',
     'html.dark .rounded-full.bg-white{background-color:#2a2a2a!important}',
     'html.dark .shadow-sm{box-shadow:0 1px 3px rgba(0,0,0,.5)!important}',
     'html.dark nav a{color:#999!important}',
     'html.dark nav a.bg-surface,html.dark nav a.font-bold.text-ink{background-color:#2a2a2a!important;color:#fff!important}',
-    'html.dark .bg-black\\/40{background-color:rgba(0,0,0,.8)!important}',
+    'html.dark .bg-black\\/40,html.dark .bg-black\\/50{background-color:rgba(0,0,0,.7)!important}',
+    'html.dark #account-dropdown-menu{background-color:#1e1e1e!important;border-color:#2a2a2a!important;color:#f3f3f3!important}',
+    'html.dark .menu-card{background-color:#161616!important;border-color:#2a2a2a!important}',
+    'html.dark .btn-card-add{background-color:#242424!important;border-color:#333!important;color:#f3f3f3!important}',
+    'html.dark .btn-card-add:hover{background-color:#000!important;border-color:#000!important;color:#fff!important}',
+    'html.dark .hero-banner{background-color:#181818!important;border-color:#2a2a2a!important}',
   ].join('');
+
 
   var _injected = false;
   var _observer = null;

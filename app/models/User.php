@@ -155,6 +155,16 @@ final class User
     }
 
     /**
+     * Perbarui waktu login terakhir pengguna.
+     */
+    public static function touchLastLogin(int $id): bool
+    {
+        $pdo = Database::connection();
+        $stmt = $pdo->prepare('UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = :id');
+        return $stmt->execute([':id' => $id]);
+    }
+
+    /**
      * Perbarui session_id aktif user (Single Active Session).
      */
     public static function updateSessionId(int $id, ?string $sessionId): bool
@@ -167,3 +177,4 @@ final class User
         ]);
     }
 }
+

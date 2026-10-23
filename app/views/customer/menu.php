@@ -7,6 +7,75 @@ declare(strict_types=1);
  */
 ?>
 <div class="space-y-6">
+  <!-- Bar Notifikasi Pesanan Aktif (Otomatis tampil jika ada pesanan tersimpan) -->
+  <div id="active-order-banner" class="hidden rounded-xl border border-line bg-surface p-3.5 flex items-center justify-between gap-3 text-xs">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-light text-accent-dark">
+        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      </span>
+      <p class="truncate text-ink font-medium">
+        Pesanan aktif <span id="active-order-code" class="font-bold"></span> sedang disiapkan.
+      </p>
+    </div>
+    <a
+      id="active-order-link"
+      href="<?= e(url('orders.php')) ?>"
+      class="shrink-0 font-bold text-ink hover:underline text-xs"
+    >
+      Lacak Status &rarr;
+    </a>
+  </div>
+
+  <!-- Hero Cafe Showcase Banner (Membuat halaman hidup & appetizing) -->
+  <div class="hero-banner relative overflow-hidden rounded-2xl border border-line bg-surface p-6 sm:p-8">
+    <div class="relative z-10 max-w-xl">
+      <!-- Status Kafe Buka -->
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-line text-xs font-semibold text-ink shadow-sm">
+        <span class="h-2 w-2 rounded-full bg-accent animate-pulse"></span>
+        <span>Buka Sekarang &bull; Meja & Bawa Pulang</span>
+      </div>
+
+      <!-- Judul Banner -->
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-ink mt-3 leading-tight">
+        Kopi Istimewa & Santapan Hangat Kafe
+      </h1>
+
+      <p class="text-xs sm:text-sm text-subtle mt-2 leading-relaxed">
+        Pesan menu favorit Anda langsung dari meja tanpa harus antre di kasir. Segar, nikmat, dan disajikan tepat waktu.
+      </p>
+
+      <!-- Pill Fitur Kafe -->
+      <div class="mt-4 flex flex-wrap items-center gap-2 text-[11px] font-medium text-subtle">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-line text-ink">
+          <?= icon('clock', 'h-3.5 w-3.5 text-accent') ?>
+          <span>Penyajian Cepat</span>
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-line text-ink">
+          <?= icon('check', 'h-3.5 w-3.5 text-accent') ?>
+          <span>100% Biji Pilihan</span>
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-line text-ink">
+          <?= icon('receipt', 'h-3.5 w-3.5 text-accent') ?>
+          <span>QRIS & Tunai</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Hiasan Geometris Elegan / Minimalis SVG Outline di Sisi Kanan (Khusus Layar Lebar) -->
+    <div class="hidden sm:block absolute right-4 bottom-2 opacity-10 pointer-events-none text-ink">
+      <svg class="w-48 h-48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+        <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+        <line x1="6" y1="1" x2="6" y2="4"></line>
+        <line x1="10" y1="1" x2="10" y2="4"></line>
+        <line x1="14" y1="1" x2="14" y2="4"></line>
+      </svg>
+    </div>
+  </div>
+
   <!-- Kolom Cari Pil di Layar Mobile (di desktop tampil di navbar) -->
   <div class="block md:hidden">
     <div class="relative w-full">
@@ -23,7 +92,7 @@ declare(strict_types=1);
   </div>
 
   <!-- Baris Chip Kategori (Scroll horizontal tanpa scrollbar) -->
-  <div class="sticky top-16 z-20 -mx-4 px-4 sm:mx-0 sm:px-0 py-2 bg-white/95 backdrop-blur-sm border-b border-line sm:border-b-0">
+  <div class="sticky top-16 z-20 -mx-4 px-4 sm:mx-0 sm:px-0 py-2 bg-white border-b border-line sm:border-b-0">
     <div id="category-chips" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
       <button
         type="button"
@@ -35,6 +104,7 @@ declare(strict_types=1);
       <!-- Chip kategori lainnya dimuat secara dinamis -->
     </div>
   </div>
+
 
   <!-- State Loading (Skeleton Sederhana Abu-abu) -->
   <div id="menu-loading" class="space-y-8">

@@ -180,6 +180,72 @@ $(function () {
     const $container = $('#menu-container');
     $container.empty();
 
+    // Rekomendasi Populer (hanya saat tampilkan semua tanpa pencarian)
+    if (!currentSearchQuery && !currentCategoryId) {
+      const popularItems = allMenus.filter(function (m) { return !!m.is_available; }).slice(0, 3);
+      if (popularItems.length > 0) {
+        let popCardsHtml = '';
+        popularItems.forEach(function (m) {
+          const imgSrc = m.image_url || defaultPlaceholder;
+          popCardsHtml += `
+            <div
+              class="menu-card relative flex items-center justify-between p-3.5 sm:p-4 rounded-xl border border-line bg-white transition-all cursor-pointer hover:border-black/30 hover:shadow-sm"
+              data-id="${m.id}"
+            >
+              <div class="flex-1 pr-3 min-w-0">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-surface border border-line text-ink mb-1.5">
+                  <svg class="h-2.5 w-2.5 text-accent shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                  <span>Paling Disukai</span>
+                </span>
+                <h3 class="font-bold text-ink text-sm sm:text-base leading-snug line-clamp-2">
+                  ${UI.escape(m.name)}
+                </h3>
+                <div class="mt-1 font-semibold text-xs sm:text-sm text-ink tabular-nums">
+                  ${formatRupiah(m.price)}
+                </div>
+                ${m.description ? `<p class="mt-1 text-xs text-subtle line-clamp-2 leading-relaxed">${UI.escape(m.description)}</p>` : ''}
+              </div>
+              <div class="relative w-28 h-28 shrink-0">
+                <img
+                  src="${imgSrc}"
+                  alt="${UI.escape(m.name)}"
+                  class="w-28 h-28 rounded-xl object-cover bg-surface border border-line"
+                  onerror="this.src='${defaultPlaceholder}'"
+                >
+                <button
+                  type="button"
+                  class="btn-card-add absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-full bg-white text-ink shadow-md border border-line flex items-center justify-center hover:bg-black hover:text-white hover:border-black transition-all cursor-pointer"
+                  data-id="${m.id}"
+                  title="Tambah ke keranjang"
+                >
+                  ${SVG_PLUS}
+                </button>
+              </div>
+            </div>
+          `;
+        });
+
+        const popSectionHtml = `
+          <section class="category-section mb-2">
+            <div class="flex items-center justify-between mb-3 sm:mb-4">
+              <div>
+                <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-ink">
+                  Menu Populer & Rekomendasi
+                </h2>
+                <p class="text-xs text-subtle mt-0.5">Pilihan favorit pelanggan minggu ini</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              ${popCardsHtml}
+            </div>
+          </section>
+        `;
+        $container.append(popSectionHtml);
+      }
+    }
+
     Object.keys(grouped).forEach(function (categoryName) {
       const items = grouped[categoryName];
 
@@ -245,6 +311,10 @@ $(function () {
     });
 
     $container.removeClass('hidden');
+
+    if (window.Theme && typeof window.Theme.isDark === 'function' && window.Theme.isDark()) {
+      window.Theme._applyTheme(true);
+    }
   }
 
   // Tombol Coba Lagi pada state error
@@ -347,6 +417,19 @@ $(function () {
   // ============================================================
   // INISIALISASI AWAL
   // ============================================================
+  function checkActiveOrder() {
+    try {
+      const lastOrderCode = localStorage.getItem('foodease_last_order');
+      if (lastOrderCode) {
+        $('#active-order-code').text('#' + lastOrderCode);
+        $('#active-order-link').attr('href', 'track.php?code=' + encodeURIComponent(lastOrderCode));
+        $('#active-order-banner').removeClass('hidden');
+      }
+    } catch (e) {}
+  }
+
+  checkActiveOrder();
   loadCategories();
   loadMenus();
 });
+

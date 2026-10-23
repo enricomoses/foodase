@@ -15,12 +15,12 @@ $userName = $authUser['name'] ?? 'Administrator';
 <head>
   <?php require APP_PATH . '/views/partials/head.php'; ?>
 </head>
-<body class="bg-white text-ink min-h-screen flex font-sans antialiased">
-  <!-- Sidebar Putih Berborder Kanan -->
+<body class="bg-white text-ink h-screen overflow-hidden flex font-sans antialiased">
+  <!-- Sidebar Putih Berborder Kanan (Tetap diam / Stay) -->
   <?php require APP_PATH . '/views/partials/sidebar.php'; ?>
 
-  <!-- Area Konten Utama & Header -->
-  <div class="flex-1 flex flex-col min-w-0">
+  <!-- Area Konten Utama & Header (Scroll internal) -->
+  <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
     <!-- Header Atas Sticky -->
     <header class="h-16 border-b border-line bg-white flex items-center justify-between px-6 sticky top-0 z-20">
       <div class="flex items-center gap-2">
