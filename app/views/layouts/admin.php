@@ -31,10 +31,10 @@ $userName = $authUser['name'] ?? 'Administrator';
         <!-- Info Pengguna -->
         <span class="text-sm font-medium text-ink"><?= e($userName) ?></span>
 
-        <!-- Tombol Keluar (Bentuk Pil Sekunder) -->
-        <form action="<?= e(url('logout.php')) ?>" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin keluar?');">
+        <!-- Tombol Keluar (Bentuk Pil Sekunder - Konfirmasi Kustom tanpa dialog Chrome) -->
+        <form id="form-logout" action="<?= e(url('logout.php')) ?>" method="POST" class="inline">
           <?= csrf_field() ?>
-          <button type="submit" class="h-9 px-4 rounded-full bg-surface text-ink text-xs font-medium hover:bg-neutral-200 transition-colors">
+          <button type="button" id="btn-header-logout" class="h-9 px-4 rounded-full bg-surface text-ink text-xs font-medium hover:bg-neutral-200 transition-colors cursor-pointer">
             Keluar
           </button>
         </form>

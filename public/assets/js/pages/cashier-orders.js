@@ -399,7 +399,9 @@ $(function () {
       if (res && res.success && res.data) {
         populateDetailModal(res.data);
       } else {
-        alert(res.message || 'Gagal memuat detail pesanan.');
+        if (window.UI && typeof window.UI.toast === 'function') {
+          window.UI.toast('error', res.message || 'Gagal memuat detail pesanan.');
+        }
         if (window.UI && typeof window.UI.closeModal === 'function') {
           window.UI.closeModal('modal-order-detail');
         } else {
@@ -409,7 +411,9 @@ $(function () {
     })
     .fail(function (jqXHR) {
       const res = jqXHR.responseJSON;
-      alert((res && res.message) ? res.message : 'Gagal memuat detail pesanan.');
+      if (window.UI && typeof window.UI.toast === 'function') {
+        window.UI.toast('error', (res && res.message) ? res.message : 'Gagal memuat detail pesanan.');
+      }
       if (window.UI && typeof window.UI.closeModal === 'function') {
         window.UI.closeModal('modal-order-detail');
       } else {
@@ -674,8 +678,6 @@ $(function () {
       .catch(function (err) {
         if (window.UI && typeof window.UI.toast === 'function') {
           window.UI.toast('error', err.message || 'Gagal mengubah status pesanan.');
-        } else {
-          alert(err.message || 'Gagal mengubah status pesanan.');
         }
       })
       .finally(function () {

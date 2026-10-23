@@ -54,14 +54,14 @@ if ($flashError) {
     <!-- Pilihan Masuk Sebagai (Role Selector: Semua, Kasir, Admin) -->
     <div>
       <label class="block text-xs font-medium text-subtle mb-1.5">Masuk Sebagai</label>
-      <input type="hidden" name="role" id="login-role" value="">
+      <input type="hidden" name="role" id="login-role" value="customer">
       <div class="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-surface border border-line" id="role-pill-group">
         <button
           type="button"
           class="role-btn h-9 rounded-lg text-xs font-semibold transition-all bg-black text-white shadow-sm cursor-pointer"
-          data-role=""
+          data-role="customer"
         >
-          Semua
+          Customer
         </button>
         <button
           type="button"

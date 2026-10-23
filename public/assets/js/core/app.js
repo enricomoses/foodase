@@ -183,7 +183,56 @@
         $('#account-dropdown-menu').addClass('hidden');
       }
     });
+
+    // Cek dan tampilkan flash toast dari sesi PHP jika ada
+    var $flash = $('#php-flash-toast');
+    if ($flash.length && window.UI && typeof window.UI.toast === 'function') {
+      var flashType = $flash.data('type') || 'info';
+      var flashTitle = $flash.data('title') || '';
+      var flashMsg = $flash.data('message') || '';
+      if (flashMsg) {
+        setTimeout(function () {
+          window.UI.toast(flashType, flashMsg, flashTitle);
+        }, 200);
+      }
+    }
+
+    // Handler Tombol Keluar (Bebas Dialog Bawaan Chrome, Pakai UI.confirm)
+    $(document).on('click', '#btn-header-logout, [data-action="logout"]', function (e) {
+      e.preventDefault();
+      var $btn = $(this);
+      var $form = $btn.closest('form');
+      if (!$form.length) {
+        $form = $('#form-logout');
+      }
+
+      if (window.UI && typeof window.UI.confirm === 'function') {
+        window.UI.confirm('Apakah Anda yakin ingin keluar dari sistem?', 'Konfirmasi Keluar')
+          .then(function (confirmed) {
+            if (confirmed) {
+              if ($form.length) {
+                $form[0].submit();
+              } else {
+                window.location.href = window.AppConfig?.baseUrl ? window.AppConfig.baseUrl + '/logout.php' : 'logout.php';
+              }
+            }
+          });
+      } else {
+        if ($form.length) {
+          $form[0].submit();
+        } else {
+          window.location.href = 'logout.php';
+        }
+      }
+    });
   });
+
+  // Override window.alert agar tidak memakai dialog bawaan browser Chrome
+  window.alert = function (message) {
+    if (window.UI && typeof window.UI.toast === 'function') {
+      window.UI.toast('info', String(message));
+    }
+  };
 
 })(jQuery);
 

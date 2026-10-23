@@ -121,7 +121,9 @@ $(function () {
       const from = $('#report-from').val().trim();
       const to   = $('#report-to').val().trim();
       if (!from || !to) {
-        alert('Silakan pilih tanggal awal dan akhir terlebih dahulu.');
+        if (window.UI && typeof window.UI.toast === 'function') {
+          window.UI.toast('warning', 'Silakan pilih rentang tanggal awal dan akhir terlebih dahulu.', 'Rentang Tanggal Wajib');
+        }
         return;
       }
       const exportUrl = cfg.exportUrl + '?from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to);

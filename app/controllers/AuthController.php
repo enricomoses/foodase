@@ -61,14 +61,24 @@ final class AuthController
         $actualRole = (string) ($user['role'] ?? 'cashier');
         $requestedRole = trim((string) ($input['role'] ?? ''));
 
-        // Jika user memilih spesifik role (admin/cashier), cocokkan dengan data akun
+        // Jika user memilih spesifik role, cocokkan dengan data akun
         if ($requestedRole !== '' && $requestedRole !== $actualRole) {
             Auth::logout();
-            $roleLabel = ($requestedRole === 'admin') ? 'Administrator' : 'Kasir';
+            $roleLabels = [
+                'admin'    => 'Administrator',
+                'cashier'  => 'Kasir',
+                'customer' => 'Customer',
+            ];
+            $roleLabel = $roleLabels[$requestedRole] ?? $requestedRole;
             Response::error("Akun ini bukan merupakan akun {$roleLabel}.", 403);
         }
 
-        $redirectUrl = ($actualRole === 'admin') ? url('admin/') : url('cashier/');
+        $redirectMap = [
+            'admin'    => url('admin/'),
+            'cashier'  => url('cashier/'),
+            'customer' => url('menu.php'),
+        ];
+        $redirectUrl = $redirectMap[$actualRole] ?? url('menu.php');
 
         Response::json([
             'user'     => $user,
@@ -105,7 +115,7 @@ final class AuthController
             $errors['username'] = 'Username hanya boleh huruf, angka, dan underscore.';
         }
 
-        if (!in_array($role, ['cashier', 'admin'], true)) {
+        if (!in_array($role, ['cashier', 'admin', 'customer'], true)) {
             $errors['role'] = 'Peran akun tidak valid.';
         }
 
@@ -212,6 +222,11 @@ final class AuthController
     public static function logoutWeb(): void
     {
         Auth::logout();
+        \App\Core\Session::flash('flash_toast', [
+            'type'    => 'success',
+            'title'   => 'Berhasil Keluar',
+            'message' => 'Anda telah berhasil keluar dari sistem.',
+        ]);
         Response::redirect('login.php');
     }
 }

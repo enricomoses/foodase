@@ -180,69 +180,115 @@ $(function () {
     const $container = $('#menu-container');
     $container.empty();
 
-    // Rekomendasi Populer (hanya saat tampilkan semua tanpa pencarian)
+    // Rekomendasi Menu Favorit (Sliding Carousel Image)
     if (!currentSearchQuery && !currentCategoryId) {
-      const popularItems = allMenus.filter(function (m) { return !!m.is_available; }).slice(0, 3);
+      const popularItems = allMenus.filter(function (m) { return !!m.is_available; }).slice(0, 8);
       if (popularItems.length > 0) {
-        let popCardsHtml = '';
+        let slidesHtml = '';
         popularItems.forEach(function (m) {
           const imgSrc = m.image_url || defaultPlaceholder;
-          popCardsHtml += `
+          slidesHtml += `
             <div
-              class="menu-card relative flex items-center justify-between p-3.5 sm:p-4 rounded-xl border border-line bg-white transition-all cursor-pointer hover:border-black/30 hover:shadow-sm"
+              class="carousel-slide menu-card relative w-60 sm:w-68 rounded-2xl border border-line bg-white p-3 shadow-sm hover:shadow-md hover:border-black/30 transition-all cursor-pointer group flex flex-col justify-between shrink-0"
               data-id="${m.id}"
             >
-              <div class="flex-1 pr-3 min-w-0">
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-surface border border-line text-ink mb-1.5">
-                  <svg class="h-2.5 w-2.5 text-accent shrink-0" fill="currentColor" viewBox="0 0 24 24">
+              <!-- Container Foto Menu Favorit -->
+              <div class="relative w-full h-36 sm:h-40 rounded-xl overflow-hidden bg-surface mb-2.5">
+                <img
+                  src="${imgSrc}"
+                  alt="${UI.escape(m.name)}"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  onerror="this.src='${defaultPlaceholder}'"
+                >
+                <span class="absolute top-2 left-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-black/80 backdrop-blur-sm text-white shadow">
+                  <svg class="h-2.5 w-2.5 text-accent" fill="currentColor" viewBox="0 0 24 24">
                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                   </svg>
                   <span>Paling Disukai</span>
                 </span>
-                <h3 class="font-bold text-ink text-sm sm:text-base leading-snug line-clamp-2">
-                  ${UI.escape(m.name)}
-                </h3>
-                <div class="mt-1 font-semibold text-xs sm:text-sm text-ink tabular-nums">
+                <span class="absolute bottom-2 right-2 px-2.5 py-0.5 rounded-full bg-white/95 backdrop-blur-sm text-ink text-xs font-bold shadow tabular-nums">
                   ${formatRupiah(m.price)}
-                </div>
-                ${m.description ? `<p class="mt-1 text-xs text-subtle line-clamp-2 leading-relaxed">${UI.escape(m.description)}</p>` : ''}
+                </span>
               </div>
-              <div class="relative w-28 h-28 shrink-0">
-                <img
-                  src="${imgSrc}"
-                  alt="${UI.escape(m.name)}"
-                  class="w-28 h-28 rounded-xl object-cover bg-surface border border-line"
-                  onerror="this.src='${defaultPlaceholder}'"
-                >
-                <button
-                  type="button"
-                  class="btn-card-add absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-full bg-white text-ink shadow-md border border-line flex items-center justify-center hover:bg-black hover:text-white hover:border-black transition-all cursor-pointer"
-                  data-id="${m.id}"
-                  title="Tambah ke keranjang"
-                >
-                  ${SVG_PLUS}
-                </button>
+
+              <!-- Deskripsi & Info Menu -->
+              <div class="flex-1 flex flex-col justify-between">
+                <div>
+                  <span class="text-[10px] font-bold text-subtle uppercase tracking-wider">${UI.escape(m.category_name || 'Kafe')}</span>
+                  <h3 class="font-bold text-ink text-sm sm:text-base leading-snug line-clamp-1 mt-0.5">
+                    ${UI.escape(m.name)}
+                  </h3>
+                  ${m.description ? `<p class="mt-1 text-xs text-subtle line-clamp-2 leading-relaxed">${UI.escape(m.description)}</p>` : ''}
+                </div>
+
+                <div class="mt-3 pt-2.5 border-t border-line flex items-center justify-between">
+                  <span class="font-bold text-xs sm:text-sm text-ink tabular-nums">
+                    ${formatRupiah(m.price)}
+                  </span>
+                  <button
+                    type="button"
+                    class="btn-card-add h-8 px-3 rounded-full bg-black text-white text-xs font-semibold hover:bg-neutral-800 transition-colors flex items-center gap-1 cursor-pointer"
+                    data-id="${m.id}"
+                    title="Tambah ke pesanan"
+                  >
+                    <span>+ Tambah</span>
+                  </button>
+                </div>
               </div>
             </div>
           `;
         });
 
-        const popSectionHtml = `
-          <section class="category-section mb-2">
+        const carouselSectionHtml = `
+          <section class="favorite-carousel-section mb-6">
             <div class="flex items-center justify-between mb-3 sm:mb-4">
               <div>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent-light text-accent text-[11px] font-bold mb-1">
+                  <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                  <span>Pilihan Favorit Kafe</span>
+                </div>
                 <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-ink">
-                  Menu Populer & Rekomendasi
+                  Menu Favorit & Paling Laris
                 </h2>
-                <p class="text-xs text-subtle mt-0.5">Pilihan favorit pelanggan minggu ini</p>
+                <p class="text-xs text-subtle mt-0.5">Geser ke samping untuk menjelajah menu favorit pilihan pelanggan</p>
+              </div>
+
+              <!-- Tombol Navigasi Geser (Prev & Next) -->
+              <div class="flex items-center gap-2">
+                <button
+                  type="button"
+                  id="btn-carousel-prev"
+                  class="w-9 h-9 rounded-full bg-surface border border-line text-ink hover:bg-neutral-200 transition-colors flex items-center justify-center cursor-pointer shadow-sm"
+                  title="Geser ke kiri"
+                  aria-label="Sebelumnya"
+                >
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  id="btn-carousel-next"
+                  class="w-9 h-9 rounded-full bg-surface border border-line text-ink hover:bg-neutral-200 transition-colors flex items-center justify-center cursor-pointer shadow-sm"
+                  title="Geser ke kanan"
+                  aria-label="Selanjutnya"
+                >
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </button>
               </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-              ${popCardsHtml}
+
+            <!-- Track Geser Horizontal -->
+            <div id="favorite-carousel-track" class="carousel-track flex gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar py-1">
+              ${slidesHtml}
             </div>
           </section>
         `;
-        $container.append(popSectionHtml);
+        $container.append(carouselSectionHtml);
       }
     }
 
@@ -412,6 +458,23 @@ $(function () {
     CartStore.add(activeDetailMenu, activeDetailQty);
     UI.closeModal('modal-menu-detail');
     UI.toast('success', 'Ditambahkan ke keranjang');
+  });
+
+  // ============================================================
+  // CAROUSEL NAVIGASI PREV & NEXT
+  // ============================================================
+  $(document).on('click', '#btn-carousel-prev', function (e) {
+    e.preventDefault();
+    const $track = $('#favorite-carousel-track');
+    const scrollAmount = ($track.width() || 300) * 0.75;
+    $track.stop().animate({ scrollLeft: $track.scrollLeft() - scrollAmount }, 300);
+  });
+
+  $(document).on('click', '#btn-carousel-next', function (e) {
+    e.preventDefault();
+    const $track = $('#favorite-carousel-track');
+    const scrollAmount = ($track.width() || 300) * 0.75;
+    $track.stop().animate({ scrollLeft: $track.scrollLeft() + scrollAmount }, 300);
   });
 
   // ============================================================
