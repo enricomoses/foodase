@@ -278,10 +278,43 @@
   });
 
   // ============================================================
-  // 5. TOMBOL KEMBALI KE LOGIN (BACK TO LOGIN)
+  // 5. HELPER PENGOSONGAN FORM JIKA PENGGUNA MEMBATALKAN (BATAL/GAJADI)
   // ============================================================
+  function clearRegisterForm() {
+    if ($formRegister && $formRegister.length) {
+      try { $formRegister[0].reset(); } catch (e) {}
+      $('#reg-name, #reg-username, #reg-password').val('');
+      $('#register-alert').addClass('hidden');
+      $('#error-reg-name, #error-reg-username, #error-reg-password').addClass('hidden').text('');
+      $('#reg-password').trigger('input');
+    }
+  }
+
+  function clearForgotForm() {
+    if ($formForgot && $formForgot.length) {
+      try { $formForgot[0].reset(); } catch (e) {}
+      $('#forgot-username, #forgot-password').val('');
+      $('#forgot-alert').addClass('hidden');
+      $('#error-forgot-username, #error-forgot-password').addClass('hidden').text('');
+      $('#forgot-password').trigger('input');
+    }
+  }
+
+  function clearLoginForm() {
+    if ($form && $form.length) {
+      try { $form[0].reset(); } catch (e) {}
+      $username.val('');
+      $password.val('');
+      clearLoginErrors();
+    }
+  }
+
+  // Tombol Kembali ke Login (Back to Login)
   $(document).on('click', '.btn-back-to-login', function (e) {
     e.preventDefault();
+    clearRegisterForm();
+    clearForgotForm();
+
     const $modalRegister = $('#modal-register');
     const $modalForgot = $('#modal-forgot');
 
@@ -298,6 +331,13 @@
     }
   });
 
+  // Tombol Batal / Kembali ke Beranda jika membatalkan login
+  $(document).on('click', '.btn-cancel-login, a[href*="index.php"]', function () {
+    clearLoginForm();
+    clearRegisterForm();
+    clearForgotForm();
+  });
+
   // ============================================================
   // 6. MODAL BUAT AKUN BARU (REGISTER MODAL DI LOGIN.PHP)
   // ============================================================
@@ -307,9 +347,12 @@
 
   $('#btn-open-register').on('click', function (e) {
     e.preventDefault();
+    clearRegisterForm(); // Pastikan bersih, tidak membawa sisa credential
     $modalRegister.removeClass('hidden');
     $('body').addClass('overflow-hidden');
-    $('#reg-name').focus();
+    setTimeout(function () {
+      $('#reg-name').focus();
+    }, 50);
   });
 
   // Role selector di dalam modal register
@@ -477,16 +520,12 @@
 
   $('#btn-open-forgot').on('click', function (e) {
     e.preventDefault();
+    clearForgotForm(); // Bersihkan sisa input agar tidak tersimpan otomatis
     $modalForgot.removeClass('hidden');
     $('body').addClass('overflow-hidden');
-
-    const curU = $username.length ? $.trim($username.val()) : '';
-    if (curU) {
-      $('#forgot-username').val(curU);
-      $('#forgot-password').focus();
-    } else {
+    setTimeout(function () {
       $('#forgot-username').focus();
-    }
+    }, 50);
   });
 
   if ($formForgot.length) {
@@ -520,7 +559,7 @@
           UI.setLoading($btnSubmitForgot, false);
           $modalForgot.addClass('hidden');
           $('body').removeClass('overflow-hidden');
-          $formForgot[0].reset();
+          clearForgotForm();
 
           UI.toast('success', res.message || 'Password berhasil diperbarui.');
           if ($username.length) {
@@ -542,11 +581,19 @@
     });
   }
 
-  // Modal dismiss handler
+  // Modal dismiss handler — bersihkan seluruh isian form jika pengguna membatalkan
   $(document).on('click', '[data-modal-dismiss]', function () {
+    clearRegisterForm();
+    clearForgotForm();
     if ($modalRegister.length) $modalRegister.addClass('hidden');
     if ($modalForgot.length) $modalForgot.addClass('hidden');
     $('body').removeClass('overflow-hidden');
+  });
+
+  // Saat halaman dimuat / kembali, bersihkan modal dari sisa isian
+  $(function () {
+    clearRegisterForm();
+    clearForgotForm();
   });
 
 })(jQuery);

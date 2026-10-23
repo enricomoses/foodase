@@ -7,7 +7,7 @@ $appName = (string) Config::get('app.name', 'FoodEase');
 ?>
 <!-- Navbar Lengket Gaya Uber Eats -->
 <header class="sticky top-0 z-30 border-b border-line bg-white">
-  <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 gap-4">
+  <div class="mx-auto flex h-16 w-full items-center justify-between px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 gap-4">
     <!-- Wordmark FoodEase Tebal di Kiri -->
     <a href="<?= e(url()) ?>" class="text-xl font-bold tracking-tight text-ink hover:opacity-80 transition-opacity shrink-0">
       <?= e($appName) ?>

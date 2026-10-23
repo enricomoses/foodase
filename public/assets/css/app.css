@@ -321,6 +321,26 @@ input, select, textarea, button, a {
     z-index: 0 !important;
 }
 
+/* ── Browser Autofill Styling Suppression (Anti Biru & Selaras Tema) ── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #F6F6F6 inset !important;
+    -webkit-text-fill-color: #000000 !important;
+    caret-color: #000000 !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+html.dark input:-webkit-autofill,
+html.dark input:-webkit-autofill:hover, 
+html.dark input:-webkit-autofill:focus, 
+html.dark input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #1e1e20 inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    caret-color: #ffffff !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
 /* ==========================================================================
    FLOATING MOBILE BOTTOM NAVIGATION (Image 1 Inspired)
    ========================================================================== */

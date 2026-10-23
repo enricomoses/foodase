@@ -6,7 +6,7 @@ declare(strict_types=1);
  * FR-CART-01..04, prd.md §6.6, §12.3-12.4.
  */
 ?>
-<div id="cart-page" class="max-w-3xl mx-auto">
+<div id="cart-page" class="w-full max-w-5xl mx-auto">
 
   <!-- ==================== STATE: LOADING ==================== -->
   <div id="cart-loading" class="space-y-4 py-4">

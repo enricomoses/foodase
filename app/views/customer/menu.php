@@ -29,70 +29,93 @@ declare(strict_types=1);
     </a>
   </div>
 
-  <!-- Hero Cafe Showcase Carousel (Interaktif & Appetizing dengan Background Foto & Promo) -->
-  <div class="relative overflow-hidden rounded-2xl border border-line bg-neutral-900 text-white shadow-md group" id="hero-carousel-wrap">
-    <!-- Slides Container -->
-    <div id="hero-carousel-slides" class="relative w-full h-[320px] sm:h-[300px] overflow-hidden">
+  <!-- Hero Cafe Showcase Carousel (Interaktif & Appetizing dengan Background Foto Jelas & Promo Visual) -->
+  <div class="relative overflow-hidden rounded-2xl border border-line bg-neutral-900 text-white shadow-lg group" id="hero-carousel-wrap">
+    <!-- Ambient Warm Cafe Lighting Glow -->
+    <div class="absolute -top-16 -left-16 w-72 h-72 rounded-full bg-amber-500/15 blur-3xl pointer-events-none z-10"></div>
+    <div class="absolute -bottom-16 right-10 w-80 h-80 rounded-full bg-orange-500/15 blur-3xl pointer-events-none z-10"></div>
 
-      <!-- Slide 1: Cafe Utama -->
-      <div class="hero-slide active absolute inset-0 w-full h-full flex items-center transition-all duration-700 opacity-100 z-10">
-        <!-- Background Foto dengan Gradien Gelap -->
-        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= e(asset('uploads/banners/hero_slide_1.jpg')) ?>');"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/30"></div>
+    <!-- Slides Container -->
+    <div id="hero-carousel-slides" class="relative w-full h-[360px] sm:h-[330px] md:h-[360px] overflow-hidden">
+
+      <!-- Slide 1: Cafe Utama & Kopi Pilihan -->
+      <div class="hero-slide active absolute inset-0 w-full h-full flex items-center justify-between transition-all duration-700 opacity-100 z-10">
+        <!-- Background Foto dengan Gradien Halus Agar Foto Jelas & Cerah -->
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= e(url('uploads/banners/hero_slide_1.jpg')) ?>');"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/20"></div>
 
         <!-- Konten Slide 1 -->
-        <div class="relative z-10 max-w-xl p-6 sm:p-8">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-xs font-semibold text-white shadow-sm mb-3">
+        <div class="relative z-10 max-w-xl p-6 sm:p-8 lg:p-10">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/25 text-xs font-semibold text-white shadow-sm mb-3">
             <span class="h-2 w-2 rounded-full bg-accent animate-pulse"></span>
             <span>Buka Sekarang &bull; Meja & Bawa Pulang</span>
           </div>
-          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight drop-shadow-sm">
             Kopi Istimewa & Santapan Hangat Kafe
           </h1>
-          <p class="text-xs sm:text-sm text-neutral-300 mt-2 leading-relaxed">
+          <p class="text-xs sm:text-sm text-neutral-200 mt-2 leading-relaxed drop-shadow-sm max-w-md">
             Pesan menu favorit Anda langsung dari meja tanpa harus antre di kasir. Segar, nikmat, dan disajikan tepat waktu.
           </p>
-          <div class="mt-4 flex flex-wrap items-center gap-2 text-[11px] font-medium text-white/90">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/15">
+          <div class="mt-4 flex flex-wrap items-center gap-2 text-[11px] font-medium text-white/95">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20">
               <?= icon('clock', 'h-3.5 w-3.5 text-accent') ?>
-              <span>Penyajian Cepat</span>
+              <span>Penyajian Cepat 10 Menit</span>
             </span>
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/15">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20">
               <?= icon('check', 'h-3.5 w-3.5 text-accent') ?>
-              <span>100% Biji Pilihan</span>
+              <span>100% Biji Kopi Arabika</span>
             </span>
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/15">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20">
               <?= icon('receipt', 'h-3.5 w-3.5 text-accent') ?>
               <span>QRIS & Tunai</span>
             </span>
           </div>
         </div>
 
-        <!-- Rating Box Floating di Kanan (Layar Besar) -->
-        <div class="hidden md:flex absolute right-8 top-1/2 -translate-y-1/2 z-10 flex-col items-center p-4 rounded-2xl bg-black/60 backdrop-blur-md border border-white/15 shadow-xl text-center">
-          <div class="w-12 h-12 rounded-full bg-accent-light flex items-center justify-center text-accent mb-2">
-            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        <!-- Showcase Visual Card di Kanan (Layar Besar) -->
+        <div class="hidden md:flex relative z-10 mr-8 lg:mr-12 items-center gap-4">
+          <!-- Mini Promo Menu Card -->
+          <div class="w-56 p-3.5 rounded-2xl bg-black/70 backdrop-blur-md border border-white/20 shadow-2xl transition-transform hover:scale-105 duration-300">
+            <div class="relative h-28 w-full rounded-xl overflow-hidden mb-2.5">
+              <img src="<?= e(url('uploads/menus/espresso.jpg')) ?>" alt="Espresso" class="w-full h-full object-cover">
+              <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-accent text-white text-[10px] font-bold">Favorit</span>
+            </div>
+            <div class="text-white">
+              <span class="text-[10px] text-neutral-300 uppercase tracking-wide font-semibold">Paling Diminati</span>
+              <h4 class="text-xs font-bold truncate">Espresso Double Shot</h4>
+              <div class="mt-1 flex items-center justify-between">
+                <span class="text-xs font-extrabold text-accent">Rp 18.000</span>
+                <span class="text-[10px] text-neutral-400">Siap Saji</span>
+              </div>
+            </div>
           </div>
-          <span class="text-lg font-bold text-white">4.9 / 5.0</span>
-          <span class="text-[11px] text-neutral-300 mt-0.5">1.200+ Ulasan Puas</span>
+
+          <!-- Rating Box -->
+          <div class="flex flex-col items-center p-4 rounded-2xl bg-black/70 backdrop-blur-md border border-white/20 shadow-2xl text-center shrink-0">
+            <div class="w-11 h-11 rounded-full bg-accent-light flex items-center justify-center text-accent mb-1.5">
+              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+            <span class="text-base font-extrabold text-white">4.9 / 5.0</span>
+            <span class="text-[10px] text-neutral-300 mt-0.5">1.200+ Ulasan</span>
+          </div>
         </div>
       </div>
 
       <!-- Slide 2: Promo Sarapan & Cold Brew -->
-      <div class="hero-slide absolute inset-0 w-full h-full flex items-center transition-all duration-700 opacity-0 pointer-events-none z-0">
-        <!-- Background Foto Slide 2 -->
-        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= e(asset('uploads/banners/hero_slide_2.jpg')) ?>');"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/35"></div>
+      <div class="hero-slide absolute inset-0 w-full h-full flex items-center justify-between transition-all duration-700 opacity-0 pointer-events-none z-0">
+        <!-- Background Foto Slide 2 Cerah -->
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= e(url('uploads/banners/hero_slide_2.jpg')) ?>');"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/20"></div>
 
         <!-- Konten Slide 2 -->
-        <div class="relative z-10 max-w-xl p-6 sm:p-8">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/25 backdrop-blur-md border border-amber-400/30 text-xs font-semibold text-amber-300 shadow-sm mb-3">
-            <span>🔥 Promo Pagi &bull; Diskon 15%</span>
+        <div class="relative z-10 max-w-xl p-6 sm:p-8 lg:p-10">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/30 backdrop-blur-md border border-amber-400/40 text-xs font-semibold text-amber-300 shadow-sm mb-3">
+            <span>🔥 Promo Sarapan Hemat &bull; Diskon 15%</span>
           </div>
-          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
+          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight drop-shadow-sm">
             Cold Brew Segar & Pastry Hangat
           </h2>
-          <p class="text-xs sm:text-sm text-neutral-300 mt-2 leading-relaxed">
+          <p class="text-xs sm:text-sm text-neutral-200 mt-2 leading-relaxed drop-shadow-sm max-w-md">
             Diseduh dingin selama 12 jam untuk rasa kopi yang halus tanpa rasa asam tajam, dipadu croissant renyah mentega pilihan.
           </p>
           <div class="mt-4 flex items-center gap-3">
@@ -104,26 +127,44 @@ declare(strict_types=1);
               <span>Jelajah Menu Kopi</span>
               <span>&rarr;</span>
             </button>
-            <span class="text-[11px] text-neutral-300">Tersedia Setiap Hari</span>
+            <span class="text-[11px] text-neutral-300">Tersedia Setiap Pagi</span>
+          </div>
+        </div>
+
+        <!-- Showcase Visual Card di Kanan Slide 2 -->
+        <div class="hidden md:flex relative z-10 mr-8 lg:mr-12 items-center gap-4">
+          <div class="w-56 p-3.5 rounded-2xl bg-black/70 backdrop-blur-md border border-white/20 shadow-2xl transition-transform hover:scale-105 duration-300">
+            <div class="relative h-28 w-full rounded-xl overflow-hidden mb-2.5">
+              <img src="<?= e(url('uploads/menus/cold_brew.jpg')) ?>" alt="Cold Brew" class="w-full h-full object-cover">
+              <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-bold">Diskon 15%</span>
+            </div>
+            <div class="text-white">
+              <span class="text-[10px] text-amber-300 uppercase tracking-wide font-semibold">Specialty Brew</span>
+              <h4 class="text-xs font-bold truncate">Cold Brew Klasik</h4>
+              <div class="mt-1 flex items-center justify-between">
+                <span class="text-xs font-extrabold text-accent">Rp 22.000</span>
+                <span class="text-[10px] text-neutral-400">Es Segar</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Slide 3: Makan Siang & Rice Bowl -->
-      <div class="hero-slide absolute inset-0 w-full h-full flex items-center transition-all duration-700 opacity-0 pointer-events-none z-0">
-        <!-- Background Foto Slide 3 -->
-        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= e(asset('uploads/banners/hero_slide_3.jpg')) ?>');"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/35"></div>
+      <div class="hero-slide absolute inset-0 w-full h-full flex items-center justify-between transition-all duration-700 opacity-0 pointer-events-none z-0">
+        <!-- Background Foto Slide 3 Cerah -->
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= e(url('uploads/banners/hero_slide_3.jpg')) ?>');"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/20"></div>
 
         <!-- Konten Slide 3 -->
-        <div class="relative z-10 max-w-xl p-6 sm:p-8">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/25 backdrop-blur-md border border-rose-400/30 text-xs font-semibold text-rose-300 shadow-sm mb-3">
-            <span>🍛 Paling Mengenyangkan</span>
+        <div class="relative z-10 max-w-xl p-6 sm:p-8 lg:p-10">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/30 backdrop-blur-md border border-rose-400/40 text-xs font-semibold text-rose-300 shadow-sm mb-3">
+            <span>🍛 Menu Santap Siang Favorit</span>
           </div>
-          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
+          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight drop-shadow-sm">
             Ayam Geprek & Nasi Goreng Spesial
           </h2>
-          <p class="text-xs sm:text-sm text-neutral-300 mt-2 leading-relaxed">
+          <p class="text-xs sm:text-sm text-neutral-200 mt-2 leading-relaxed drop-shadow-sm max-w-md">
             Pilihan pas santap siang! Olahan ayam krispi bumbu geprek dan nasi goreng kampung dengan telur mata sapi hangat.
           </p>
           <div class="mt-4 flex items-center gap-3">
@@ -135,7 +176,25 @@ declare(strict_types=1);
               <span>Pesan Makan Siang</span>
               <span>&rarr;</span>
             </button>
-            <span class="text-[11px] text-neutral-300">Porsi Pas & Mantap</span>
+            <span class="text-[11px] text-neutral-300">Porsi Mantap</span>
+          </div>
+        </div>
+
+        <!-- Showcase Visual Card di Kanan Slide 3 -->
+        <div class="hidden md:flex relative z-10 mr-8 lg:mr-12 items-center gap-4">
+          <div class="w-56 p-3.5 rounded-2xl bg-black/70 backdrop-blur-md border border-white/20 shadow-2xl transition-transform hover:scale-105 duration-300">
+            <div class="relative h-28 w-full rounded-xl overflow-hidden mb-2.5">
+              <img src="<?= e(url('uploads/menus/ayam_geprek.jpg')) ?>" alt="Ayam Geprek" class="w-full h-full object-cover">
+              <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-bold">Best Seller</span>
+            </div>
+            <div class="text-white">
+              <span class="text-[10px] text-rose-300 uppercase tracking-wide font-semibold">Makanan Berat</span>
+              <h4 class="text-xs font-bold truncate">Nasi Ayam Geprek</h4>
+              <div class="mt-1 flex items-center justify-between">
+                <span class="text-xs font-extrabold text-accent">Rp 28.000</span>
+                <span class="text-[10px] text-neutral-400">Paling Laris</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -202,7 +261,9 @@ declare(strict_types=1);
   <div id="menu-loading" class="space-y-8">
     <div class="space-y-4">
       <div class="h-6 w-32 rounded bg-surface animate-pulse"></div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4">
+        <div class="h-32 rounded-xl border border-line bg-surface/50 p-4 animate-pulse"></div>
+        <div class="h-32 rounded-xl border border-line bg-surface/50 p-4 animate-pulse"></div>
         <div class="h-32 rounded-xl border border-line bg-surface/50 p-4 animate-pulse"></div>
         <div class="h-32 rounded-xl border border-line bg-surface/50 p-4 animate-pulse"></div>
         <div class="h-32 rounded-xl border border-line bg-surface/50 p-4 animate-pulse"></div>
@@ -210,7 +271,9 @@ declare(strict_types=1);
     </div>
     <div class="space-y-4">
       <div class="h-6 w-40 rounded bg-surface animate-pulse"></div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4">
+        <div class="h-32 rounded-xl border border-line bg-surface/50 p-4 animate-pulse"></div>
+        <div class="h-32 rounded-xl border border-line bg-surface/50 p-4 animate-pulse"></div>
         <div class="h-32 rounded-xl border border-line bg-surface/50 p-4 animate-pulse"></div>
         <div class="h-32 rounded-xl border border-line bg-surface/50 p-4 animate-pulse"></div>
         <div class="h-32 rounded-xl border border-line bg-surface/50 p-4 animate-pulse"></div>

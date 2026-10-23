@@ -17,7 +17,7 @@ if ($flashError) {
   <div>
     <a
       href="<?= e(url()) ?>"
-      class="inline-flex items-center gap-1.5 text-xs font-medium text-subtle hover:text-ink transition-colors"
+      class="btn-cancel-login inline-flex items-center gap-1.5 text-xs font-medium text-subtle hover:text-ink transition-colors cursor-pointer"
     >
       <?= icon('arrow-left', 'h-4 w-4') ?>
       <span>Kembali ke Beranda</span>
@@ -48,7 +48,7 @@ if ($flashError) {
   </div>
 
   <!-- Form Login -->
-  <form id="form-login" action="<?= e(url('api/auth/login.php')) ?>" method="POST" novalidate class="space-y-4">
+  <form id="form-login" action="<?= e(url('api/auth/login.php')) ?>" method="POST" novalidate autocomplete="off" class="space-y-4">
     <?= csrf_field() ?>
 
     <!-- Pilihan Masuk Sebagai (Role Selector: Semua, Kasir, Admin) -->
@@ -87,7 +87,7 @@ if ($flashError) {
         type="text"
         id="username"
         name="username"
-        autocomplete="username"
+        autocomplete="off"
         autofocus
         class="h-12 w-full rounded-lg bg-surface px-4 text-sm text-ink placeholder-subtle border border-transparent focus:bg-white focus:border-ink focus:outline-none transition-colors"
         placeholder="Masukkan username"
@@ -95,24 +95,15 @@ if ($flashError) {
       <p id="error-username" class="hidden mt-1 text-xs font-medium text-danger"></p>
     </div>
 
-    <!-- Password -->
+    <!-- Password Container -->
     <div>
-      <div class="flex items-center justify-between mb-1.5">
-        <label for="password" class="block text-xs font-medium text-subtle">Password</label>
-        <button
-          type="button"
-          id="btn-open-forgot"
-          class="text-xs font-medium text-subtle hover:text-ink underline cursor-pointer"
-        >
-          Lupa password?
-        </button>
-      </div>
+      <label for="password" class="block text-xs font-medium text-subtle mb-1.5">Password</label>
       <div class="relative">
         <input
           type="password"
           id="password"
           name="password"
-          autocomplete="current-password"
+          autocomplete="new-password"
           class="h-12 w-full rounded-lg bg-surface px-4 pr-11 text-sm text-ink placeholder-subtle border border-transparent focus:bg-white focus:border-ink focus:outline-none transition-colors"
           placeholder="Masukkan password"
         >
@@ -126,15 +117,34 @@ if ($flashError) {
           <span class="icon-eye-off hidden"><?= icon('eye-off', 'h-4 w-4') ?></span>
         </button>
       </div>
+
+      <!-- Posisi Tautan Lupa Password di Bawah Container Password (Permintaan Pengguna) -->
+      <div class="flex justify-end mt-2">
+        <button
+          type="button"
+          id="btn-open-forgot"
+          class="text-xs font-medium text-subtle hover:text-ink underline cursor-pointer"
+        >
+          Lupa password?
+        </button>
+      </div>
       <p id="error-password" class="hidden mt-1 text-xs font-medium text-danger"></p>
     </div>
 
-    <!-- Tombol Submit Pil Hitam Utama -->
-    <div class="pt-2">
+    <!-- Tombol Submit & Batal Pil Hitam/Abu -->
+    <div class="pt-2 flex items-center gap-2">
+      <button
+        type="button"
+        id="btn-clear-login"
+        class="btn-cancel-login h-12 px-5 rounded-full bg-surface text-ink text-xs font-semibold hover:bg-neutral-200 transition-colors cursor-pointer"
+        title="Batal dan kosongkan form"
+      >
+        Batal
+      </button>
       <button
         type="submit"
         id="btn-login"
-        class="h-12 w-full rounded-full bg-black px-6 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-2 transition-colors cursor-pointer"
+        class="h-12 flex-1 rounded-full bg-black px-6 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-2 transition-colors cursor-pointer"
       >
         Masuk
       </button>
@@ -188,7 +198,7 @@ if ($flashError) {
         </button>
       </div>
 
-      <form id="form-register" action="<?= e(url('api/auth/register.php')) ?>" method="POST" novalidate class="mt-4 space-y-4">
+      <form id="form-register" action="<?= e(url('api/auth/register.php')) ?>" method="POST" novalidate autocomplete="off" class="mt-4 space-y-4">
         <?= csrf_field() ?>
 
         <div id="register-alert" class="hidden rounded-xl bg-danger-light p-3 text-xs font-medium text-danger">
@@ -204,6 +214,7 @@ if ($flashError) {
             name="name"
             required
             maxlength="100"
+            autocomplete="off"
             class="h-12 w-full rounded-lg bg-surface px-4 text-sm text-ink placeholder-subtle border border-transparent focus:bg-white focus:border-ink focus:outline-none transition-colors"
             placeholder="Contoh: Rian Prasetya"
           >
@@ -219,6 +230,7 @@ if ($flashError) {
             name="username"
             required
             maxlength="30"
+            autocomplete="off"
             class="h-12 w-full rounded-lg bg-surface px-4 text-sm text-ink placeholder-subtle border border-transparent focus:bg-white focus:border-ink focus:outline-none transition-colors"
             placeholder="Contoh: rian_kasir"
           >
@@ -257,6 +269,7 @@ if ($flashError) {
               id="reg-password"
               name="password"
               required
+              autocomplete="new-password"
               class="h-12 w-full rounded-lg bg-surface px-4 pr-11 text-sm text-ink border border-transparent focus:bg-white focus:border-ink focus:outline-none transition-colors"
               placeholder="Masukkan password kuat"
             >
@@ -359,7 +372,7 @@ if ($flashError) {
         </button>
       </div>
 
-      <form id="form-forgot" action="<?= e(url('api/auth/forgot-password.php')) ?>" method="POST" novalidate class="mt-4 space-y-4">
+      <form id="form-forgot" action="<?= e(url('api/auth/forgot-password.php')) ?>" method="POST" novalidate autocomplete="off" class="mt-4 space-y-4">
         <?= csrf_field() ?>
 
         <div id="forgot-alert" class="hidden rounded-xl bg-danger-light p-3 text-xs font-medium text-danger">
@@ -374,6 +387,7 @@ if ($flashError) {
             id="forgot-username"
             name="username"
             required
+            autocomplete="off"
             class="h-12 w-full rounded-lg bg-surface px-4 text-sm text-ink placeholder-subtle border border-transparent focus:bg-white focus:border-ink focus:outline-none transition-colors"
             placeholder="Masukkan username akun Anda"
           >
@@ -389,6 +403,7 @@ if ($flashError) {
               id="forgot-password"
               name="password"
               required
+              autocomplete="new-password"
               class="h-12 w-full rounded-lg bg-surface px-4 pr-11 text-sm text-ink border border-transparent focus:bg-white focus:border-ink focus:outline-none transition-colors"
               placeholder="Masukkan password baru"
             >

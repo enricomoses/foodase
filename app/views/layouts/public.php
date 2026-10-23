@@ -14,14 +14,14 @@ declare(strict_types=1);
 <body class="bg-white text-ink min-h-screen flex flex-col font-sans antialiased">
   <?php require APP_PATH . '/views/partials/navbar.php'; ?>
 
-  <!-- Konten Utama (Maksimal 6xl sesuai prd.md §12.3, padding bottom untuk mobile bar) -->
-  <main class="flex-1 mx-auto max-w-6xl w-full p-4 sm:p-6 pb-24 md:pb-6">
+  <!-- Konten Utama (Layar Penuh / Full Screen Responsif) -->
+  <main class="flex-1 mx-auto w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-4 sm:py-6 pb-24 md:pb-8">
     <?= $content ?? '' ?>
   </main>
 
-  <!-- Footer Publik Bersih (padding ekstra di mobile) -->
+  <!-- Footer Publik Bersih (Layar Penuh / Full Screen) -->
   <footer class="border-t border-line bg-white py-8 pb-24 md:pb-8 mt-auto">
-    <div class="mx-auto max-w-6xl px-4 text-center text-xs text-subtle">
+    <div class="mx-auto w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 text-center text-xs text-subtle">
       &copy; <?= date('Y') ?> FoodEase — Sistem Pemesanan & Kasir Kafe
     </div>
   </footer>

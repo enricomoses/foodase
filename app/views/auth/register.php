@@ -33,7 +33,7 @@ declare(strict_types=1);
   </div>
 
   <!-- Form Pendaftaran -->
-  <form id="form-register-page" action="<?= e(url('api/auth/register.php')) ?>" method="POST" novalidate class="space-y-4">
+  <form id="form-register-page" action="<?= e(url('api/auth/register.php')) ?>" method="POST" novalidate autocomplete="off" class="space-y-4">
     <?= csrf_field() ?>
 
     <!-- Nama Lengkap -->
@@ -45,6 +45,7 @@ declare(strict_types=1);
         name="name"
         required
         maxlength="100"
+        autocomplete="off"
         autofocus
         class="h-12 w-full rounded-lg bg-surface px-4 text-sm text-ink placeholder-subtle border border-transparent focus:bg-white focus:border-ink focus:outline-none transition-colors"
         placeholder="Contoh: Rian Prasetya"
@@ -61,7 +62,7 @@ declare(strict_types=1);
         name="username"
         required
         maxlength="30"
-        autocomplete="username"
+        autocomplete="off"
         class="h-12 w-full rounded-lg bg-surface px-4 text-sm text-ink placeholder-subtle border border-transparent focus:bg-white focus:border-ink focus:outline-none transition-colors"
         placeholder="Contoh: rian_kasir"
       >
@@ -149,12 +150,19 @@ declare(strict_types=1);
       <p id="error-page-reg-password" class="hidden mt-1 text-xs font-medium text-danger"></p>
     </div>
 
-    <!-- Tombol Submit Pil Hitam Utama -->
-    <div class="pt-2">
+    <!-- Tombol Submit & Batal Pil Hitam/Abu -->
+    <div class="pt-2 flex items-center gap-2">
+      <a
+        href="<?= e(url('login.php')) ?>"
+        class="btn-cancel-login h-12 px-5 rounded-full bg-surface text-ink text-xs font-semibold hover:bg-neutral-200 transition-colors cursor-pointer flex items-center justify-center"
+        title="Batal dan kembali ke login"
+      >
+        Batal
+      </a>
       <button
         type="submit"
         id="btn-page-submit-register"
-        class="h-12 w-full rounded-full bg-black px-6 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-2 transition-colors cursor-pointer"
+        class="h-12 flex-1 rounded-full bg-black px-6 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-2 transition-colors cursor-pointer"
       >
         Daftar Sekarang
       </button>
