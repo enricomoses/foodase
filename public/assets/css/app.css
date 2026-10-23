@@ -295,6 +295,41 @@ input, select, textarea, button, a {
     flex-shrink: 0;
 }
 
+/* ==========================================================================
+   HERO BANNER PROMO CAROUSEL
+   ========================================================================== */
+#hero-carousel-wrap {
+    background-color: #121316 !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.hero-slide {
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-slide.active {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    pointer-events: auto !important;
+    z-index: 10 !important;
+}
+
+.hero-slide:not(.active) {
+    opacity: 0 !important;
+    transform: scale(1.02) !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+}
+
+/* ==========================================================================
+   FLOATING MOBILE BOTTOM NAVIGATION (Image 1 Inspired)
+   ========================================================================== */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    nav[aria-label="Navigasi Bawah"] {
+        bottom: calc(0.75rem + env(safe-area-inset-bottom));
+    }
+}
+
 
 /* ==========================================================================
    PRINT STRUK KASIR TERMAL 80 MM

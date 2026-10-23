@@ -29,50 +29,142 @@ declare(strict_types=1);
     </a>
   </div>
 
-  <!-- Hero Cafe Showcase Banner (Membuat halaman hidup & appetizing) -->
-  <div class="hero-banner relative overflow-hidden rounded-2xl border border-line bg-surface p-6 sm:p-8">
-    <div class="relative z-10 max-w-xl">
-      <!-- Status Kafe Buka -->
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-line text-xs font-semibold text-ink shadow-sm">
-        <span class="h-2 w-2 rounded-full bg-accent animate-pulse"></span>
-        <span>Buka Sekarang &bull; Meja & Bawa Pulang</span>
+  <!-- Hero Cafe Showcase Carousel (Interaktif & Appetizing dengan Background Foto & Promo) -->
+  <div class="relative overflow-hidden rounded-2xl border border-line bg-neutral-900 text-white shadow-md group" id="hero-carousel-wrap">
+    <!-- Slides Container -->
+    <div id="hero-carousel-slides" class="relative w-full h-[320px] sm:h-[300px] overflow-hidden">
+
+      <!-- Slide 1: Cafe Utama -->
+      <div class="hero-slide active absolute inset-0 w-full h-full flex items-center transition-all duration-700 opacity-100 z-10">
+        <!-- Background Foto dengan Gradien Gelap -->
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= e(asset('uploads/banners/hero_slide_1.jpg')) ?>');"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/30"></div>
+
+        <!-- Konten Slide 1 -->
+        <div class="relative z-10 max-w-xl p-6 sm:p-8">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-xs font-semibold text-white shadow-sm mb-3">
+            <span class="h-2 w-2 rounded-full bg-accent animate-pulse"></span>
+            <span>Buka Sekarang &bull; Meja & Bawa Pulang</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
+            Kopi Istimewa & Santapan Hangat Kafe
+          </h1>
+          <p class="text-xs sm:text-sm text-neutral-300 mt-2 leading-relaxed">
+            Pesan menu favorit Anda langsung dari meja tanpa harus antre di kasir. Segar, nikmat, dan disajikan tepat waktu.
+          </p>
+          <div class="mt-4 flex flex-wrap items-center gap-2 text-[11px] font-medium text-white/90">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/15">
+              <?= icon('clock', 'h-3.5 w-3.5 text-accent') ?>
+              <span>Penyajian Cepat</span>
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/15">
+              <?= icon('check', 'h-3.5 w-3.5 text-accent') ?>
+              <span>100% Biji Pilihan</span>
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/15">
+              <?= icon('receipt', 'h-3.5 w-3.5 text-accent') ?>
+              <span>QRIS & Tunai</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Rating Box Floating di Kanan (Layar Besar) -->
+        <div class="hidden md:flex absolute right-8 top-1/2 -translate-y-1/2 z-10 flex-col items-center p-4 rounded-2xl bg-black/60 backdrop-blur-md border border-white/15 shadow-xl text-center">
+          <div class="w-12 h-12 rounded-full bg-accent-light flex items-center justify-center text-accent mb-2">
+            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          </div>
+          <span class="text-lg font-bold text-white">4.9 / 5.0</span>
+          <span class="text-[11px] text-neutral-300 mt-0.5">1.200+ Ulasan Puas</span>
+        </div>
       </div>
 
-      <!-- Judul Banner -->
-      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-ink mt-3 leading-tight">
-        Kopi Istimewa & Santapan Hangat Kafe
-      </h1>
+      <!-- Slide 2: Promo Sarapan & Cold Brew -->
+      <div class="hero-slide absolute inset-0 w-full h-full flex items-center transition-all duration-700 opacity-0 pointer-events-none z-0">
+        <!-- Background Foto Slide 2 -->
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= e(asset('uploads/banners/hero_slide_2.jpg')) ?>');"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/35"></div>
 
-      <p class="text-xs sm:text-sm text-subtle mt-2 leading-relaxed">
-        Pesan menu favorit Anda langsung dari meja tanpa harus antre di kasir. Segar, nikmat, dan disajikan tepat waktu.
-      </p>
-
-      <!-- Pill Fitur Kafe -->
-      <div class="mt-4 flex flex-wrap items-center gap-2 text-[11px] font-medium text-subtle">
-        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-line text-ink">
-          <?= icon('clock', 'h-3.5 w-3.5 text-accent') ?>
-          <span>Penyajian Cepat</span>
-        </span>
-        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-line text-ink">
-          <?= icon('check', 'h-3.5 w-3.5 text-accent') ?>
-          <span>100% Biji Pilihan</span>
-        </span>
-        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-line text-ink">
-          <?= icon('receipt', 'h-3.5 w-3.5 text-accent') ?>
-          <span>QRIS & Tunai</span>
-        </span>
+        <!-- Konten Slide 2 -->
+        <div class="relative z-10 max-w-xl p-6 sm:p-8">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/25 backdrop-blur-md border border-amber-400/30 text-xs font-semibold text-amber-300 shadow-sm mb-3">
+            <span>🔥 Promo Pagi &bull; Diskon 15%</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
+            Cold Brew Segar & Pastry Hangat
+          </h2>
+          <p class="text-xs sm:text-sm text-neutral-300 mt-2 leading-relaxed">
+            Diseduh dingin selama 12 jam untuk rasa kopi yang halus tanpa rasa asam tajam, dipadu croissant renyah mentega pilihan.
+          </p>
+          <div class="mt-4 flex items-center gap-3">
+            <button
+              type="button"
+              class="btn-filter-category-quick h-10 px-5 rounded-full bg-white text-black text-xs font-bold hover:bg-neutral-200 transition-colors cursor-pointer flex items-center gap-1.5 shadow"
+              data-cat-name="Kopi"
+            >
+              <span>Jelajah Menu Kopi</span>
+              <span>&rarr;</span>
+            </button>
+            <span class="text-[11px] text-neutral-300">Tersedia Setiap Hari</span>
+          </div>
+        </div>
       </div>
+
+      <!-- Slide 3: Makan Siang & Rice Bowl -->
+      <div class="hero-slide absolute inset-0 w-full h-full flex items-center transition-all duration-700 opacity-0 pointer-events-none z-0">
+        <!-- Background Foto Slide 3 -->
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= e(asset('uploads/banners/hero_slide_3.jpg')) ?>');"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/35"></div>
+
+        <!-- Konten Slide 3 -->
+        <div class="relative z-10 max-w-xl p-6 sm:p-8">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/25 backdrop-blur-md border border-rose-400/30 text-xs font-semibold text-rose-300 shadow-sm mb-3">
+            <span>🍛 Paling Mengenyangkan</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
+            Ayam Geprek & Nasi Goreng Spesial
+          </h2>
+          <p class="text-xs sm:text-sm text-neutral-300 mt-2 leading-relaxed">
+            Pilihan pas santap siang! Olahan ayam krispi bumbu geprek dan nasi goreng kampung dengan telur mata sapi hangat.
+          </p>
+          <div class="mt-4 flex items-center gap-3">
+            <button
+              type="button"
+              class="btn-filter-category-quick h-10 px-5 rounded-full bg-white text-black text-xs font-bold hover:bg-neutral-200 transition-colors cursor-pointer flex items-center gap-1.5 shadow"
+              data-cat-name="Makanan Berat"
+            >
+              <span>Pesan Makan Siang</span>
+              <span>&rarr;</span>
+            </button>
+            <span class="text-[11px] text-neutral-300">Porsi Pas & Mantap</span>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- Hiasan Geometris Elegan / Minimalis SVG Outline di Sisi Kanan (Khusus Layar Lebar) -->
-    <div class="hidden sm:block absolute right-4 bottom-2 opacity-10 pointer-events-none text-ink">
-      <svg class="w-48 h-48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
-        <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-        <line x1="6" y1="1" x2="6" y2="4"></line>
-        <line x1="10" y1="1" x2="10" y2="4"></line>
-        <line x1="14" y1="1" x2="14" y2="4"></line>
-      </svg>
+    <!-- Tombol Navigasi Panah Kiri & Kanan (Muncul saat Hover di Layar Lebar) -->
+    <button
+      type="button"
+      id="btn-hero-slide-prev"
+      class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-sm border border-white/20 flex items-center justify-center transition-all opacity-80 hover:opacity-100 cursor-pointer shadow"
+      aria-label="Slide sebelumnya"
+    >
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+    <button
+      type="button"
+      id="btn-hero-slide-next"
+      class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-sm border border-white/20 flex items-center justify-center transition-all opacity-80 hover:opacity-100 cursor-pointer shadow"
+      aria-label="Slide berikutnya"
+    >
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+
+    <!-- Indikator Dots Slide di Bawah -->
+    <div class="absolute bottom-3.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5" id="hero-carousel-dots">
+      <button type="button" class="hero-dot w-7 h-1.5 rounded-full bg-white transition-all cursor-pointer" data-slide="0" aria-label="Slide 1"></button>
+      <button type="button" class="hero-dot w-2 h-1.5 rounded-full bg-white/40 hover:bg-white/70 transition-all cursor-pointer" data-slide="1" aria-label="Slide 2"></button>
+      <button type="button" class="hero-dot w-2 h-1.5 rounded-full bg-white/40 hover:bg-white/70 transition-all cursor-pointer" data-slide="2" aria-label="Slide 3"></button>
     </div>
   </div>
 

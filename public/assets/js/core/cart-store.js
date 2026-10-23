@@ -28,7 +28,7 @@ window.CartStore = (function ($) {
     const totalCount = items.reduce(function (sum, item) {
       return sum + (parseInt(item.qty, 10) || 1);
     }, 0);
-    $('#cart-count').text(totalCount);
+    $('#cart-count, .cart-badge-count').text(totalCount);
   }
 
   // Update badge saat halaman selesai dimuat

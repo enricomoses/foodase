@@ -105,6 +105,16 @@ $(function () {
     handleSearchInput(val);
   });
 
+  $(document).on('click', '#btn-mobile-nav-search', function (e) {
+    e.preventDefault();
+    const $search = $('#mobile-search-input:visible, #global-search-input:visible').first();
+    if ($search.length) {
+      $('html, body').animate({ scrollTop: Math.max(0, $search.offset().top - 80) }, 300, function () {
+        $search.trigger('focus');
+      });
+    }
+  });
+
   // Reset filter dari state kosong
   $('#btn-reset-filter').on('click', function () {
     currentSearchQuery = '';
@@ -461,7 +471,97 @@ $(function () {
   });
 
   // ============================================================
-  // CAROUSEL NAVIGASI PREV & NEXT
+  // HERO SHOWCASE BANNER CAROUSEL
+  // ============================================================
+  let currentHeroSlide = 0;
+  const $heroSlides = $('#hero-carousel-slides .hero-slide');
+  const totalHeroSlides = $heroSlides.length;
+  let heroTimer = null;
+
+  function showHeroSlide(index) {
+    if (index >= totalHeroSlides) index = 0;
+    if (index < 0) index = totalHeroSlides - 1;
+    currentHeroSlide = index;
+
+    $heroSlides.each(function (i) {
+      if (i === currentHeroSlide) {
+        $(this)
+          .removeClass('opacity-0 pointer-events-none z-0')
+          .addClass('active opacity-100 z-10');
+      } else {
+        $(this)
+          .removeClass('active opacity-100 z-10')
+          .addClass('opacity-0 pointer-events-none z-0');
+      }
+    });
+
+    // Perbarui indikator dots
+    $('#hero-carousel-dots .hero-dot').each(function (i) {
+      if (i === currentHeroSlide) {
+        $(this).removeClass('w-2 bg-white/40').addClass('w-7 bg-white');
+      } else {
+        $(this).removeClass('w-7 bg-white').addClass('w-2 bg-white/40');
+      }
+    });
+  }
+
+  function startHeroTimer() {
+    stopHeroTimer();
+    heroTimer = setInterval(function () {
+      showHeroSlide(currentHeroSlide + 1);
+    }, 5000);
+  }
+
+  function stopHeroTimer() {
+    if (heroTimer) {
+      clearInterval(heroTimer);
+      heroTimer = null;
+    }
+  }
+
+  $('#btn-hero-slide-prev').on('click', function (e) {
+    e.preventDefault();
+    showHeroSlide(currentHeroSlide - 1);
+    startHeroTimer();
+  });
+
+  $('#btn-hero-slide-next').on('click', function (e) {
+    e.preventDefault();
+    showHeroSlide(currentHeroSlide + 1);
+    startHeroTimer();
+  });
+
+  $('#hero-carousel-dots').on('click', '.hero-dot', function (e) {
+    e.preventDefault();
+    const idx = parseInt($(this).data('slide'), 10) || 0;
+    showHeroSlide(idx);
+    startHeroTimer();
+  });
+
+  $('#hero-carousel-wrap')
+    .on('mouseenter', stopHeroTimer)
+    .on('mouseleave', startHeroTimer);
+
+  startHeroTimer();
+
+  // Tombol filter cepat kategori di dalam slide
+  $(document).on('click', '.btn-filter-category-quick', function (e) {
+    e.preventDefault();
+    const catName = String($(this).data('cat-name') || '').toLowerCase();
+    const matched = allCategories.find(function (c) {
+      return c.name.toLowerCase().includes(catName);
+    });
+    if (matched) {
+      $(`#category-chips .category-chip[data-category-id="${matched.id}"]`).trigger('click');
+      const $chips = $('#category-chips');
+      if ($chips.length) {
+        $('html, body').animate({ scrollTop: $chips.offset().top - 80 }, 400);
+      }
+    }
+  });
+
+  // ============================================================
+  // CAROUSEL NAVIGASI PREV & NEXT (MENU FAVORIT)
   // ============================================================
   $(document).on('click', '#btn-carousel-prev', function (e) {
     e.preventDefault();

@@ -25,22 +25,57 @@ declare(strict_types=1);
     <?php endfor; ?>
   </div>
 
-  <!-- ==================== STATE: KOSONG ==================== -->
-  <div id="cart-empty" class="hidden flex flex-col items-center justify-center py-24 text-center">
-    <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center text-subtle mb-4">
-      <!-- Ikon keranjang (SVG outline) -->
-      <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-      </svg>
+  <!-- ==================== STATE: KOSONG (Gaya Image 1 - Appetizing & Engaging) ==================== -->
+  <div id="cart-empty" class="hidden flex flex-col items-center justify-center py-14 sm:py-20 text-center px-4">
+    <!-- Ilustrasi Toko Kafe & Burger Berwarna (Persis Image 1) -->
+    <div class="relative w-44 h-44 sm:w-52 sm:h-52 mb-6 flex items-center justify-center">
+      <div class="w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-gradient-to-b from-amber-100 to-orange-50 dark:from-neutral-800 dark:to-neutral-900 border-4 border-white dark:border-neutral-700 shadow-xl flex items-center justify-center relative overflow-hidden">
+        <!-- SVG Toko Kafe & Burger Lezat Berwarna -->
+        <svg class="w-32 h-32 sm:w-36 sm:h-36" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Tenda Awning Garis Merah Putih -->
+          <path d="M25 50 C25 45 35 42 80 42 C125 42 135 45 135 50 L140 70 C140 73 137 76 133 76 C129 76 126 73 126 70 C126 73 123 76 119 76 C115 76 112 73 112 70 C112 73 109 76 105 76 C101 76 98 73 98 70 C98 73 95 76 91 76 C87 76 84 73 84 70 C84 73 81 76 77 76 C73 76 70 73 70 70 C70 73 67 76 63 76 C59 76 56 73 56 70 C56 73 53 76 49 76 C45 76 42 73 42 70 C42 73 39 76 35 76 C31 76 28 73 28 70 Z" fill="#EF4444"/>
+          <path d="M42 43 L42 76 C45 76 49 73 49 70 L49 43 Z M70 42 L70 76 C73 76 77 73 77 70 L77 42 Z M98 42 L98 76 C101 76 105 73 105 70 L105 42 Z M126 43 L126 76 C129 76 133 73 133 70 L133 43 Z" fill="#FFFFFF"/>
+          
+          <!-- Jendela Toko Kafe Biru Cerah -->
+          <rect x="36" y="70" width="88" height="52" rx="4" fill="#E0F2FE"/>
+          <line x1="80" y1="70" x2="80" y2="122" stroke="#BAE6FD" stroke-width="2"/>
+          <rect x="30" y="118" width="100" height="8" rx="2" fill="#F59E0B"/>
+
+          <!-- Burger Berlapis Lezat di Tengah Jendela -->
+          <!-- Bun Atas -->
+          <path d="M56 86 C56 75 104 75 104 86 Z" fill="#D97706"/>
+          <ellipse cx="68" cy="80" rx="1.5" ry="1" fill="#FEF3C7"/>
+          <ellipse cx="80" cy="78" rx="1.5" ry="1" fill="#FEF3C7"/>
+          <ellipse cx="92" cy="81" rx="1.5" ry="1" fill="#FEF3C7"/>
+          <!-- Selada Hijau -->
+          <path d="M52 87 Q60 84 68 87 Q76 90 84 87 Q92 84 100 87 Q104 88 108 87 L106 91 L54 91 Z" fill="#22C55E"/>
+          <!-- Daging Patty Cokelat -->
+          <rect x="54" y="91" width="52" height="8" rx="4" fill="#78350F"/>
+          <!-- Keju Leleh Kuning -->
+          <path d="M55 95 L68 95 L72 101 L76 95 L105 95 L105 98 L55 98 Z" fill="#FBBF24"/>
+          <!-- Tomat Merah -->
+          <rect x="58" y="98" width="44" height="4" rx="2" fill="#EF4444"/>
+          <!-- Bun Bawah -->
+          <path d="M56 102 C56 108 104 108 104 102 Z" fill="#D97706"/>
+        </svg>
+      </div>
     </div>
-    <h2 class="text-lg font-bold text-ink">Keranjang kosong</h2>
-    <p class="mt-1 text-sm text-subtle">Tambahkan menu terlebih dahulu untuk melanjutkan.</p>
+
+    <!-- Teks Headline & Subtitle Menarik (Persis Image 1) -->
+    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-ink">
+      Ready for Something Delicious?
+    </h2>
+    <p class="mt-2 text-sm text-subtle max-w-sm mx-auto leading-relaxed">
+      Keranjang pesanan Anda masih kosong. Jelajahi aneka sajian kafe kami dan tambahkan menu favorit untuk memulai pesanan.
+    </p>
+
+    <!-- Tombol Aksi Utama Berbentuk Pil -->
     <a
       href="<?= e(url('index.php')) ?>"
-      class="mt-6 h-11 px-6 rounded-full bg-black text-white text-sm font-medium inline-flex items-center hover:bg-neutral-800 transition-colors"
+      class="mt-6 h-12 px-8 rounded-full bg-black text-white text-sm font-bold inline-flex items-center gap-2 hover:bg-neutral-800 transition-all shadow-md hover:shadow-lg cursor-pointer transform hover:-translate-y-0.5"
     >
-      Lihat Menu
+      <span>Mulai Memesan Menu</span>
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
     </a>
   </div>
 
