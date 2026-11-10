@@ -1,10 +1,5 @@
 <?php
 declare(strict_types=1);
-
-/**
- * Layout halaman autentikasi (Kartu Tengah Bersih — Gaya Uber Eats).
- * Variabel yang didukung: $title, $content, $scripts (array).
- */
 ?>
 <!DOCTYPE html>
 <html lang="id">

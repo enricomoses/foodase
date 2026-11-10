@@ -15,20 +15,20 @@ declare(strict_types=1);
   <?php require APP_PATH . '/views/partials/navbar.php'; ?>
 
   <!-- Konten Utama (Layar Penuh / Full Screen Responsif) -->
-  <main class="flex-1 mx-auto w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-4 sm:py-6 pb-24 md:pb-8">
+  <main class="flex-1 mx-auto w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-4 sm:py-6 pb-28">
     <?= $content ?? '' ?>
   </main>
 
   <!-- Footer Publik Bersih (Layar Penuh / Full Screen) -->
-  <footer class="border-t border-line bg-white py-8 pb-24 md:pb-8 mt-auto">
+  <footer class="border-t border-line bg-white py-8 pb-28 mt-auto">
     <div class="mx-auto w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 text-center text-xs text-subtle">
       &copy; <?= date('Y') ?> FoodEase — Sistem Pemesanan & Kasir Kafe
     </div>
   </footer>
 
   <!-- Floating Mobile Bottom Navigation Bar (Gaya Image 1 - Mobile App UX) -->
-  <nav class="block md:hidden fixed bottom-3 left-3 right-3 z-40" aria-label="Navigasi Bawah">
-    <div class="mx-auto max-w-md bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border border-line rounded-full shadow-2xl px-3.5 py-1.5 flex items-center justify-between">
+  <nav class="fixed bottom-3 left-3 right-3 z-40" aria-label="Navigasi Bawah">
+    <div class="mx-auto max-w-screen-xl bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border border-line rounded-full shadow-2xl px-3.5 py-1.5 flex items-center justify-between">
       <!-- Home / Menu -->
       <a href="<?= e(url('index.php')) ?>" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-full text-ink hover:text-ink transition-colors">
         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
