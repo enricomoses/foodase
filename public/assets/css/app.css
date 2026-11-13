@@ -45,7 +45,7 @@
 :root {
     --color-bg:      #ffffff;
     --color-surface: #F6F6F6;
-    --color-border:  #E2E2E2;
+    --color-border:  #d1d5db;
     --color-ink:     #000000;
     --color-subtle:  #545454;
     --color-input-bg: #F6F6F6;
@@ -222,6 +222,130 @@ html.dark [class~="shadow-sm"] {
     box-shadow: 0 1px 3px 0 rgba(0,0,0,0.5), 0 1px 2px -1px rgba(0,0,0,0.5) !important;
 }
 
+/* --- Segmented Toggle Tipe Pesanan (Jelas & Kontras Maksimal di Light & Dark Mode) --- */
+#order-type-toggle {
+    background-color: var(--color-surface) !important;
+    border: 1.5px solid var(--color-border) !important;
+    padding: 4px !important;
+}
+
+.order-type-btn {
+    border: 1px solid transparent !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* State Aktif - Mode Terang: Pil Hitam Pekat Teks Putih */
+.order-type-btn.is-active {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    border: 1px solid #000000 !important;
+}
+.order-type-btn.is-active span {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+/* State Aktif - Mode Gelap: Pil Putih Pekat Teks Hitam */
+html.dark .order-type-btn.is-active {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.3) !important;
+    border: 1px solid #ffffff !important;
+}
+html.dark .order-type-btn.is-active span {
+    color: #000000 !important;
+    font-weight: 700 !important;
+}
+
+/* State Tidak Aktif */
+.order-type-btn:not(.is-active) {
+    background-color: transparent !important;
+    color: #545454 !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+    border: 1px solid transparent !important;
+}
+.order-type-btn:not(.is-active) span {
+    color: #545454 !important;
+    font-weight: 600 !important;
+}
+.order-type-btn:not(.is-active):hover {
+    color: #000000 !important;
+}
+.order-type-btn:not(.is-active):hover span {
+    color: #000000 !important;
+}
+
+html.dark .order-type-btn:not(.is-active) {
+    background-color: transparent !important;
+    color: #a0a0a0 !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+    border: 1px solid transparent !important;
+}
+html.dark .order-type-btn:not(.is-active) span {
+    color: #a0a0a0 !important;
+    font-weight: 600 !important;
+}
+html.dark .order-type-btn:not(.is-active):hover {
+    color: #ffffff !important;
+}
+html.dark .order-type-btn:not(.is-active):hover span {
+    color: #ffffff !important;
+}
+
+/* --- Tombol Submit Buat Pesanan (Jelas & Terang di Light & Dark Mode) --- */
+#btn-submit-order {
+    background-color: #06C167 !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(6, 193, 103, 0.3) !important;
+}
+#btn-submit-order:hover {
+    background-color: #048848 !important;
+}
+#btn-submit-order:disabled {
+    opacity: 0.45 !important;
+    cursor: not-allowed !important;
+}
+#btn-submit-order span,
+#btn-submit-text {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+/* --- Terminal Kasir: Tombol Konfirmasi (Hijau) & Batalkan (Merah) --- */
+#btn-terminal-submit-cash,
+#btn-terminal-submit-qris {
+    background-color: #06C167 !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 8px rgba(6, 193, 103, 0.35) !important;
+}
+#btn-terminal-submit-cash:hover,
+#btn-terminal-submit-qris:hover {
+    background-color: #048848 !important;
+    opacity: 0.95 !important;
+}
+
+#btn-terminal-open-cancel {
+    background-color: #E11900 !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 8px rgba(225, 25, 0, 0.35) !important;
+}
+#btn-terminal-open-cancel:hover {
+    background-color: #b91500 !important;
+}
+
 
 body, aside, header, main,
 [class~="bg-white"], [class~="bg-surface"],
@@ -342,11 +466,85 @@ html.dark input:-webkit-autofill:active {
 }
 
 /* ==========================================================================
-   FLOATING MOBILE BOTTOM NAVIGATION (Image 1 Inspired)
+   FLOATING MOBILE BOTTOM NAVIGATION (High Contrast & Clear Readability)
    ========================================================================== */
+.bottom-nav-pill {
+    background-color: #ffffff !important;
+    border: 1.5px solid #d1d5db !important;
+    box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.18), 0 4px 12px -2px rgba(0, 0, 0, 0.10) !important;
+}
+.bottom-nav-link,
+.bottom-nav-item {
+    color: #171717 !important;
+}
+.bottom-nav-link svg,
+.bottom-nav-item svg {
+    stroke: #171717 !important;
+    color: #171717 !important;
+}
+.bottom-nav-link:hover,
+.bottom-nav-link:hover svg,
+.bottom-nav-item:hover,
+.bottom-nav-item:hover svg {
+    color: #000000 !important;
+    stroke: #000000 !important;
+}
+
+/* Dark Mode - Elevated dark container with clear white icons & text */
+html.dark .bottom-nav-pill {
+    background-color: #222226 !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+}
+html.dark .bottom-nav-link,
+html.dark .bottom-nav-item {
+    color: #ffffff !important;
+}
+html.dark .bottom-nav-link svg,
+html.dark .bottom-nav-item svg {
+    stroke: #ffffff !important;
+    color: #ffffff !important;
+}
+html.dark .bottom-nav-link:hover,
+html.dark .bottom-nav-link:hover svg,
+html.dark .bottom-nav-item:hover,
+html.dark .bottom-nav-item:hover svg {
+    color: #06C167 !important;
+    stroke: #06C167 !important;
+}
+
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
     nav[aria-label="Navigasi Bawah"] {
         bottom: calc(0.75rem + env(safe-area-inset-bottom));
+    }
+}
+
+/* POS Order Panel Stay Sticky */
+.pos-sticky-panel {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    z-index: 10;
+}
+
+/* POS Terminal Workspace (Dual-Pane & Mobile Drawer) */
+#orders-table-body tr.is-selected {
+    background-color: var(--color-surface) !important;
+    border-left: 4px solid var(--color-ink) !important;
+}
+
+@media (max-width: 1023px) {
+    #pos-terminal-panel.mobile-open {
+        position: fixed !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        z-index: 50 !important;
+        max-height: 88vh !important;
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3) !important;
     }
 }
 

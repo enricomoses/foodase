@@ -10,21 +10,21 @@ $appName = (string) Config::get('app.name', 'FoodEase');
 
 if ($currentRole === 'admin') {
     $menus = [
-        ['key' => 'dashboard',  'label' => 'Dashboard',    'url' => url('admin/index.php')],
-        ['key' => 'orders',     'label' => 'Pesanan',      'url' => url('admin/orders.php')],
-        ['key' => 'pos',        'label' => 'POS',          'url' => url('cashier/pos.php')],
-        ['key' => 'history',    'label' => 'Riwayat',      'url' => url('cashier/history.php')],
-        ['key' => 'menus',      'label' => 'Kelola Menu',  'url' => url('admin/menus.php')],
-        ['key' => 'categories', 'label' => 'Kategori',     'url' => url('admin/categories.php')],
-        ['key' => 'users',      'label' => 'Pengguna',     'url' => url('admin/users.php')],
-        ['key' => 'reports',    'label' => 'Laporan',      'url' => url('admin/reports.php')],
+        ['key' => 'dashboard',  'label' => __('sidebar_dashboard'),    'url' => url('admin/index.php')],
+        ['key' => 'orders',     'label' => __('sidebar_orders'),       'url' => url('admin/orders.php')],
+        ['key' => 'pos',        'label' => __('sidebar_pos'),          'url' => url('cashier/pos.php')],
+        ['key' => 'history',    'label' => __('sidebar_history'),      'url' => url('cashier/history.php')],
+        ['key' => 'menus',      'label' => __('sidebar_menus'),        'url' => url('admin/menus.php')],
+        ['key' => 'categories', 'label' => __('sidebar_categories'),   'url' => url('admin/categories.php')],
+        ['key' => 'users',      'label' => __('sidebar_users'),        'url' => url('admin/users.php')],
+        ['key' => 'reports',    'label' => __('sidebar_reports'),      'url' => url('admin/reports.php')],
     ];
 } else {
     // Role cashier atau default
     $menus = [
-        ['key' => 'cashier', 'label' => 'Pesanan Masuk',   'url' => url('cashier/index.php')],
-        ['key' => 'pos',     'label' => 'POS',             'url' => url('cashier/pos.php')],
-        ['key' => 'history', 'label' => 'Riwayat',         'url' => url('cashier/history.php')],
+        ['key' => 'cashier', 'label' => __('sidebar_cashier'),   'url' => url('cashier/index.php')],
+        ['key' => 'pos',     'label' => __('sidebar_pos'),       'url' => url('cashier/pos.php')],
+        ['key' => 'history', 'label' => __('sidebar_history'),   'url' => url('cashier/history.php')],
     ];
 }
 ?>
@@ -47,6 +47,7 @@ if ($currentRole === 'admin') {
       <a
         href="<?= e($item['url']) ?>"
         class="flex h-11 items-center px-3.5 text-sm transition-colors rounded-lg <?= $isActive ? 'bg-surface font-bold text-ink' : 'font-medium text-subtle hover:bg-surface hover:text-ink' ?>"
+        data-i18n="sidebar_<?= e($item['key']) ?>"
       >
         <?= e($item['label']) ?>
       </a>

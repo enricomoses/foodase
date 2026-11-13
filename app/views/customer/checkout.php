@@ -16,7 +16,7 @@ $csrfToken = csrf_token();
 
   <!-- ===== FORM CHECKOUT (ditampilkan awal) ===== -->
   <div id="checkout-form-section">
-    <h1 class="text-2xl font-bold tracking-tight text-ink mb-6">Checkout</h1>
+    <h1 class="text-2xl font-bold tracking-tight text-ink mb-6" data-i18n="checkout_title"><?= e(__('checkout_title')) ?></h1>
 
     <!-- Error global server -->
     <div id="checkout-server-error" class="hidden mb-4 flex items-start gap-2 rounded-xl border border-danger-light bg-danger-light/40 px-4 py-3">
@@ -27,8 +27,8 @@ $csrfToken = csrf_token();
     </div>
 
     <!-- ── Kartu 1: Tipe Pesanan ── -->
-    <div class="rounded-xl border border-line bg-white p-5 mb-4">
-      <h2 class="text-base font-bold text-ink mb-3">Tipe pesanan</h2>
+    <div class="rounded-xl border border-line bg-white p-5 mb-4 shadow-sm">
+      <h2 class="text-base font-bold text-ink mb-3" data-i18n="order_type"><?= e(__('order_type')) ?></h2>
 
       <!-- Toggle pil dua pilihan (aktif: putih + bayangan di dalam wadah abu) -->
       <div class="flex p-1 rounded-full bg-surface gap-1" id="order-type-toggle" role="radiogroup" aria-label="Tipe pesanan">
@@ -38,9 +38,9 @@ $csrfToken = csrf_token();
           role="radio"
           aria-checked="true"
           data-value="dine_in"
-          class="order-type-btn flex-1 h-10 rounded-full text-sm font-medium transition-all bg-white shadow-sm text-ink cursor-pointer"
+          class="order-type-btn is-active flex-1 h-10 rounded-full text-sm transition-all cursor-pointer flex items-center justify-center"
         >
-          Makan di tempat
+          <span data-i18n="dine_in"><?= e(__('dine_in')) ?></span>
         </button>
         <button
           type="button"
@@ -48,9 +48,9 @@ $csrfToken = csrf_token();
           role="radio"
           aria-checked="false"
           data-value="takeaway"
-          class="order-type-btn flex-1 h-10 rounded-full text-sm font-medium transition-all text-subtle cursor-pointer hover:text-ink"
+          class="order-type-btn flex-1 h-10 rounded-full text-sm transition-all cursor-pointer flex items-center justify-center"
         >
-          Bawa pulang
+          <span data-i18n="takeaway"><?= e(__('takeaway')) ?></span>
         </button>
       </div>
 
@@ -58,20 +58,21 @@ $csrfToken = csrf_token();
     </div>
 
     <!-- ── Kartu 2: Detail Pelanggan ── -->
-    <div class="rounded-xl border border-line bg-white p-5 mb-4 space-y-4">
-      <h2 class="text-base font-bold text-ink">Detail</h2>
+    <div class="rounded-xl border border-line bg-white p-5 mb-4 space-y-4 shadow-sm">
+      <h2 class="text-base font-bold text-ink" data-i18n="customer_name"><?= e(__('customer_name')) ?></h2>
 
       <!-- Nama Pelanggan -->
       <div>
         <label for="input-customer-name" class="block text-xs font-medium text-subtle mb-1.5">
-          Nama <span class="text-danger">*</span>
+          <span data-i18n="customer_name"><?= e(__('customer_name')) ?></span> <span class="text-danger">*</span>
         </label>
         <input
           type="text"
           id="input-customer-name"
           name="customer_name"
           maxlength="50"
-          placeholder="Nama pemesan"
+          placeholder="<?= e(__('name_placeholder')) ?>"
+          data-i18n-placeholder="name_placeholder"
           autocomplete="name"
           class="h-12 w-full rounded-lg bg-surface px-4 border border-transparent focus:bg-white focus:border-ink focus:outline-none text-sm text-ink placeholder-subtle transition-colors"
         >
@@ -81,16 +82,16 @@ $csrfToken = csrf_token();
       <!-- Nomor Meja (tampil hanya dine-in) -->
       <div id="table-number-group">
         <label for="input-table-number" class="block text-xs font-medium text-subtle mb-1.5">
-          Nomor meja <span class="text-danger">*</span>
+          <span data-i18n="table_number"><?= e(__('table_number')) ?></span> <span class="text-danger">*</span>
         </label>
         <select
           id="input-table-number"
           name="table_number"
           class="h-12 w-full rounded-lg bg-surface px-4 border border-transparent focus:bg-white focus:border-ink focus:outline-none text-sm text-ink transition-colors appearance-none cursor-pointer"
         >
-          <option value="">— Pilih nomor meja —</option>
+          <option value="" disabled selected data-i18n="table_placeholder"><?= e(__('table_placeholder')) ?></option>
           <?php for ($t = 1; $t <= $maxTable; $t++): ?>
-          <option value="<?= e((string) $t) ?>">Meja <?= e((string) $t) ?></option>
+          <option value="<?= e((string) $t) ?>"><?= e(__('table_number')) ?> <?= e((string) $t) ?></option>
           <?php endfor; ?>
         </select>
         <p id="error-table-number" class="hidden mt-1 text-xs text-danger"></p>
@@ -99,14 +100,15 @@ $csrfToken = csrf_token();
       <!-- Catatan -->
       <div>
         <label for="input-notes" class="block text-xs font-medium text-subtle mb-1.5">
-          Catatan <span class="text-subtle font-normal">(opsional)</span>
+          <span data-i18n="notes_label"><?= e(__('notes_label')) ?></span> <span class="text-subtle font-normal">(<?= e(__('optional')) ?>)</span>
         </label>
         <textarea
           id="input-notes"
           name="notes"
           rows="2"
           maxlength="255"
-          placeholder="Mis. kopi tanpa gula, pisahkan nasi..."
+          placeholder="<?= e(__('notes_placeholder')) ?>"
+          data-i18n-placeholder="notes_placeholder"
           class="w-full rounded-lg bg-surface px-4 py-3 border border-transparent focus:bg-white focus:border-ink focus:outline-none text-sm text-ink placeholder-subtle transition-colors resize-none"
         ></textarea>
         <p id="error-notes" class="hidden mt-1 text-xs text-danger"></p>
@@ -114,7 +116,7 @@ $csrfToken = csrf_token();
     </div>
 
     <!-- ── Kartu 3: Ringkasan Pesanan ── -->
-    <div class="rounded-xl border border-line bg-white p-5 mb-6">
+    <div class="rounded-xl border border-line bg-white p-5 mb-6 shadow-sm">
       <h2 class="text-base font-bold text-ink mb-3">Pesanan Anda</h2>
 
       <!-- State kosong -->
@@ -151,11 +153,12 @@ $csrfToken = csrf_token();
     <button
       type="button"
       id="btn-submit-order"
-      class="w-full h-12 rounded-full bg-black text-white text-sm font-medium hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer flex items-center justify-center gap-2"
+      style="background-color: #06C167 !important; color: #ffffff !important;"
+      class="w-full h-12 rounded-full text-white text-sm font-bold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm"
     >
-      <span id="btn-submit-text">Buat pesanan</span>
+      <span id="btn-submit-text" style="color: #ffffff !important; font-weight: 700 !important;" data-i18n="btn_submit_order"><?= e(__('btn_submit_order')) ?></span>
       <!-- Spinner tersembunyi saat tidak loading -->
-      <svg id="btn-submit-spinner" class="hidden h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+      <svg id="btn-submit-spinner" class="hidden h-4 w-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
       </svg>
@@ -177,18 +180,18 @@ $csrfToken = csrf_token();
       </svg>
     </div>
 
-    <h1 class="text-2xl font-bold tracking-tight text-ink mb-1">Pesanan dibuat!</h1>
+    <h1 class="text-2xl font-bold tracking-tight text-ink mb-1" data-i18n="order_success_title"><?= e(__('order_success_title')) ?></h1>
     <p class="text-sm text-subtle mb-6">Tunjukkan kode ini kepada kasir dan lakukan pembayaran.</p>
 
     <!-- Kode Pesanan Besar -->
     <div class="w-full rounded-2xl border-2 border-ink bg-black text-white py-8 px-6 mb-6">
-      <p class="text-xs font-medium text-white/60 mb-1 tracking-widest uppercase">Kode Pesanan</p>
+      <p class="text-xs font-medium text-white/60 mb-1 tracking-widest uppercase" data-i18n="order_code"><?= e(__('order_code')) ?></p>
       <p id="success-order-code" class="text-4xl sm:text-5xl font-bold tracking-tight tabular-nums">—</p>
     </div>
 
     <!-- Total -->
     <div class="w-full flex items-center justify-between rounded-xl border border-line bg-white px-5 py-3 mb-6">
-      <span class="text-sm font-medium text-subtle">Total pembayaran</span>
+      <span class="text-sm font-medium text-subtle" data-i18n="cart_total"><?= e(__('cart_total')) ?></span>
       <span id="success-total" class="text-base font-bold text-ink tabular-nums">Rp 0</span>
     </div>
 

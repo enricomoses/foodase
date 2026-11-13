@@ -165,18 +165,14 @@ $(function () {
   /* ============================================================
      TOGGLE TIPE PESANAN
      ============================================================ */
-  $('#order-type-toggle').on('click', '.order-type-btn', function () {
-    const val = $(this).data('value');
+  $('#order-type-toggle').on('click', '.order-type-btn', function (e) {
+    e.preventDefault();
+    const val = $(this).attr('data-value') || $(this).data('value');
     orderType  = val;
 
-    // Update tombol aktif
-    $('.order-type-btn').each(function () {
-      const isActive = $(this).data('value') === val;
-      $(this)
-        .toggleClass('bg-white shadow-sm text-ink', isActive)
-        .toggleClass('text-subtle', !isActive)
-        .attr('aria-checked', isActive ? 'true' : 'false');
-    });
+    // Update kelas aktif secara tegas & langsung
+    $('.order-type-btn').removeClass('is-active').attr('aria-checked', 'false');
+    $(this).addClass('is-active').attr('aria-checked', 'true');
 
     // Tampilkan / sembunyikan field nomor meja
     if (val === 'dine_in') {

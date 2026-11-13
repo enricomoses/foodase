@@ -15,6 +15,10 @@ $(function () {
   /* ============================================================
      HELPERS
      ============================================================ */
+  function t(key, fallback) {
+    return (window.I18n && typeof window.I18n.t === 'function') ? window.I18n.t(key, fallback) : (fallback || key);
+  }
+
   function formatRupiah(amount) {
     return (window.Fmt && typeof window.Fmt.rupiah === 'function')
       ? window.Fmt.rupiah(amount)
@@ -121,6 +125,10 @@ $(function () {
       const lineTotal = formatRupiah((item.price || 0) * (item.qty || 1));
       const isUnavail = !!item.unavailable;
 
+      const displayName = (window.I18n && typeof window.I18n.translateMenuName === 'function')
+        ? window.I18n.translateMenuName(item.name)
+        : item.name;
+
       const $row = $(`
         <div
           class="cart-item flex items-center gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-xl border ${isUnavail ? 'border-danger-light bg-danger-light/20' : 'border-line bg-white'} transition-colors"
@@ -130,21 +138,21 @@ $(function () {
           <div class="relative shrink-0">
             <img
               src="${$('<div>').text(imgSrc).html()}"
-              alt="${$('<div>').text(item.name).html()}"
+              alt="${$('<div>').text(displayName).html()}"
               class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover bg-surface border border-line ${isUnavail ? 'opacity-50' : ''}"
               onerror="this.src='${PLACEHOLDER}'"
             >
-            ${isUnavail ? '<span class="absolute -top-1.5 -right-1.5 text-[10px] font-bold bg-danger text-white px-1.5 py-0.5 rounded-full leading-none">Habis</span>' : ''}
+            ${isUnavail ? `<span class="absolute -top-1.5 -right-1.5 text-[10px] font-bold bg-danger text-white px-1.5 py-0.5 rounded-full leading-none">${t('badge_out_of_stock', 'Habis')}</span>` : ''}
           </div>
 
           <!-- Nama & Harga -->
           <div class="flex-1 min-w-0">
             <p class="font-semibold text-sm sm:text-base text-ink leading-snug line-clamp-2">
-              ${$('<div>').text(item.name).html()}
+              ${$('<div>').text(displayName).html()}
             </p>
             <p class="mt-0.5 text-xs text-subtle tabular-nums">${priceFormatted} / item</p>
             <p class="mt-1 text-sm font-bold text-ink tabular-nums">${lineTotal}</p>
-            ${isUnavail ? '<p class="mt-1 text-xs text-danger font-medium">Tidak tersedia</p>' : ''}
+            ${isUnavail ? `<p class="mt-1 text-xs text-danger font-medium">${t('toast_unavailable', 'Tidak tersedia')}</p>` : ''}
           </div>
 
           <!-- Stepper + Hapus -->
@@ -367,6 +375,13 @@ $(function () {
     if (orig && orig.key === 'foodease_cart') {
       // Re-init saat localStorage berubah dari tab lain
       init();
+    }
+  });
+
+  // Re-render keranjang jika bahasa berubah
+  $(document).on('foodease:lang-changed', function () {
+    if (cartItems && cartItems.length) {
+      renderCart();
     }
   });
 

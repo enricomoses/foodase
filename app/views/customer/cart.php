@@ -62,11 +62,11 @@ declare(strict_types=1);
     </div>
 
     <!-- Teks Headline & Subtitle Menarik (Persis Image 1) -->
-    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-ink">
-      Ready for Something Delicious?
+    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-ink" data-i18n="cart_empty_title">
+      <?= e(__('cart_empty_title')) ?>
     </h2>
-    <p class="mt-2 text-sm text-subtle max-w-sm mx-auto leading-relaxed">
-      Keranjang pesanan Anda masih kosong. Jelajahi aneka sajian kafe kami dan tambahkan menu favorit untuk memulai pesanan.
+    <p class="mt-2 text-sm text-subtle max-w-sm mx-auto leading-relaxed" data-i18n="cart_empty_desc">
+      <?= e(__('cart_empty_desc')) ?>
     </p>
 
     <!-- Tombol Aksi Utama Berbentuk Pil -->
@@ -74,7 +74,7 @@ declare(strict_types=1);
       href="<?= e(url('index.php')) ?>"
       class="mt-6 h-12 px-8 rounded-full bg-black text-white text-sm font-bold inline-flex items-center gap-2 hover:bg-neutral-800 transition-all shadow-md hover:shadow-lg cursor-pointer transform hover:-translate-y-0.5"
     >
-      <span>Mulai Memesan Menu</span>
+      <span data-i18n="cart_btn_explore"><?= e(__('cart_btn_explore')) ?></span>
       <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
     </a>
   </div>
@@ -84,13 +84,14 @@ declare(strict_types=1);
 
     <!-- Header -->
     <div class="flex items-center justify-between mb-5">
-      <h1 class="text-2xl font-bold tracking-tight text-ink">Keranjang</h1>
+      <h1 class="text-2xl font-bold tracking-tight text-ink" data-i18n="cart_title"><?= e(__('cart_title')) ?></h1>
       <button
         type="button"
         id="btn-clear-cart"
         class="text-xs font-medium text-danger hover:underline transition-colors cursor-pointer"
+        data-i18n="cart_btn_clear"
       >
-        Kosongkan
+        <?= e(__('cart_btn_clear')) ?>
       </button>
     </div>
 
@@ -115,7 +116,7 @@ declare(strict_types=1);
 
       <!-- Total -->
       <div class="flex items-center justify-between py-3 border-t border-line first:border-t-0">
-        <span class="text-sm text-subtle font-medium">Subtotal</span>
+        <span class="text-sm text-subtle font-medium" data-i18n="cart_subtotal"><?= e(__('cart_subtotal')) ?></span>
         <span id="cart-subtotal" class="text-sm font-semibold text-ink tabular-nums">Rp 0</span>
       </div>
 
@@ -123,16 +124,18 @@ declare(strict_types=1);
       <div class="flex flex-col sm:flex-row gap-3 mt-4">
         <a
           href="<?= e(url('index.php')) ?>"
-          class="flex-1 h-11 rounded-full bg-surface text-ink text-sm font-medium inline-flex items-center justify-center hover:bg-neutral-200 transition-colors"
+          class="flex-1 h-11 rounded-full bg-surface border border-line text-ink text-sm font-bold inline-flex items-center justify-center hover:bg-neutral-200 transition-colors"
+          data-i18n="checkout_back"
         >
-          ← Kembali ke Menu
+          <?= e(__('checkout_back')) ?>
         </a>
         <a
           href="<?= e(url('checkout.php')) ?>"
           id="btn-checkout"
           class="flex-1 h-11 rounded-full bg-black text-white text-sm font-medium inline-flex items-center justify-center hover:bg-neutral-800 transition-colors"
+          data-i18n="checkout_btn"
         >
-          Checkout
+          <?= e(__('checkout_btn')) ?>
         </a>
       </div>
     </div>

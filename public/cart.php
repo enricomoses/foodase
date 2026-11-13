@@ -7,5 +7,5 @@ use App\Core\View;
 
 echo View::render('customer/cart', [
     'title'   => 'Keranjang',
-    'scripts' => ['js/pages/cart.js?v=1'],
+    'scripts' => ['js/pages/cart.js?v=12'],
 ], 'public');

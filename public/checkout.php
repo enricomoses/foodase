@@ -11,5 +11,5 @@ $maxTable = (int) Config::get('order.max_table', 30);
 echo View::render('customer/checkout', [
     'title'    => 'Checkout',
     'max_table' => $maxTable,
-    'scripts'  => ['js/pages/checkout.js?v=1'],
+    'scripts'  => ['js/pages/checkout.js?v=12'],
 ], 'public');
