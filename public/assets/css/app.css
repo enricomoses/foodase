@@ -346,6 +346,32 @@ html.dark .order-type-btn:not(.is-active):hover span {
     background-color: #b91500 !important;
 }
 
+/* --- Tombol Kosongkan Keranjang (Merah Jelas di Light & Dark Mode) --- */
+#btn-clear-cart {
+    color: #E11900 !important;
+}
+html.dark #btn-clear-cart {
+    color: #f87171 !important;
+}
+
+#btn-clear-confirm {
+    background-color: #E11900 !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(225, 25, 0, 0.35) !important;
+}
+#btn-clear-confirm:hover {
+    background-color: #b91500 !important;
+}
+html.dark #btn-clear-confirm {
+    background-color: #E11900 !important;
+    color: #ffffff !important;
+}
+html.dark #btn-clear-confirm:hover {
+    background-color: #b91500 !important;
+}
+
 
 body, aside, header, main,
 [class~="bg-white"], [class~="bg-surface"],
