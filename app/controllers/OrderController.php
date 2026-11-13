@@ -163,14 +163,16 @@ final class OrderController
 
         $details = OrderDetail::byOrder((int) $order['id']);
         $items = array_map(static function (array $d): array {
+            $rawName = (string) $d['menu_name'];
             return [
-                'id'         => (int) $d['id'],
-                'menu_id'    => (int) $d['menu_id'],
-                'menu_name'  => (string) $d['menu_name'],
-                'price'      => (int) $d['price'],
-                'qty'        => (int) $d['qty'],
-                'subtotal'   => (int) $d['subtotal'],
-                'image_url'  => UploadService::imageUrl($d['image'] ?? null),
+                'id'                 => (int) $d['id'],
+                'menu_id'            => (int) $d['menu_id'],
+                'menu_name'          => \App\Core\I18n::translateMenuName($rawName),
+                'menu_name_original' => $rawName,
+                'price'              => (int) $d['price'],
+                'qty'                => (int) $d['qty'],
+                'subtotal'           => (int) $d['subtotal'],
+                'image_url'          => UploadService::imageUrl($d['image'] ?? null),
             ];
         }, $details);
 
@@ -219,12 +221,14 @@ final class OrderController
                 $details = OrderDetail::byOrder((int) $order['id']);
 
                 $items = array_map(static function (array $d): array {
+                    $rawName = (string) $d['menu_name'];
                     return [
-                        'menu_name' => (string) $d['menu_name'],
-                        'price'     => (int) $d['price'],
-                        'qty'       => (int) $d['qty'],
-                        'subtotal'  => (int) $d['subtotal'],
-                        'image_url' => UploadService::imageUrl($d['image'] ?? null),
+                        'menu_name'          => \App\Core\I18n::translateMenuName($rawName),
+                        'menu_name_original' => $rawName,
+                        'price'              => (int) $d['price'],
+                        'qty'                => (int) $d['qty'],
+                        'subtotal'           => (int) $d['subtotal'],
+                        'image_url'          => UploadService::imageUrl($d['image'] ?? null),
                     ];
                 }, $details);
 
@@ -333,14 +337,16 @@ final class OrderController
 
         $details = OrderDetail::byOrder((int) $order['id']);
         $items = array_map(static function (array $d): array {
+            $rawName = (string) $d['menu_name'];
             return [
-                'id'         => (int) $d['id'],
-                'menu_id'    => (int) $d['menu_id'],
-                'menu_name'  => (string) $d['menu_name'],
-                'price'      => (int) $d['price'],
-                'qty'        => (int) $d['qty'],
-                'subtotal'   => (int) $d['subtotal'],
-                'image_url'  => UploadService::imageUrl($d['image'] ?? null),
+                'id'                 => (int) $d['id'],
+                'menu_id'            => (int) $d['menu_id'],
+                'menu_name'          => \App\Core\I18n::translateMenuName($rawName),
+                'menu_name_original' => $rawName,
+                'price'              => (int) $d['price'],
+                'qty'                => (int) $d['qty'],
+                'subtotal'           => (int) $d['subtotal'],
+                'image_url'          => UploadService::imageUrl($d['image'] ?? null),
             ];
         }, $details);
 

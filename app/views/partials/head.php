@@ -38,7 +38,7 @@ $pageTitle = isset($title) && $title !== ''
         colors: {
           ink: '#000000',
           surface: '#F6F6F6',
-          line: '#E2E2E2',
+          line: '#d1d5db',
           subtle: '#545454',
           accent: { DEFAULT: '#06C167', dark: '#048848', light: '#E6F8EF' },
           danger:  { DEFAULT: '#E11900', light: '#FDECEA' },
@@ -52,4 +52,4 @@ $pageTitle = isset($title) && $title !== ''
 <script src="https://cdn.tailwindcss.com"></script>
 
 <!-- LANGKAH 4: CSS Kustom Aplikasi (SETELAH Tailwind) -->
-<link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
+<link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>?v=<?= file_exists(PUBLIC_PATH . '/assets/css/app.css') ? filemtime(PUBLIC_PATH . '/assets/css/app.css') : time() ?>">

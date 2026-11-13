@@ -7,7 +7,7 @@ declare(strict_types=1);
  */
 ?>
 <div class="space-y-6">
-  <!-- Bar Notifikasi Pesanan Aktif (Otomatis tampil jika ada pesanan tersimpan) -->
+  <!-- Bar Notifikasi Pesanan Aktif (Otomatis tampil jika ada pesanan tersimpan dan berstatus aktif) -->
   <div id="active-order-banner" class="hidden rounded-xl border border-line bg-surface p-3.5 flex items-center justify-between gap-3 text-xs">
     <div class="flex items-center gap-2.5 min-w-0">
       <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-light text-accent-dark">
@@ -17,24 +17,33 @@ declare(strict_types=1);
         </svg>
       </span>
       <p class="truncate text-ink font-medium">
-        Pesanan aktif <span id="active-order-code" class="font-bold"></span> sedang disiapkan.
+        <span data-i18n="active_order_prefix"><?= e(__('active_order_prefix')) ?></span> <span id="active-order-code" class="font-bold"></span> <span id="active-order-status-desc"><?= e(__('status_processing')) ?></span>.
       </p>
     </div>
-    <a
-      id="active-order-link"
-      href="<?= e(url('orders.php')) ?>"
-      class="shrink-0 font-bold text-ink hover:underline text-xs"
-    >
-      Lacak Status &rarr;
-    </a>
+    <div class="flex items-center gap-3 shrink-0">
+      <a
+        id="active-order-link"
+        href="<?= e(url('orders.php')) ?>"
+        class="font-bold text-ink hover:underline text-xs"
+        data-i18n="track_status"
+      >
+        <?= e(__('track_status')) ?>
+      </a>
+      <button
+        type="button"
+        id="btn-dismiss-active-order"
+        class="h-6 w-6 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 flex items-center justify-center text-subtle hover:text-ink transition-colors cursor-pointer"
+        title="Tutup notifikasi"
+      >
+        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
   </div>
 
   <!-- Hero Cafe Showcase Carousel (Interaktif & Appetizing dengan Background Foto Jelas & Promo Visual) -->
   <div class="relative overflow-hidden rounded-2xl border border-line bg-neutral-900 text-white shadow-lg group" id="hero-carousel-wrap">
-    <!-- Ambient Warm Cafe Lighting Glow -->
-    <div class="absolute -top-16 -left-16 w-72 h-72 rounded-full bg-amber-500/15 blur-3xl pointer-events-none z-10"></div>
-    <div class="absolute -bottom-16 right-10 w-80 h-80 rounded-full bg-orange-500/15 blur-3xl pointer-events-none z-10"></div>
-
     <!-- Slides Container -->
     <div id="hero-carousel-slides" class="relative w-full h-[360px] sm:h-[330px] md:h-[360px] overflow-hidden">
 
@@ -46,28 +55,28 @@ declare(strict_types=1);
 
         <!-- Konten Slide 1 -->
         <div class="relative z-10 max-w-xl p-6 sm:p-8 lg:p-10">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/25 text-xs font-semibold text-white shadow-sm mb-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/25 text-xs font-semibold text-white mb-3">
             <span class="h-2 w-2 rounded-full bg-accent animate-pulse"></span>
-            <span>Buka Sekarang &bull; Meja & Bawa Pulang</span>
+            <span data-i18n="hero_badge_open"><?= e(__('hero_badge_open')) ?></span>
           </div>
-          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight drop-shadow-sm">
-            Kopi Istimewa & Santapan Hangat Kafe
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight drop-shadow-sm" data-i18n="hero_slide1_title">
+            <?= e(__('hero_slide1_title')) ?>
           </h1>
-          <p class="text-xs sm:text-sm text-neutral-200 mt-2 leading-relaxed drop-shadow-sm max-w-md">
-            Pesan menu favorit Anda langsung dari meja tanpa harus antre di kasir. Segar, nikmat, dan disajikan tepat waktu.
+          <p class="text-xs sm:text-sm text-neutral-200 mt-2 leading-relaxed drop-shadow-sm max-w-md" data-i18n="hero_slide1_desc">
+            <?= e(__('hero_slide1_desc')) ?>
           </p>
           <div class="mt-4 flex flex-wrap items-center gap-2 text-[11px] font-medium text-white/95">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 border border-white/20">
               <?= icon('clock', 'h-3.5 w-3.5 text-accent') ?>
-              <span>Penyajian Cepat 10 Menit</span>
+              <span data-i18n="hero_badge_fast"><?= e(__('hero_badge_fast')) ?></span>
             </span>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 border border-white/20">
               <?= icon('check', 'h-3.5 w-3.5 text-accent') ?>
-              <span>100% Biji Kopi Arabika</span>
+              <span data-i18n="hero_badge_beans"><?= e(__('hero_badge_beans')) ?></span>
             </span>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 border border-white/20">
               <?= icon('receipt', 'h-3.5 w-3.5 text-accent') ?>
-              <span>QRIS & Tunai</span>
+              <span data-i18n="hero_badge_payment"><?= e(__('hero_badge_payment')) ?></span>
             </span>
           </div>
         </div>
@@ -82,14 +91,14 @@ declare(strict_types=1);
 
         <!-- Konten Slide 2 -->
         <div class="relative z-10 max-w-xl p-6 sm:p-8 lg:p-10">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/30 backdrop-blur-md border border-amber-400/40 text-xs font-semibold text-amber-300 shadow-sm mb-3">
-            <span>🔥 Promo Sarapan Hemat &bull; Diskon 15%</span>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 border border-white/20 text-xs font-semibold text-white mb-3">
+            <span data-i18n="hero_promo_badge"><?= e(__('hero_promo_badge')) ?></span>
           </div>
-          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight drop-shadow-sm">
-            Cold Brew Segar & Pastry Hangat
+          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight drop-shadow-sm" data-i18n="hero_slide2_title">
+            <?= e(__('hero_slide2_title')) ?>
           </h2>
-          <p class="text-xs sm:text-sm text-neutral-200 mt-2 leading-relaxed drop-shadow-sm max-w-md">
-            Diseduh dingin selama 12 jam untuk rasa kopi yang halus tanpa rasa asam tajam, dipadu croissant renyah mentega pilihan.
+          <p class="text-xs sm:text-sm text-neutral-200 mt-2 leading-relaxed drop-shadow-sm max-w-md" data-i18n="hero_slide2_desc">
+            <?= e(__('hero_slide2_desc')) ?>
           </p>
           <div class="mt-4 flex items-center gap-3">
             <button
@@ -97,10 +106,10 @@ declare(strict_types=1);
               class="btn-filter-category-quick h-10 px-5 rounded-full bg-white text-black text-xs font-bold hover:bg-neutral-200 transition-colors cursor-pointer flex items-center gap-1.5 shadow"
               data-cat-name="Kopi"
             >
-              <span>Jelajah Menu Kopi</span>
+              <span data-i18n="hero_btn_explore_coffee"><?= e(__('hero_btn_explore_coffee')) ?></span>
               <span>&rarr;</span>
             </button>
-            <span class="text-[11px] text-neutral-300">Tersedia Setiap Pagi</span>
+            <span class="text-[11px] text-neutral-300" data-i18n="hero_avail_morning"><?= e(__('hero_avail_morning')) ?></span>
           </div>
         </div>
 
@@ -114,14 +123,14 @@ declare(strict_types=1);
 
         <!-- Konten Slide 3 -->
         <div class="relative z-10 max-w-xl p-6 sm:p-8 lg:p-10">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/30 backdrop-blur-md border border-rose-400/40 text-xs font-semibold text-rose-300 shadow-sm mb-3">
-            <span>🍛 Menu Santap Siang Favorit</span>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 border border-white/20 text-xs font-semibold text-white mb-3">
+            <span data-i18n="hero_slide3_badge"><?= e(__('hero_slide3_badge')) ?></span>
           </div>
-          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight drop-shadow-sm">
-            Ayam Geprek & Nasi Goreng Spesial
+          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight drop-shadow-sm" data-i18n="hero_slide3_title">
+            <?= e(__('hero_slide3_title')) ?>
           </h2>
-          <p class="text-xs sm:text-sm text-neutral-200 mt-2 leading-relaxed drop-shadow-sm max-w-md">
-            Pilihan pas santap siang! Olahan ayam krispi bumbu geprek dan nasi goreng kampung dengan telur mata sapi hangat.
+          <p class="text-xs sm:text-sm text-neutral-200 mt-2 leading-relaxed drop-shadow-sm max-w-md" data-i18n="hero_slide3_desc">
+            <?= e(__('hero_slide3_desc')) ?>
           </p>
           <div class="mt-4 flex items-center gap-3">
             <button
@@ -129,10 +138,10 @@ declare(strict_types=1);
               class="btn-filter-category-quick h-10 px-5 rounded-full bg-white text-black text-xs font-bold hover:bg-neutral-200 transition-colors cursor-pointer flex items-center gap-1.5 shadow"
               data-cat-name="Makanan Berat"
             >
-              <span>Pesan Makan Siang</span>
+              <span data-i18n="hero_btn_explore_food"><?= e(__('hero_btn_explore_food')) ?></span>
               <span>&rarr;</span>
             </button>
-            <span class="text-[11px] text-neutral-300">Porsi Mantap</span>
+            <span class="text-[11px] text-neutral-300" data-i18n="hero_freshly_cooked"><?= e(__('hero_freshly_cooked')) ?></span>
           </div>
         </div>
 
@@ -175,7 +184,8 @@ declare(strict_types=1);
       <input
         type="search"
         id="mobile-search-input"
-        placeholder="Cari makanan atau minuman..."
+        placeholder="<?= e(__('nav_search_placeholder')) ?>"
+        data-i18n-placeholder="nav_search_placeholder"
         class="h-11 w-full rounded-full bg-surface pl-10 pr-4 text-sm text-ink placeholder-subtle border border-transparent focus:bg-white focus:border-ink focus:outline-none transition-colors"
       >
     </div>
@@ -189,7 +199,7 @@ declare(strict_types=1);
         class="category-chip h-9 px-4 rounded-full text-xs font-semibold whitespace-nowrap transition-colors bg-black text-white cursor-pointer"
         data-category-id=""
       >
-        Semua
+        <span data-i18n="cat_all"><?= e(__('cat_all')) ?></span>
       </button>
       <!-- Chip kategori lainnya dimuat secara dinamis -->
     </div>
@@ -271,7 +281,7 @@ declare(strict_types=1);
       <div class="absolute right-4 top-4 z-10">
         <button
           type="button"
-          class="h-9 w-9 rounded-full bg-white/90 backdrop-blur-sm shadow border border-line flex items-center justify-center text-ink hover:bg-white transition-colors"
+          class="h-9 w-9 rounded-full bg-white border border-line flex items-center justify-center text-ink hover:bg-surface transition-colors cursor-pointer"
           data-modal-dismiss
           aria-label="Tutup"
         >
@@ -287,8 +297,8 @@ declare(strict_types=1);
           alt=""
           class="w-full h-full object-cover"
         >
-        <span id="detail-badge-habis" class="hidden absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-bold bg-danger text-white shadow">
-          Habis
+        <span id="detail-badge-habis" class="hidden absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-bold bg-danger text-white shadow" data-i18n="badge_out_of_stock">
+          <?= e(__('badge_out_of_stock')) ?>
         </span>
       </div>
 
@@ -307,7 +317,7 @@ declare(strict_types=1);
         <!-- Stepper Jumlah & Tombol Tambah ke Keranjang -->
         <div class="mt-8 pt-4 border-t border-line space-y-4">
           <div class="flex items-center justify-between">
-            <span class="text-sm font-medium text-subtle">Jumlah</span>
+            <span class="text-sm font-medium text-subtle" data-i18n="qty_label"><?= e(__('qty_label')) ?></span>
             <!-- Stepper Pil -->
             <div class="flex items-center gap-3 bg-surface p-1 rounded-full border border-line">
               <button

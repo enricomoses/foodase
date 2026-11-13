@@ -15,11 +15,19 @@ $(function () {
     return baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/foodease/';
   }
 
+  let cachedOrders = [];
+
   function init() {
     loadMyOrders();
 
     $('#btn-history-retry').on('click', function () {
       loadMyOrders();
+    });
+
+    $(document).on('foodease:lang-changed', function () {
+      if (cachedOrders && cachedOrders.length) {
+        renderOrdersList(cachedOrders);
+      }
     });
   }
 
@@ -37,6 +45,7 @@ $(function () {
     .done(function (res) {
       showLoading(false);
       const orders = (res && res.data && Array.isArray(res.data)) ? res.data : [];
+      cachedOrders = orders;
 
       if (!orders.length) {
         $('#history-empty').removeClass('hidden');
@@ -54,6 +63,10 @@ $(function () {
     });
   }
 
+  function t(key, fallback) {
+    return (window.I18n && typeof window.I18n.t === 'function') ? window.I18n.t(key, fallback) : (fallback || key);
+  }
+
   function renderOrdersList(orders) {
     const $container = $('#history-list').empty();
 
@@ -63,20 +76,21 @@ $(function () {
       const dateStr = window.Fmt.datetime(order.created_at);
       const totalStr = window.Fmt.rupiah(order.total);
 
-      let typeText = order.order_type === 'dine_in' ? 'Makan di tempat' : 'Bawa pulang';
+      let typeText = order.order_type === 'dine_in' ? t('dine_in', 'Makan di tempat') : t('takeaway', 'Bawa pulang');
       if (order.order_type === 'dine_in' && order.table_number) {
-        typeText += ' • Meja ' + order.table_number;
+        typeText += ' • ' + t('history_table', 'Meja') + ' ' + order.table_number;
       }
 
       // Ringkasan item
       let itemsSummary = '';
       if (order.items && order.items.length) {
         const itemNames = order.items.map(function (it) {
-          return $('<div>').text(it.menu_name).html() + ' × ' + it.qty;
+          const menuTitle = window.I18n ? window.I18n.translateMenuName(it.menu_name) : it.menu_name;
+          return $('<div>').text(menuTitle).html() + ' × ' + it.qty;
         });
         itemsSummary = itemNames.join(', ');
       } else {
-        itemsSummary = (order.items_count || 1) + ' item';
+        itemsSummary = (order.items_count || 1) + ' ' + t('history_items', 'item');
       }
 
       const trackUrl = getBaseUrl() + 'track.php?code=' + encodeURIComponent(order.order_code);
@@ -120,7 +134,7 @@ $(function () {
               href="${trackUrl}"
               class="h-9 px-4 rounded-full bg-black text-white text-xs font-medium inline-flex items-center gap-1.5 hover:bg-neutral-800 transition-colors"
             >
-              <span>Lacak Pesanan</span>
+              <span>${t('history_track_order', 'Lacak Pesanan')}</span>
               <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
               </svg>

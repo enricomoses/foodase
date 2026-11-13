@@ -12,8 +12,8 @@ declare(strict_types=1);
   <!-- Header Halaman -->
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
     <div>
-      <h1 class="text-2xl font-bold tracking-tight text-ink">Riwayat Pesanan</h1>
-      <p class="text-xs text-subtle mt-0.5">Daftar pesanan Anda yang dibuat dari perangkat ini.</p>
+      <h1 class="text-2xl font-bold tracking-tight text-ink" data-i18n="orders_title"><?= e(__('orders_title')) ?></h1>
+      <p class="text-xs text-subtle mt-0.5" data-i18n="history_subtitle"><?= e(__('history_subtitle')) ?></p>
     </div>
 
     <!-- Tautan Lacak Pesanan Lain -->
@@ -24,7 +24,7 @@ declare(strict_types=1);
       <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
-      <span>Lacak dengan kode & nama &rarr;</span>
+      <span data-i18n="history_track_by_code_link"><?= e(__('history_track_by_code_link')) ?></span>
     </a>
   </div>
 
@@ -58,13 +58,14 @@ declare(strict_types=1);
 
   <!-- State Error -->
   <div id="history-error" class="hidden rounded-2xl border border-line bg-white p-8 text-center">
-    <p id="history-error-text" class="text-xs text-danger mb-4">Gagal memuat riwayat pesanan.</p>
+    <p id="history-error-text" class="text-xs text-danger mb-4" data-i18n="history_err_load"><?= e(__('history_err_load')) ?></p>
     <button
       type="button"
       id="btn-history-retry"
       class="h-9 px-5 rounded-full bg-black text-white text-xs font-medium hover:bg-neutral-800 transition-colors cursor-pointer"
+      data-i18n="history_btn_retry"
     >
-      Coba Lagi
+      <?= e(__('history_btn_retry')) ?>
     </button>
   </div>
 
@@ -77,22 +78,24 @@ declare(strict_types=1);
         <line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>
       </svg>
     </div>
-    <h2 class="text-lg font-bold text-ink mb-1.5">Belum ada riwayat pesanan</h2>
-    <p class="text-xs text-subtle max-w-sm mx-auto mb-6">
-      Anda belum membuat pesanan dari perangkat ini. Jelajahi menu kami dan pesan hidangan favorit Anda!
+    <h2 class="text-lg font-bold text-ink mb-1.5" data-i18n="history_empty_title"><?= e(__('history_empty_title')) ?></h2>
+    <p class="text-xs text-subtle max-w-sm mx-auto mb-6" data-i18n="history_empty_desc">
+      <?= e(__('history_empty_desc')) ?>
     </p>
     <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
       <a
         href="<?= e(url('index.php')) ?>"
         class="h-11 px-6 rounded-full bg-black text-white text-xs font-medium inline-flex items-center justify-center hover:bg-neutral-800 transition-colors"
+        data-i18n="history_btn_start"
       >
-        Mulai Pesan Menu
+        <?= e(__('history_btn_start')) ?>
       </a>
       <a
         href="<?= e(url('track.php')) ?>"
         class="h-11 px-6 rounded-full bg-surface text-ink text-xs font-medium inline-flex items-center justify-center hover:bg-neutral-200 transition-colors"
+        data-i18n="history_btn_track"
       >
-        Lacak dengan Kode
+        <?= e(__('history_btn_track')) ?>
       </a>
     </div>
   </div>

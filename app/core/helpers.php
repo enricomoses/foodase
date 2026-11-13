@@ -67,6 +67,36 @@ function log_error(string|\Throwable $message): void
     @file_put_contents($logDir . '/app.log', $line, FILE_APPEND | LOCK_EX);
 }
 
+/** Terjemahkan teks berdasarkan bahasa aktif (id, en, zh). */
+function __(string $key, array $replace = [], ?string $lang = null): string
+{
+    return \App\Core\I18n::get($key, $replace, $lang);
+}
+
+/** Ambil kode bahasa aktif saat ini ('id', 'en', 'zh'). */
+function current_lang(): string
+{
+    return \App\Core\I18n::getLang();
+}
+
+/** Terjemahkan nama menu kafe. */
+function translate_menu(string $name, ?string $lang = null): string
+{
+    return \App\Core\I18n::translateMenuName($name, $lang);
+}
+
+/** Terjemahkan deskripsi menu kafe. */
+function translate_menu_desc(?string $desc, string $name, ?string $lang = null): string
+{
+    return \App\Core\I18n::translateMenuDesc($desc, $name, $lang);
+}
+
+/** Terjemahkan nama kategori menu kafe. */
+function translate_category(string $name, ?string $lang = null): string
+{
+    return \App\Core\I18n::translateCategory($name, $lang);
+}
+
 if (defined('APP_PATH') && is_file(APP_PATH . '/views/partials/icons.php')) {
     require_once APP_PATH . '/views/partials/icons.php';
 }

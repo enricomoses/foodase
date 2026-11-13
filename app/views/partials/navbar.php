@@ -22,17 +22,56 @@ $appName = (string) Config::get('app.name', 'FoodEase');
         <input
           type="search"
           id="global-search-input"
-          placeholder="Cari makanan atau minuman..."
+          data-i18n-placeholder="nav_search_placeholder"
+          placeholder="<?= e(__('nav_search_placeholder')) ?>"
           class="h-10 w-full rounded-full bg-surface pl-10 pr-4 text-sm text-ink placeholder-subtle border border-transparent focus:bg-white focus:border-ink focus:outline-none transition-colors"
         >
       </div>
     </div>
 
-    <!-- Navigasi Kanan: Tautan Pesanan, Toggle Tema, Akun, Keranjang -->
-    <nav class="flex items-center gap-2 sm:gap-3 shrink-0">
-      <a href="<?= e(url('orders.php')) ?>" class="text-sm font-medium text-ink hover:text-subtle transition-colors hidden xs:inline-block">
-        Pesanan
+    <!-- Navigasi Kanan: Tautan Pesanan, Bahasa, Toggle Tema, Akun, Keranjang -->
+    <nav class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+      <a href="<?= e(url('orders.php')) ?>" class="text-sm font-medium text-ink hover:text-subtle transition-colors hidden xs:inline-block" data-i18n="nav_orders">
+        <?= e(__('nav_orders')) ?>
       </a>
+
+      <!-- Pemilih Bahasa (ID / EN / ZH) -->
+      <div class="relative" id="lang-dropdown-wrapper">
+        <button
+          type="button"
+          id="btn-lang-toggle"
+          class="h-9 px-2.5 rounded-full bg-surface hover:bg-neutral-200 transition-colors flex items-center gap-1.5 text-xs font-bold text-ink border border-line cursor-pointer"
+          title="Pilih Bahasa / Select Language / 选择语言"
+          aria-expanded="false"
+        >
+          <svg class="h-3.5 w-3.5 text-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+          <span id="current-lang-label" class="uppercase font-bold"><?= strtoupper(current_lang()) ?></span>
+          <svg class="h-3 w-3 text-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div
+          id="lang-dropdown-menu"
+          class="hidden absolute right-0 mt-2 w-44 rounded-xl bg-white border border-line shadow-lg py-1.5 z-50 text-xs"
+        >
+          <button type="button" class="lang-option w-full flex items-center justify-between px-3.5 py-2 text-ink hover:bg-surface transition-colors cursor-pointer" data-lang="id">
+            <span class="flex items-center gap-2.5"><span class="w-5 text-center font-bold text-[11px] text-subtle">ID</span> <span>Indonesia</span></span>
+            <span class="lang-check font-bold text-accent <?= current_lang() === 'id' ? '' : 'hidden' ?>">✓</span>
+          </button>
+          <button type="button" class="lang-option w-full flex items-center justify-between px-3.5 py-2 text-ink hover:bg-surface transition-colors cursor-pointer" data-lang="en">
+            <span class="flex items-center gap-2.5"><span class="w-5 text-center font-bold text-[11px] text-subtle">EN</span> <span>English</span></span>
+            <span class="lang-check font-bold text-accent <?= current_lang() === 'en' ? '' : 'hidden' ?>">✓</span>
+          </button>
+          <button type="button" class="lang-option w-full flex items-center justify-between px-3.5 py-2 text-ink hover:bg-surface transition-colors cursor-pointer" data-lang="zh">
+            <span class="flex items-center gap-2.5"><span class="w-5 text-center font-bold text-[11px] text-subtle">ZH</span> <span>中文 (Mandarin)</span></span>
+            <span class="lang-check font-bold text-accent <?= current_lang() === 'zh' ? '' : 'hidden' ?>">✓</span>
+          </button>
+        </div>
+      </div>
 
       <!-- Tombol Toggle Tema (Dark/Light) -->
       <button
@@ -59,77 +98,18 @@ $appName = (string) Config::get('app.name', 'FoodEase');
         </svg>
       </button>
 
-      <!-- Logo / Tombol Akun di Kanan Atas -->
-      <?php if (\App\Core\Auth::check()): ?>
-        <?php $currentUser = \App\Core\Auth::user(); ?>
-        <div class="relative" id="account-dropdown-wrapper">
-          <button
-            type="button"
-            id="btn-account-menu"
-            class="h-9 px-2.5 sm:px-3 rounded-full bg-surface hover:bg-neutral-200 transition-colors flex items-center gap-1.5 text-ink text-xs font-semibold cursor-pointer border border-line"
-            title="Menu Akun: <?= e($currentUser['name'] ?? 'Pengguna') ?>"
-            aria-expanded="false"
-          >
-            <span class="w-5 h-5 rounded-full bg-black text-white flex items-center justify-center text-[10px] font-bold shrink-0">
-              <?= e(strtoupper(substr((string) ($currentUser['name'] ?? 'U'), 0, 1))) ?>
-            </span>
-            <span class="hidden md:inline max-w-[90px] truncate"><?= e($currentUser['name'] ?? 'Akun') ?></span>
-            <svg class="h-3 w-3 text-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          <!-- Popover Dropdown Akun -->
-          <div
-            id="account-dropdown-menu"
-            class="hidden absolute right-0 mt-2 w-52 rounded-xl bg-white border border-line shadow-lg py-1.5 z-50 text-xs"
-          >
-            <div class="px-3.5 py-2 border-b border-line">
-              <p class="font-bold text-ink truncate"><?= e($currentUser['name'] ?? 'Pengguna') ?></p>
-              <p class="text-subtle text-[11px] font-medium uppercase tracking-wider mt-0.5">
-                <?= ($currentUser['role'] ?? '') === 'admin' ? 'Administrator Kafe' : 'Kasir Kafe' ?>
-              </p>
-            </div>
-            <a
-              href="<?= e(($currentUser['role'] ?? '') === 'admin' ? url('admin/') : url('cashier/')) ?>"
-              class="flex items-center gap-2 px-3.5 py-2 text-ink hover:bg-surface transition-colors"
-            >
-              <svg class="h-4 w-4 text-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-              </svg>
-              <span>Dashboard <?= ($currentUser['role'] ?? '') === 'admin' ? 'Admin' : 'Kasir' ?></span>
-            </a>
-            <a
-              href="<?= e(url('logout.php')) ?>"
-              class="flex items-center gap-2 px-3.5 py-2 text-danger hover:bg-danger-light transition-colors"
-            >
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              <span>Keluar</span>
-            </a>
-          </div>
-        </div>
-      <?php else: ?>
-        <a
-          href="<?= e(url('login.php')) ?>"
-          class="h-9 px-2.5 sm:px-3 rounded-full bg-surface hover:bg-neutral-200 transition-colors flex items-center gap-1.5 text-subtle hover:text-ink cursor-pointer border border-line"
-          title="Masuk Akun Staf / Admin"
-          aria-label="Akun Staf"
-        >
-          <svg class="h-4 w-4 shrink-0 text-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
-          <span class="text-xs font-semibold text-ink hidden sm:inline">Akun</span>
-        </a>
-      <?php endif; ?>
-
-      <!-- Tombol Pil Hitam Keranjang · n -->
+      <!-- Tombol Pil Hitam Keranjang · n (dengan Icon Keranjang) -->
       <a
         href="<?= e(url('cart.php')) ?>"
-        class="h-10 px-3.5 sm:px-4 rounded-full bg-black text-white text-sm font-medium inline-flex items-center gap-1.5 hover:bg-neutral-800 transition-colors shrink-0"
+        class="h-10 px-3.5 sm:px-4 rounded-full bg-black text-white text-sm font-medium inline-flex items-center gap-2 hover:bg-neutral-800 transition-colors shrink-0 shadow-sm"
         aria-label="Keranjang Belanja"
       >
-        <span>Keranjang</span>
+        <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="9" cy="21" r="1"/>
+          <circle cx="20" cy="21" r="1"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        <span data-i18n="nav_cart"><?= e(__('nav_cart')) ?></span>
         <span class="opacity-60">&middot;</span>
         <span id="cart-count">0</span>
       </a>

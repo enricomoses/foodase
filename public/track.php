@@ -11,5 +11,5 @@ $code = trim((string) Request::get('code', ''));
 echo View::render('customer/track', [
     'title'   => 'Lacak Pesanan',
     'code'    => $code,
-    'scripts' => ['js/pages/track.js?v=1'],
+    'scripts' => ['js/pages/track.js?v=7'],
 ], 'public');

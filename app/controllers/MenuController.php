@@ -43,10 +43,18 @@ final class MenuController
 
         $result = Menu::list($filters);
 
-        // Tambahkan image_url untuk setiap item
+        // Tambahkan image_url dan terjemahan untuk setiap item
         foreach ($result['data'] as &$row) {
             $row['image_url']   = UploadService::imageUrl($row['image'] ?? null);
             $row['is_available'] = (bool) $row['is_available'];
+            $row['name_original'] = $row['name'];
+            $row['name'] = \App\Core\I18n::translateMenuName($row['name']);
+            $row['description_original'] = $row['description'] ?? '';
+            $row['description'] = \App\Core\I18n::translateMenuDesc($row['description'] ?? null, $row['name_original']);
+            if (isset($row['category_name'])) {
+                $row['category_name_original'] = $row['category_name'];
+                $row['category_name'] = \App\Core\I18n::translateCategory($row['category_name']);
+            }
         }
         unset($row);
 

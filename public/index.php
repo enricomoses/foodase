@@ -7,5 +7,5 @@ use App\Core\View;
 
 echo View::render('customer/menu', [
     'title'   => 'Menu',
-    'scripts' => ['js/pages/menu.js?v=2'],
+    'scripts' => ['js/pages/menu.js?v=12'],
 ], 'public');

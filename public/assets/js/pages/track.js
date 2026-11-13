@@ -27,6 +27,7 @@ $(function () {
   let pollTimer      = null;
   let isPollingActive = false;
   let lastStatus     = null;
+  let cachedOrderData = null;
 
   /* ============================================================
      INISIALISASI
@@ -54,6 +55,12 @@ $(function () {
      EVENT LISTENERS
      ============================================================ */
   function bindEvents() {
+    $(document).on('foodease:lang-changed', function () {
+      if (cachedOrderData) {
+        renderOrderData(cachedOrderData);
+      }
+    });
+
     // Submit form cari pesanan
     $('#form-track-search').on('submit', function (e) {
       e.preventDefault();
@@ -142,6 +149,7 @@ $(function () {
      ============================================================ */
   function renderOrderData(order) {
     lastStatus = order.status;
+    cachedOrderData = order;
 
     // Sembunyikan form pencarian jika sudah berhasil memuat
     $('#track-search-card').addClass('hidden');
@@ -171,9 +179,10 @@ $(function () {
     // 5. Info Pesanan
     $('#track-customer-name').text(order.customer_name);
 
-    let typeText = order.order_type === 'dine_in' ? 'Makan di tempat' : 'Bawa pulang';
+    const t = (k, fallback) => (window.I18n && typeof window.I18n.t === 'function') ? window.I18n.t(k, fallback) : fallback;
+    let typeText = order.order_type === 'dine_in' ? t('dine_in', 'Makan di tempat') : t('takeaway', 'Bawa pulang');
     if (order.order_type === 'dine_in' && order.table_number) {
-      typeText += ' (Meja ' + order.table_number + ')';
+      typeText += ' (' + t('history_table', 'Meja') + ' ' + order.table_number + ')';
     }
     $('#track-order-type').text(typeText);
 
@@ -296,16 +305,17 @@ $(function () {
 
     items.forEach(function (item) {
       const imgSrc = item.image_url || PLACEHOLDER;
+      const itemTitle = window.I18n ? window.I18n.translateMenuName(item.menu_name) : item.menu_name;
       const $row = $(`
         <div class="flex items-center gap-3 py-2.5">
           <img
             src="${$('<div>').text(imgSrc).html()}"
-            alt="${$('<div>').text(item.menu_name).html()}"
+            alt="${$('<div>').text(itemTitle).html()}"
             class="w-10 h-10 rounded-lg object-cover bg-surface border border-line shrink-0"
             onerror="this.src='${PLACEHOLDER}'"
           >
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-ink line-clamp-1">${$('<div>').text(item.menu_name).html()}</p>
+            <p class="text-sm font-medium text-ink line-clamp-1">${$('<div>').text(itemTitle).html()}</p>
             <p class="text-xs text-subtle tabular-nums">${window.Fmt.rupiah(item.price)} × ${item.qty}</p>
           </div>
           <p class="text-sm font-bold text-ink tabular-nums shrink-0">${window.Fmt.rupiah(item.subtotal)}</p>

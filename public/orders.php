@@ -7,5 +7,5 @@ use App\Core\View;
 
 echo View::render('customer/history', [
     'title'   => 'Riwayat Pesanan',
-    'scripts' => ['js/pages/history.js?v=1'],
+    'scripts' => ['js/pages/history.js?v=7'],
 ], 'public');

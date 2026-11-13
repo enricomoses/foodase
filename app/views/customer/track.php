@@ -16,7 +16,7 @@ $initialCode = (string) ($code ?? '');
       <svg class="h-5 w-5 text-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
-      <h1 class="text-xl font-bold tracking-tight text-ink">Lacak Pesanan</h1>
+      <h1 class="text-xl font-bold tracking-tight text-ink" data-i18n="nav_track"><?= e(__('nav_track')) ?></h1>
     </div>
     <p class="text-xs text-subtle mb-5">
       Masukkan kode pesanan dan nama pemesan untuk melihat status pesanan Anda.
@@ -25,7 +25,7 @@ $initialCode = (string) ($code ?? '');
     <form id="form-track-search" class="space-y-4">
       <div>
         <label for="input-search-code" class="block text-xs font-medium text-subtle mb-1.5">
-          Kode Pesanan <span class="text-danger">*</span>
+          <span data-i18n="order_code"><?= e(__('order_code')) ?></span> <span class="text-danger">*</span>
         </label>
         <input
           type="text"
@@ -41,13 +41,14 @@ $initialCode = (string) ($code ?? '');
 
       <div>
         <label for="input-search-name" class="block text-xs font-medium text-subtle mb-1.5">
-          Nama Pemesan <span class="text-subtle font-normal">(opsional jika dipesan dari perangkat ini)</span>
+          <span data-i18n="customer_name"><?= e(__('customer_name')) ?></span> <span class="text-subtle font-normal">(<?= e(__('optional')) ?>)</span>
         </label>
         <input
           type="text"
           id="input-search-name"
           name="name"
-          placeholder="Nama yang digunakan saat checkout"
+          placeholder="<?= e(__('name_placeholder')) ?>"
+          data-i18n-placeholder="name_placeholder"
           autocomplete="name"
           class="h-12 w-full rounded-lg bg-surface px-4 border border-transparent focus:bg-white focus:border-ink focus:outline-none text-sm text-ink placeholder-subtle transition-colors"
         >
@@ -60,7 +61,7 @@ $initialCode = (string) ($code ?? '');
         id="btn-search-submit"
         class="w-full h-12 rounded-full bg-black text-white text-sm font-medium hover:bg-neutral-800 transition-colors cursor-pointer flex items-center justify-center gap-2"
       >
-        <span>Lacak Sekarang</span>
+        <span data-i18n="nav_track"><?= e(__('nav_track')) ?></span>
       </button>
     </form>
   </div>

@@ -22,6 +22,11 @@ final class CategoryController
     public static function index(): void
     {
         $categories = CategoryService::list();
+        foreach ($categories as &$c) {
+            $c['name_original'] = $c['name'];
+            $c['name'] = \App\Core\I18n::translateCategory($c['name']);
+        }
+        unset($c);
         Response::json($categories, 'Daftar kategori berhasil diambil.');
     }
 
