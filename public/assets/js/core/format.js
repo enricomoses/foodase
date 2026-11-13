@@ -107,7 +107,22 @@ window.Fmt = (function () {
         cls: 'border border-line text-subtle'
       };
 
-      const escapedLabel = $('<div>').text(meta.label).html();
+      let labelText = meta.label;
+      if (window.I18n && typeof window.I18n.t === 'function') {
+        if (key === 'dine_in') {
+          labelText = window.I18n.t('dine_in', meta.label);
+        } else if (key === 'takeaway') {
+          labelText = window.I18n.t('takeaway', meta.label);
+        } else if (key === 'available') {
+          labelText = window.I18n.t('available', meta.label);
+        } else if (key === 'unavailable') {
+          labelText = window.I18n.t('badge_out_of_stock', meta.label);
+        } else {
+          labelText = window.I18n.t('status_' + key, meta.label);
+        }
+      }
+
+      const escapedLabel = $('<div>').text(labelText).html();
       return `<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${meta.cls}">${escapedLabel}</span>`;
     }
   };

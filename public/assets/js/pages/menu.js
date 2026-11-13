@@ -8,6 +8,11 @@ $(function () {
   // SVG Ikon Plus
   const SVG_PLUS = '<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
 
+  // Helper terjemahan singkat untuk menu.js
+  function t(key, fallback) {
+    return (window.I18n && typeof window.I18n.t === 'function') ? window.I18n.t(key, fallback) : (fallback || key);
+  }
+
   // Cache data
   let allCategories = [];
   let allMenus = [];
@@ -50,17 +55,28 @@ $(function () {
     $chipsContainer.find('.category-chip:not([data-category-id=""])').remove();
 
     allCategories.forEach(function (cat) {
+      const catDisplayName = window.I18n ? window.I18n.translateCategory(cat.name) : cat.name;
+      const isActive = String(cat.id) === String(currentCategoryId);
+      const activeClass = isActive
+        ? 'bg-black text-white'
+        : 'bg-surface text-subtle hover:bg-neutral-200 hover:text-ink';
       const chipHtml = `
         <button
           type="button"
-          class="category-chip h-9 px-4 rounded-full text-xs font-semibold whitespace-nowrap transition-colors bg-surface text-subtle hover:bg-neutral-200 hover:text-ink cursor-pointer"
+          class="category-chip h-9 px-4 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${activeClass} cursor-pointer"
           data-category-id="${cat.id}"
         >
-          ${UI.escape(cat.name)}
+          ${UI.escape(catDisplayName)}
         </button>
       `;
       $chipsContainer.append(chipHtml);
     });
+
+    // Perbarui style chip "Semua"
+    const isAllActive = !currentCategoryId;
+    $chipsContainer.find('.category-chip[data-category-id=""]')
+      .toggleClass('bg-black text-white', isAllActive)
+      .toggleClass('bg-surface text-subtle hover:bg-neutral-200 hover:text-ink', !isAllActive);
   }
 
   // Klik chip kategori
@@ -160,7 +176,7 @@ $(function () {
       })
       .catch(function (err) {
         $('#menu-loading').addClass('hidden');
-        $('#menu-error-message').text(err.message || 'Gagal memuat katalog menu.');
+        $('#menu-error-message').text(err.message || (t('err_load_menu', 'Gagal memuat katalog menu.')));
         $('#menu-error').removeClass('hidden');
       });
   }
@@ -170,7 +186,7 @@ $(function () {
       if (currentSearchQuery) {
         $('#menu-empty-message').text(`Tidak ada menu yang sesuai dengan kata kunci "${currentSearchQuery}".`);
       } else {
-        $('#menu-empty-message').text('Belum ada menu yang tersedia untuk kategori ini.');
+        $('#menu-empty-message').text((t('empty_category', 'Belum ada menu yang tersedia untuk kategori ini.')));
       }
       $('#menu-empty').removeClass('hidden');
       $('#menu-container').addClass('hidden');
@@ -180,7 +196,7 @@ $(function () {
     // Kelompokkan menu berdasarkan kategori
     const grouped = {};
     allMenus.forEach(function (m) {
-      const catName = m.category_name || 'Lainnya';
+      const catName = (m.category_name || t('cat_other', 'Lainnya'));
       if (!grouped[catName]) {
         grouped[catName] = [];
       }
@@ -197,38 +213,32 @@ $(function () {
         let slidesHtml = '';
         popularItems.forEach(function (m) {
           const imgSrc = m.image_url || defaultPlaceholder;
+          const menuName = window.I18n ? window.I18n.translateMenuName(m.name) : m.name;
+          const menuCategory = window.I18n ? window.I18n.translateCategory(m.category_name || 'Kafe') : (m.category_name || 'Kafe');
+          const menuDesc = window.I18n ? window.I18n.translateMenuDesc(m.description, m.name) : m.description;
           slidesHtml += `
             <div
-              class="carousel-slide menu-card relative w-60 sm:w-68 rounded-2xl border border-line bg-white p-3 shadow-sm hover:shadow-md hover:border-black/30 transition-all cursor-pointer group flex flex-col justify-between shrink-0"
+              class="carousel-slide menu-card relative w-56 sm:w-64 rounded-xl border border-line bg-white p-3 hover:border-black/30 transition-all cursor-pointer group flex flex-col justify-between shrink-0"
               data-id="${m.id}"
             >
-              <!-- Container Foto Menu Favorit -->
-              <div class="relative w-full h-36 sm:h-40 rounded-xl overflow-hidden bg-surface mb-2.5">
+              <!-- Container Foto Menu Favorit (Bersih tanpa badge AI slop) -->
+              <div class="relative w-full h-36 sm:h-40 rounded-lg overflow-hidden bg-surface mb-2.5">
                 <img
                   src="${imgSrc}"
-                  alt="${UI.escape(m.name)}"
+                  alt="${UI.escape(menuName)}"
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   onerror="this.src='${defaultPlaceholder}'"
                 >
-                <span class="absolute top-2 left-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-black/80 backdrop-blur-sm text-white shadow">
-                  <svg class="h-2.5 w-2.5 text-accent" fill="currentColor" viewBox="0 0 24 24">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                  </svg>
-                  <span>Paling Disukai</span>
-                </span>
-                <span class="absolute bottom-2 right-2 px-2.5 py-0.5 rounded-full bg-white/95 backdrop-blur-sm text-ink text-xs font-bold shadow tabular-nums">
-                  ${formatRupiah(m.price)}
-                </span>
               </div>
 
               <!-- Deskripsi & Info Menu -->
               <div class="flex-1 flex flex-col justify-between">
                 <div>
-                  <span class="text-[10px] font-bold text-subtle uppercase tracking-wider">${UI.escape(m.category_name || 'Kafe')}</span>
+                  <span class="text-[10px] font-bold text-subtle uppercase tracking-wider">${UI.escape(menuCategory)}</span>
                   <h3 class="font-bold text-ink text-sm sm:text-base leading-snug line-clamp-1 mt-0.5">
-                    ${UI.escape(m.name)}
+                    ${UI.escape(menuName)}
                   </h3>
-                  ${m.description ? `<p class="mt-1 text-xs text-subtle line-clamp-2 leading-relaxed">${UI.escape(m.description)}</p>` : ''}
+                  ${menuDesc ? `<p class="mt-1 text-xs text-subtle line-clamp-2 leading-relaxed">${UI.escape(menuDesc)}</p>` : ''}
                 </div>
 
                 <div class="mt-3 pt-2.5 border-t border-line flex items-center justify-between">
@@ -241,7 +251,7 @@ $(function () {
                     data-id="${m.id}"
                     title="Tambah ke pesanan"
                   >
-                    <span>+ Tambah</span>
+                    <span>${t('btn_add', '+ Tambah')}</span>
                   </button>
                 </div>
               </div>
@@ -253,25 +263,19 @@ $(function () {
           <section class="favorite-carousel-section mb-6">
             <div class="flex items-center justify-between mb-3 sm:mb-4">
               <div>
-                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent-light text-accent text-[11px] font-bold mb-1">
-                  <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                  </svg>
-                  <span>Pilihan Favorit Kafe</span>
-                </div>
                 <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-ink">
-                  Menu Favorit & Paling Laris
+                  ${t('favorite_title', 'Menu Favorit & Paling Laris')}
                 </h2>
-                <p class="text-xs text-subtle mt-0.5">Geser ke samping untuk menjelajah menu favorit pilihan pelanggan</p>
+                <p class="text-xs text-subtle mt-0.5">${t('favorite_desc', 'Paling sering dipesan oleh pelanggan')}</p>
               </div>
 
               <!-- Tombol Navigasi Geser (Prev & Next) -->
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1.5">
                 <button
                   type="button"
                   id="btn-carousel-prev"
-                  class="w-9 h-9 rounded-full bg-surface border border-line text-ink hover:bg-neutral-200 transition-colors flex items-center justify-center cursor-pointer shadow-sm"
-                  title="Geser ke kiri"
+                  class="w-8 h-8 rounded-full bg-surface border border-line text-ink hover:bg-neutral-200 transition-colors flex items-center justify-center cursor-pointer"
+                  title="Sebelumnya"
                   aria-label="Sebelumnya"
                 >
                   <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -281,8 +285,8 @@ $(function () {
                 <button
                   type="button"
                   id="btn-carousel-next"
-                  class="w-9 h-9 rounded-full bg-surface border border-line text-ink hover:bg-neutral-200 transition-colors flex items-center justify-center cursor-pointer shadow-sm"
-                  title="Geser ke kanan"
+                  class="w-8 h-8 rounded-full bg-surface border border-line text-ink hover:bg-neutral-200 transition-colors flex items-center justify-center cursor-pointer"
+                  title="Selanjutnya"
                   aria-label="Selanjutnya"
                 >
                   <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -310,6 +314,8 @@ $(function () {
         const isAvail = !!m.is_available;
         const imgSrc = m.image_url || defaultPlaceholder;
         const disabledClass = !isAvail ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-black/30 hover:shadow-sm';
+        const menuName = window.I18n ? window.I18n.translateMenuName(m.name) : m.name;
+        const menuDesc = window.I18n ? window.I18n.translateMenuDesc(m.description, m.name) : m.description;
 
         cardsHtml += `
           <div
@@ -319,20 +325,20 @@ $(function () {
             <!-- Teks di Kiri -->
             <div class="flex-1 pr-3 min-w-0">
               <h3 class="font-bold text-ink text-sm sm:text-base leading-snug line-clamp-2">
-                ${UI.escape(m.name)}
+                ${UI.escape(menuName)}
               </h3>
               <div class="mt-1 font-semibold text-xs sm:text-sm text-ink tabular-nums">
                 ${formatRupiah(m.price)}
               </div>
-              ${m.description ? `<p class="mt-1 text-xs text-subtle line-clamp-2 leading-relaxed">${UI.escape(m.description)}</p>` : ''}
-              ${!isAvail ? '<span class="inline-block mt-2 px-2 py-0.5 rounded-full text-[11px] font-bold bg-danger-light text-danger">Habis</span>' : ''}
+              ${menuDesc ? `<p class="mt-1 text-xs text-subtle line-clamp-2 leading-relaxed">${UI.escape(menuDesc)}</p>` : ''}
+              ${!isAvail ? `<span class="inline-block mt-2 px-2 py-0.5 rounded-full text-[11px] font-bold bg-danger-light text-danger">${t('badge_out_of_stock', 'Habis')}</span>` : ''}
             </div>
 
             <!-- Foto Persegi 112 px di Kanan -->
             <div class="relative w-28 h-28 shrink-0">
               <img
                 src="${imgSrc}"
-                alt="${UI.escape(m.name)}"
+                alt="${UI.escape(menuName)}"
                 class="w-28 h-28 rounded-xl object-cover bg-surface border border-line"
                 onerror="this.src='${defaultPlaceholder}'"
               >
@@ -342,7 +348,7 @@ $(function () {
                   type="button"
                   class="btn-card-add absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-full bg-white text-ink shadow-md border border-line flex items-center justify-center hover:bg-black hover:text-white hover:border-black transition-all cursor-pointer"
                   data-id="${m.id}"
-                  title="Tambah ke keranjang"
+                  title="${t('btn_add_to_cart', 'Tambah ke keranjang')}"
                 >
                   ${SVG_PLUS}
                 </button>
@@ -352,10 +358,11 @@ $(function () {
         `;
       });
 
+      const displayCategoryName = window.I18n ? window.I18n.translateCategory(categoryName) : categoryName;
       const sectionHtml = `
         <section class="category-section">
           <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-ink mb-3 sm:mb-4">
-            ${UI.escape(categoryName)}
+            ${UI.escape(displayCategoryName)}
           </h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4">
             ${cardsHtml}
@@ -388,8 +395,14 @@ $(function () {
 
     if (!menu || !menu.is_available) return;
 
-    CartStore.add(menu, 1);
-    UI.toast('success', 'Ditambahkan ke keranjang');
+    const updatedCart = CartStore.add(menu, 1);
+    const currentItem = updatedCart.find(function (it) {
+      return parseInt(it.id, 10) === id;
+    });
+    const totalQty = currentItem ? currentItem.qty : 1;
+    const menuName = window.I18n ? window.I18n.translateMenuName(menu.name) : menu.name;
+
+    UI.toast('success', `${menuName} × ${totalQty} ditambahkan ke keranjang`, 'Berhasil Ditambahkan');
   });
 
   // ============================================================
@@ -408,7 +421,7 @@ $(function () {
 
     // Jika menu habis, jangan buka atau tampilkan info habis
     if (!menu.is_available) {
-      UI.toast('warning', 'Menu ini sedang tidak tersedia (Habis).');
+      UI.toast('warning', (t('toast_unavailable', 'Menu ini sedang tidak tersedia.')));
       return;
     }
 
@@ -420,11 +433,15 @@ $(function () {
     activeDetailQty = 1;
 
     const imgSrc = menu.image_url || defaultPlaceholder;
-    $('#detail-image').attr('src', imgSrc).attr('alt', menu.name);
-    $('#detail-category').text(menu.category_name || 'Menu');
-    $('#detail-name').text(menu.name);
+    const menuTitle = window.I18n ? window.I18n.translateMenuName(menu.name) : menu.name;
+    const catTitle = window.I18n ? window.I18n.translateCategory(menu.category_name || 'Menu') : (menu.category_name || 'Menu');
+    const descText = window.I18n ? window.I18n.translateMenuDesc(menu.description, menu.name) : menu.description;
+
+    $('#detail-image').attr('src', imgSrc).attr('alt', menuTitle);
+    $('#detail-category').text(catTitle);
+    $('#detail-name').text(menuTitle);
     $('#detail-price').text(formatRupiah(menu.price));
-    $('#detail-description').text(menu.description || 'Tidak ada deskripsi.');
+    $('#detail-description').text((descText || t('no_description', 'Tidak ada deskripsi.')));
 
     if (menu.is_available) {
       $('#detail-badge-habis').addClass('hidden');
@@ -444,7 +461,7 @@ $(function () {
 
     if (activeDetailMenu) {
       const total = (parseInt(activeDetailMenu.price, 10) || 0) * activeDetailQty;
-      $('#detail-add-text').html(`Tambah &middot; ${formatRupiah(total)}`);
+      $('#detail-add-text').html(`${t('btn_add_detail', 'Tambah')} &middot; ${formatRupiah(total)}`);
     }
   }
 
@@ -465,9 +482,15 @@ $(function () {
   $('#btn-detail-add').on('click', function () {
     if (!activeDetailMenu || !activeDetailMenu.is_available) return;
 
-    CartStore.add(activeDetailMenu, activeDetailQty);
+    const updatedCart = CartStore.add(activeDetailMenu, activeDetailQty);
+    const currentItem = updatedCart.find(function (it) {
+      return parseInt(it.id, 10) === parseInt(activeDetailMenu.id, 10);
+    });
+    const totalQty = currentItem ? currentItem.qty : activeDetailQty;
+    const menuName = window.I18n ? window.I18n.translateMenuName(activeDetailMenu.name) : activeDetailMenu.name;
+
     UI.closeModal('modal-menu-detail');
-    UI.toast('success', 'Ditambahkan ke keranjang');
+    UI.toast('success', `${menuName} × ${totalQty} ditambahkan ke keranjang`, 'Berhasil Ditambahkan');
   });
 
   // ============================================================
@@ -578,18 +601,79 @@ $(function () {
   });
 
   // ============================================================
-  // INISIALISASI AWAL
+  // INISIALISASI AWAL & CEK PESANAN AKTIF REAL-TIME
   // ============================================================
   function checkActiveOrder() {
     try {
       const lastOrderCode = localStorage.getItem('foodease_last_order');
-      if (lastOrderCode) {
-        $('#active-order-code').text('#' + lastOrderCode);
-        $('#active-order-link').attr('href', 'track.php?code=' + encodeURIComponent(lastOrderCode));
-        $('#active-order-banner').removeClass('hidden');
+      if (!lastOrderCode) {
+        $('#active-order-banner').addClass('hidden');
+        return;
       }
-    } catch (e) {}
+
+      // Verifikasi status pesanan langsung dari server
+      Api.get('api/orders/track.php', { code: lastOrderCode })
+        .then(function (res) {
+          const order = (res && res.data) ? (res.data.order || res.data) : null;
+          if (!order || !order.status) {
+            localStorage.removeItem('foodease_last_order');
+            $('#active-order-banner').addClass('hidden');
+            return;
+          }
+
+          const status = String(order.status || '').toLowerCase();
+          // Hanya tampilkan jika status benar-benar aktif (belum selesai/batal)
+          if (status === 'pending' || status === 'processing' || status === 'ready') {
+            $('#active-order-code').text('#' + (order.order_code || lastOrderCode));
+            $('#active-order-link').attr('href', 'track.php?code=' + encodeURIComponent(order.order_code || lastOrderCode));
+
+            let statusDesc = t('status_processing', 'sedang disiapkan');
+            if (status === 'pending') {
+              statusDesc = t('status_pending', 'menunggu pembayaran');
+            } else if (status === 'ready') {
+              statusDesc = t('status_ready', 'siap diambil');
+            }
+            $('#active-order-status-desc').text(statusDesc);
+            $('#active-order-banner').removeClass('hidden');
+          } else {
+            // Pesanan sudah selesai (completed) atau dibatalkan (cancelled)
+            localStorage.removeItem('foodease_last_order');
+            $('#active-order-banner').addClass('hidden');
+          }
+        })
+        .catch(function () {
+          // Jika pesanan tidak ditemukan atau otorisasi gagal, bersihkan
+          localStorage.removeItem('foodease_last_order');
+          $('#active-order-banner').addClass('hidden');
+        });
+    } catch (e) {
+      $('#active-order-banner').addClass('hidden');
+    }
   }
+
+  // Dismiss notifikasi pesanan aktif
+  $(document).on('click', '#btn-dismiss-active-order', function (e) {
+    e.preventDefault();
+    try {
+      localStorage.removeItem('foodease_last_order');
+    } catch (err) {}
+    $('#active-order-banner').addClass('hidden');
+  });
+
+  // Tanggapi perubahan bahasa in-place (tanpa reload, tetap di posisi dan halaman saat ini)
+  $(document).on('foodease:lang-changed', function () {
+    renderCategoryChips();
+    renderMenuCatalog();
+    checkActiveOrder();
+    if (activeDetailMenu) {
+      const menuName = window.I18n ? window.I18n.translateMenuName(activeDetailMenu.name) : activeDetailMenu.name;
+      const menuCategory = window.I18n ? window.I18n.translateCategory(activeDetailMenu.category_name || 'Kafe') : (activeDetailMenu.category_name || 'Kafe');
+      const menuDesc = window.I18n ? window.I18n.translateMenuDesc(activeDetailMenu.description, activeDetailMenu.name) : activeDetailMenu.description;
+      $('#modal-menu-title').text(menuName);
+      $('#modal-menu-category').text(menuCategory);
+      $('#modal-menu-desc').text(menuDesc || t('no_description', 'Tidak ada deskripsi.'));
+    }
+  });
 
   checkActiveOrder();
   loadCategories();

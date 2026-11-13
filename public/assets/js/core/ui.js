@@ -20,9 +20,13 @@ window.UI = (function ($) {
     }
   });
 
+  // Active toast tracking untuk mencegah penumpukan & mendukung in-place update (FR-TOAST)
+  let activeToast = null;
+
   return {
     /**
      * Tampilkan notifikasi toast modern sesuai Image 2 (Dark capsule, circular badge, progress bar).
+     * Jika toast sedang aktif, update isi & reset progress bar dari full lagi tanpa menumpuk.
      * @param {'success'|'error'|'info'|'warning'} type
      * @param {string} message Deskripsi pesan
      * @param {string} [title] Judul notifikasi (opsional, default otomatis sesuai type)
@@ -48,7 +52,7 @@ window.UI = (function ($) {
       const resolvedTitle = title || defaultTitles[type] || 'Notifikasi';
       const resolvedDuration = (typeof duration === 'number' && duration > 0) ? duration : 4000;
 
-      // Konfigurasi ikon & warna sesuai Image 2 (lingkaran besar di kiri)
+      // Konfigurasi ikon & warna
       let badgeBg = 'bg-[#22c55e]'; // Hijau emerald
       let progressColor = 'bg-[#22c55e]';
       let iconSvg = `
@@ -88,21 +92,74 @@ window.UI = (function ($) {
         `;
       }
 
-      // Template notifikasi persis seperti Image 2
+      // 1. CEK INSTANCE TUNGGAL DI DOM
+      let $existing = $('#toast-single-instance');
+      if ($existing.length && !$existing.hasClass('toast-leave')) {
+        if (window._toastAnimId) cancelAnimationFrame(window._toastAnimId);
+        if (window._toastTimerId) clearTimeout(window._toastTimerId);
+
+        $existing.find('.toast-title').text(resolvedTitle);
+        $existing.find('.toast-msg').text(message);
+        $existing.find('.toast-badge').attr('class', `toast-badge w-11 h-11 rounded-full ${badgeBg} flex items-center justify-center shrink-0 shadow-md`).html(iconSvg);
+
+        const $fill = $existing.find('.toast-progress-fill');
+        $fill.attr('class', `toast-progress-fill ${progressColor}`).css('width', '100%');
+
+        let startTime = Date.now();
+        let isPaused = false;
+
+        function refreshProgress() {
+          if (!isPaused) {
+            const elapsed = Date.now() - startTime;
+            const percent = Math.max(0, 100 - (elapsed / resolvedDuration) * 100);
+            $fill.css('width', percent + '%');
+
+            if (percent <= 0) {
+              dismissExisting();
+              return;
+            }
+          }
+          window._toastAnimId = requestAnimationFrame(refreshProgress);
+        }
+
+        function dismissExisting() {
+          if (window._toastAnimId) cancelAnimationFrame(window._toastAnimId);
+          $existing.addClass('toast-leave');
+          setTimeout(() => { $existing.remove(); }, 220);
+        }
+
+        $existing.off('mouseenter mouseleave click');
+        $existing.on('mouseenter', () => { isPaused = true; });
+        $existing.on('mouseleave', () => { isPaused = false; });
+        $existing.on('click', dismissExisting);
+        $existing.find('.toast-close-btn').off('click').on('click', (e) => {
+          e.stopPropagation();
+          dismissExisting();
+        });
+
+        window._toastAnimId = requestAnimationFrame(refreshProgress);
+        return;
+      }
+
+      // 2. JIKA BELUM ADA ATAU SEDANG LEAVE: Bersihkan semua elemen lama di container
+      if (window._toastAnimId) cancelAnimationFrame(window._toastAnimId);
+      container.empty();
+
+      // Template notifikasi tunggal persis seperti Image 2
       const $toast = $(`
-        <div class="toast-item relative flex flex-col p-4 sm:p-4.5 cursor-pointer select-none">
+        <div id="toast-single-instance" class="toast-item relative flex flex-col p-4 sm:p-4.5 cursor-pointer select-none">
           <div class="flex items-start gap-3.5">
-            <!-- Lingkaran besar dengan ikon di kiri (persis Image 2) -->
-            <div class="w-11 h-11 rounded-full ${badgeBg} flex items-center justify-center shrink-0 shadow-md">
+            <!-- Lingkaran besar dengan ikon di kiri -->
+            <div class="toast-badge w-11 h-11 rounded-full ${badgeBg} flex items-center justify-center shrink-0 shadow-md">
               ${iconSvg}
             </div>
 
             <!-- Konten Teks di Tengah -->
             <div class="flex-1 min-w-0 pr-1">
-              <h4 class="text-white font-bold text-sm sm:text-base leading-tight tracking-tight">
+              <h4 class="toast-title text-white font-bold text-sm sm:text-base leading-tight tracking-tight">
                 ${UI.escape(resolvedTitle)}
               </h4>
-              <p class="text-neutral-300 text-xs sm:text-[13px] mt-1 leading-snug">
+              <p class="toast-msg text-neutral-300 text-xs sm:text-[13px] mt-1 leading-snug">
                 ${UI.escape(message)}
               </p>
             </div>
@@ -118,7 +175,7 @@ window.UI = (function ($) {
 
           <!-- Progress bar horizontal di bagian bawah -->
           <div class="toast-progress-track">
-            <div class="toast-progress-fill ${progressColor}"></div>
+            <div class="toast-progress-fill ${progressColor}" style="width: 100%;"></div>
           </div>
         </div>
       `);
@@ -126,8 +183,6 @@ window.UI = (function ($) {
       const $fill = $toast.find('.toast-progress-fill');
       let startTime = Date.now();
       let remaining = resolvedDuration;
-      let timerId = null;
-      let animFrameId = null;
       let isPaused = false;
 
       function updateProgress() {
@@ -141,13 +196,11 @@ window.UI = (function ($) {
             return;
           }
         }
-        animFrameId = requestAnimationFrame(updateProgress);
+        window._toastAnimId = requestAnimationFrame(updateProgress);
       }
 
       function dismissToast() {
-        if (animFrameId) cancelAnimationFrame(animFrameId);
-        if (timerId) clearTimeout(timerId);
-
+        if (window._toastAnimId) cancelAnimationFrame(window._toastAnimId);
         $toast.addClass('toast-leave');
         setTimeout(function () {
           $toast.remove();
@@ -175,9 +228,8 @@ window.UI = (function ($) {
         dismissToast();
       });
 
-      // Tambahkan ke container
       container.append($toast);
-      animFrameId = requestAnimationFrame(updateProgress);
+      window._toastAnimId = requestAnimationFrame(updateProgress);
     },
 
     /**

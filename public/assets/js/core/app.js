@@ -117,11 +117,11 @@
           el.style.setProperty('color', '#f3f3f3', 'important');
           el.style.setProperty('border-color', '#333333', 'important');
         });
-        // Nav links
-        document.querySelectorAll('nav a').forEach(function (el) {
+        // Nav links (kecuali bottom nav)
+        document.querySelectorAll('nav:not([aria-label="Navigasi Bawah"]) a').forEach(function (el) {
           el.style.setProperty('color', '#999999', 'important');
         });
-        document.querySelectorAll('nav a.bg-surface, nav a.font-bold').forEach(function (el) {
+        document.querySelectorAll('nav:not([aria-label="Navigasi Bawah"]) a.bg-surface, nav:not([aria-label="Navigasi Bawah"]) a.font-bold').forEach(function (el) {
           el.style.setProperty('background-color', '#2a2a2a', 'important');
           el.style.setProperty('color', '#ffffff', 'important');
         });
