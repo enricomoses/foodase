@@ -6,7 +6,37 @@ declare(strict_types=1);
 <head>
   <?php require APP_PATH . '/views/partials/head.php'; ?>
 </head>
-<body class="bg-surface text-ink min-h-screen flex items-center justify-center p-4 font-sans antialiased relative">
+<body class="fe-auth min-h-screen font-sans antialiased">
+  <div class="fe-auth-shell">
+    <!-- Panel kiri: brand editorial (desktop) -->
+    <aside class="fe-auth-aside">
+      <div class="p-10 lg:p-14">
+        <a href="<?= e(url()) ?>" class="fe-wordmark text-xl text-white hover:opacity-80 transition-opacity">
+          <span class="fe-wordmark-mark" aria-hidden="true">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 8h11v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 9h2.5a2.5 2.5 0 0 1 0 5H15"/>
+              <path stroke-linecap="round" d="M7 3.5c0 1-.8 1.2-.8 2.2M11 3.5c0 1-.8 1.2-.8 2.2"/>
+            </svg>
+          </span>
+          <span>FoodEase</span>
+        </a>
+      </div>
+
+      <div class="p-10 lg:p-14">
+        <p class="fe-eyebrow text-[10px]">FoodEase Cafe</p>
+        <p class="fe-auth-quote mt-5">Seduh.<br><span>Santap.</span><br>Selesai.</p>
+        <p class="mt-6 max-w-xs text-sm leading-relaxed text-white/55">
+          Pesan langsung dari meja, bayar tanpa antre. Kopi dan makanan segar disiapkan begitu pesanan masuk.
+        </p>
+      </div>
+
+      <div class="p-10 lg:p-14 text-[10px] uppercase tracking-[0.25em] text-white/35">
+        Est. 2024 — Coffee &amp; Kitchen
+      </div>
+    </aside>
+
+    <main class="fe-auth-main">
   <!-- Tombol Bahasa & Toggle Tema di Halaman Auth -->
   <div class="fixed top-4 right-4 z-40 flex items-center gap-2">
     <!-- Pemilih Bahasa (ID / EN / ZH) -->
@@ -67,9 +97,15 @@ declare(strict_types=1);
     </button>
   </div>
 
-  <!-- Kartu Tengah Bersih (rounded-2xl border-line bg-white) -->
-  <div class="w-full max-w-md rounded-2xl border border-line bg-white p-6 sm:p-8 shadow-sm">
+  <!-- Kartu Form -->
+  <div class="fe-auth-card">
     <?= $content ?? '' ?>
+  </div>
+
+  <p class="mt-8 text-center text-[10px] uppercase tracking-[0.28em] text-subtle">
+    &copy; <?= date('Y') ?> FoodEase
+  </p>
+    </main>
   </div>
 
   <?php require APP_PATH . '/views/partials/modal.php'; ?>
@@ -77,12 +113,12 @@ declare(strict_types=1);
 
   <!-- Script Bersama -->
   <script src="<?= e(asset('vendor/jquery/jquery-3.7.1.min.js')) ?>"></script>
-  <script src="<?= e(asset('js/core/app.js?v=12')) ?>"></script>
-  <script src="<?= e(asset('js/core/i18n.js?v=12')) ?>"></script>
-  <script src="<?= e(asset('js/core/api.js?v=12')) ?>"></script>
-  <script src="<?= e(asset('js/core/icons.js?v=12')) ?>"></script>
-  <script src="<?= e(asset('js/core/ui.js?v=12')) ?>"></script>
-  <script src="<?= e(asset('js/core/format.js?v=12')) ?>"></script>
+  <script src="<?= e(asset('js/core/app.js?v=16')) ?>"></script>
+  <script src="<?= e(asset('js/core/i18n.js?v=16')) ?>"></script>
+  <script src="<?= e(asset('js/core/api.js?v=16')) ?>"></script>
+  <script src="<?= e(asset('js/core/icons.js?v=16')) ?>"></script>
+  <script src="<?= e(asset('js/core/ui.js?v=16')) ?>"></script>
+  <script src="<?= e(asset('js/core/format.js?v=16')) ?>"></script>
 
   <!-- Script Halaman -->
   <?php if (!empty($scripts) && is_array($scripts)): ?>

@@ -446,27 +446,20 @@ $(function () {
   });
 
   /* ── 5. Toggle Tipe Pesanan (Dine In vs Takeaway) ─────────── */
-  $('.pos-type-btn').on('click', function () {
+  $('#pos-order-type-toggle').on('click', '.pos-type-btn', function (e) {
+    e.preventDefault();
     const type = $(this).data('type');
     currentOrderType = type;
 
-    // Toggle tampilan segmented control
+    // Toggle segmented control dengan styling berkontras tinggi
+    $('.pos-type-btn').removeClass('is-active').attr('aria-checked', 'false');
+    $(this).addClass('is-active').attr('aria-checked', 'true');
+
     if (type === 'dine_in') {
-      $('#pos-type-dine-in')
-        .addClass('bg-white text-ink shadow-sm')
-        .removeClass('text-subtle');
-      $('#pos-type-takeaway')
-        .removeClass('bg-white text-ink shadow-sm')
-        .addClass('text-subtle');
       $('#pos-table-group').removeClass('hidden');
     } else {
-      $('#pos-type-takeaway')
-        .addClass('bg-white text-ink shadow-sm')
-        .removeClass('text-subtle');
-      $('#pos-type-dine-in')
-        .removeClass('bg-white text-ink shadow-sm')
-        .addClass('text-subtle');
       $('#pos-table-group').addClass('hidden');
+      $('#pos-table-number').val('');
       $('#pos-error-table').addClass('hidden').text('');
     }
   });
@@ -533,12 +526,8 @@ $(function () {
     $('#pos-notes').val('');
 
     // Kembalikan segmented control ke dine_in
-    $('#pos-type-dine-in')
-      .addClass('bg-white text-ink shadow-sm')
-      .removeClass('text-subtle');
-    $('#pos-type-takeaway')
-      .removeClass('bg-white text-ink shadow-sm')
-      .addClass('text-subtle');
+    $('.pos-type-btn').removeClass('is-active').attr('aria-checked', 'false');
+    $('#pos-type-dine-in').addClass('is-active').attr('aria-checked', 'true');
     $('#pos-table-group').removeClass('hidden');
 
     clearFieldErrors();

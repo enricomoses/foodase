@@ -218,7 +218,7 @@ $(function () {
           const menuDesc = window.I18n ? window.I18n.translateMenuDesc(m.description, m.name) : m.description;
           slidesHtml += `
             <div
-              class="carousel-slide menu-card relative w-56 sm:w-64 rounded-xl border border-line bg-white p-3 hover:border-black/30 transition-all cursor-pointer group flex flex-col justify-between shrink-0"
+              class="carousel-slide menu-card fe-menu-card relative w-56 sm:w-64 rounded-xl border border-line bg-white p-3 hover:border-black/30 transition-all cursor-pointer group flex flex-col justify-between shrink-0"
               data-id="${m.id}"
             >
               <!-- Container Foto Menu Favorit (Bersih tanpa badge AI slop) -->
@@ -242,7 +242,7 @@ $(function () {
                 </div>
 
                 <div class="mt-3 pt-2.5 border-t border-line flex items-center justify-between">
-                  <span class="font-bold text-xs sm:text-sm text-ink tabular-nums">
+                  <span class="menu-price font-bold text-xs sm:text-sm text-ink tabular-nums">
                     ${formatRupiah(m.price)}
                   </span>
                   <button
@@ -319,7 +319,7 @@ $(function () {
 
         cardsHtml += `
           <div
-            class="menu-card relative flex items-center justify-between p-3.5 sm:p-4 rounded-xl border border-line bg-white transition-all ${disabledClass}"
+            class="menu-card fe-menu-card relative flex items-center justify-between p-3.5 sm:p-4 rounded-xl border border-line bg-white transition-all ${disabledClass}"
             data-id="${m.id}"
           >
             <!-- Teks di Kiri -->
@@ -327,7 +327,7 @@ $(function () {
               <h3 class="font-bold text-ink text-sm sm:text-base leading-snug line-clamp-2">
                 ${UI.escape(menuName)}
               </h3>
-              <div class="mt-1 font-semibold text-xs sm:text-sm text-ink tabular-nums">
+              <div class="menu-price mt-1 font-semibold text-xs sm:text-sm text-ink tabular-nums">
                 ${formatRupiah(m.price)}
               </div>
               ${menuDesc ? `<p class="mt-1 text-xs text-subtle line-clamp-2 leading-relaxed">${UI.escape(menuDesc)}</p>` : ''}
@@ -374,10 +374,6 @@ $(function () {
     });
 
     $container.removeClass('hidden');
-
-    if (window.Theme && typeof window.Theme.isDark === 'function' && window.Theme.isDark()) {
-      window.Theme._applyTheme(true);
-    }
   }
 
   // Tombol Coba Lagi pada state error
@@ -402,7 +398,7 @@ $(function () {
     const totalQty = currentItem ? currentItem.qty : 1;
     const menuName = window.I18n ? window.I18n.translateMenuName(menu.name) : menu.name;
 
-    UI.toast('success', `${menuName} × ${totalQty} ditambahkan ke keranjang`, 'Berhasil Ditambahkan');
+    UI.toast('success', `${menuName} × ${totalQty}`, 'Berhasil Ditambahkan');
   });
 
   // ============================================================
@@ -490,41 +486,92 @@ $(function () {
     const menuName = window.I18n ? window.I18n.translateMenuName(activeDetailMenu.name) : activeDetailMenu.name;
 
     UI.closeModal('modal-menu-detail');
-    UI.toast('success', `${menuName} × ${totalQty} ditambahkan ke keranjang`, 'Berhasil Ditambahkan');
+    UI.toast('success', `${menuName} × ${totalQty}`, 'Berhasil Ditambahkan');
   });
 
   // ============================================================
-  // HERO SHOWCASE BANNER CAROUSEL
+  // HERO EDITORIAL: DOTS, AUTO-ROTATE, SWIPE
   // ============================================================
+  const HERO_SLIDES = [
+    {
+      theme: 'choco',
+      display1: 'Chocolate',
+      display2: 'Delight!',
+      image: 'uploads/menus/menu_42_milo_dinosaur.jpg',
+      menuName: 'Milo Dinosaur',
+      descKey: 'hero_feat_choco'
+    },
+    {
+      theme: 'citrus',
+      display1: 'Citrus',
+      display2: 'Breeze!',
+      image: 'uploads/menus/menu_5_teh_lemon.jpg',
+      menuName: 'Teh Lemon',
+      descKey: 'hero_feat_citrus'
+    },
+    {
+      theme: 'matcha',
+      display1: 'Matcha',
+      display2: 'Moment!',
+      image: 'uploads/menus/menu_7_matcha_latte.jpg',
+      menuName: 'Matcha Latte',
+      descKey: 'hero_feat_matcha'
+    },
+    {
+      theme: 'berry',
+      display1: 'Berry',
+      display2: 'Blast!',
+      image: 'uploads/menus/menu_41_strawberry_smoothie.jpg',
+      menuName: 'Strawberry Smoothie',
+      descKey: 'hero_feat_berry'
+    }
+  ];
+
   let currentHeroSlide = 0;
-  const $heroSlides = $('#hero-carousel-slides .hero-slide');
-  const totalHeroSlides = $heroSlides.length;
   let heroTimer = null;
 
-  function showHeroSlide(index) {
-    if (index >= totalHeroSlides) index = 0;
-    if (index < 0) index = totalHeroSlides - 1;
+  function showHeroSlide(index, instant) {
+    if (!HERO_SLIDES.length) return;
+    if (index >= HERO_SLIDES.length) index = 0;
+    if (index < 0) index = HERO_SLIDES.length - 1;
     currentHeroSlide = index;
 
-    $heroSlides.each(function (i) {
-      if (i === currentHeroSlide) {
-        $(this)
-          .removeClass('opacity-0 pointer-events-none z-0')
-          .addClass('active opacity-100 z-10');
-      } else {
-        $(this)
-          .removeClass('active opacity-100 z-10')
-          .addClass('opacity-0 pointer-events-none z-0');
-      }
-    });
+    const slide = HERO_SLIDES[index];
+    const menuName = window.I18n ? window.I18n.translateMenuName(slide.menuName) : slide.menuName;
 
-    // Perbarui indikator dots
-    $('#hero-carousel-dots .hero-dot').each(function (i) {
-      if (i === currentHeroSlide) {
-        $(this).removeClass('w-2 bg-white/40').addClass('w-7 bg-white');
+    $('#hero-carousel-wrap').attr('data-theme', slide.theme);
+    $('#hero-title-line1').text(slide.display1);
+    $('#hero-title-line2').text(slide.display2);
+    $('#hero-menu-name').text(menuName);
+    $('#hero-desc').text(t(slide.descKey, ''));
+    $('#hero-slide-counter').text(
+      String(index + 1).padStart(2, '0') + ' / ' + String(HERO_SLIDES.length).padStart(2, '0')
+    );
+
+    const $img = $('#hero-product-image');
+    if ($img.attr('src') !== slide.image) {
+      if (instant) {
+        $img.attr('src', slide.image).attr('alt', menuName);
       } else {
-        $(this).removeClass('w-7 bg-white').addClass('w-2 bg-white/40');
+        const img = $img[0];
+        let settled = false;
+        const finish = function () {
+          if (settled) return;
+          settled = true;
+          $img.removeClass('is-switching');
+          img.removeEventListener('load', finish);
+        };
+        img.addEventListener('load', finish);
+        $img.addClass('is-switching').attr('src', slide.image).attr('alt', menuName);
+        setTimeout(finish, 450);
       }
+    } else {
+      $img.attr('alt', menuName);
+    }
+
+    $('#hero-dots .hero-dot').each(function (i) {
+      const isActive = i === currentHeroSlide;
+      $(this).toggleClass('is-active', isActive).attr('aria-selected', isActive ? 'true' : 'false');
     });
   }
 
@@ -532,7 +579,7 @@ $(function () {
     stopHeroTimer();
     heroTimer = setInterval(function () {
       showHeroSlide(currentHeroSlide + 1);
-    }, 5000);
+    }, 7000);
   }
 
   function stopHeroTimer() {
@@ -554,7 +601,7 @@ $(function () {
     startHeroTimer();
   });
 
-  $('#hero-carousel-dots').on('click', '.hero-dot', function (e) {
+  $('#hero-dots').on('click', '.hero-dot', function (e) {
     e.preventDefault();
     const idx = parseInt($(this).data('slide'), 10) || 0;
     showHeroSlide(idx);
@@ -564,6 +611,31 @@ $(function () {
   $('#hero-carousel-wrap')
     .on('mouseenter', stopHeroTimer)
     .on('mouseleave', startHeroTimer);
+
+  // Geser (swipe) pada layar sentuh
+  let heroTouchStartX = null;
+  $('#hero-carousel-wrap')
+    .on('touchstart', function (e) {
+      const touch = e.originalEvent.touches[0];
+      heroTouchStartX = touch ? touch.clientX : null;
+    })
+    .on('touchend', function (e) {
+      if (heroTouchStartX === null) return;
+      const touch = e.originalEvent.changedTouches[0];
+      const deltaX = touch ? touch.clientX - heroTouchStartX : 0;
+      heroTouchStartX = null;
+      if (Math.abs(deltaX) < 40) return;
+      showHeroSlide(currentHeroSlide + (deltaX < 0 ? 1 : -1));
+      startHeroTimer();
+    });
+
+  // Tombol "Pesan Sekarang" menggulir ke katalog menu
+  $('#hero-cta').on('click', function (e) {
+    const $target = $('#menu-start');
+    if (!$target.length) return;
+    e.preventDefault();
+    $('html, body').animate({ scrollTop: Math.max(0, $target.offset().top - 72) }, 450);
+  });
 
   startHeroTimer();
 
@@ -665,6 +737,7 @@ $(function () {
     renderCategoryChips();
     renderMenuCatalog();
     checkActiveOrder();
+    showHeroSlide(currentHeroSlide, true);
     if (activeDetailMenu) {
       const menuName = window.I18n ? window.I18n.translateMenuName(activeDetailMenu.name) : activeDetailMenu.name;
       const menuCategory = window.I18n ? window.I18n.translateCategory(activeDetailMenu.category_name || 'Kafe') : (activeDetailMenu.category_name || 'Kafe');

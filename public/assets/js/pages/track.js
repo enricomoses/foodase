@@ -283,10 +283,10 @@ $(function () {
       const $label = $('#p-label-' + i);
 
       if (i <= fillLevel) {
-        $bar.removeClass('bg-line').addClass('bg-black');
+        $bar.removeClass('bg-line bg-black').addClass('bg-accent');
         $label.removeClass('text-subtle').addClass('text-ink font-bold');
       } else {
-        $bar.removeClass('bg-black').addClass('bg-line');
+        $bar.removeClass('bg-accent bg-black').addClass('bg-line');
         $label.removeClass('text-ink font-bold').addClass('text-subtle font-medium');
       }
     }

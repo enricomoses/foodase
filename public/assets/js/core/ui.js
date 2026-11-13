@@ -94,10 +94,11 @@ window.UI = (function ($) {
 
       // 1. CEK INSTANCE TUNGGAL DI DOM
       let $existing = $('#toast-single-instance');
-      if ($existing.length && !$existing.hasClass('toast-leave')) {
+      if ($existing.length) {
         if (window._toastAnimId) cancelAnimationFrame(window._toastAnimId);
         if (window._toastTimerId) clearTimeout(window._toastTimerId);
 
+        $existing.removeClass('toast-leave').show();
         $existing.find('.toast-title').text(resolvedTitle);
         $existing.find('.toast-msg').text(message);
         $existing.find('.toast-badge').attr('class', `toast-badge w-11 h-11 rounded-full ${badgeBg} flex items-center justify-center shrink-0 shadow-md`).html(iconSvg);

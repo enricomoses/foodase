@@ -1054,7 +1054,7 @@ $(function () {
       })
       .html(
         '<span>✓ Pembayaran ' + orderCode + ' Sukses!</span>' +
-        '<a href="' + receiptUrl + '" target="_blank" style="color:#06C167;text-decoration:underline;font-weight:700;">Cetak Struk ↗</a>'
+        '<a href="' + receiptUrl + '" target="_blank" style="color:#D08445;text-decoration:underline;font-weight:700;">Cetak Struk ↗</a>'
       );
 
     $('body').append($toast);

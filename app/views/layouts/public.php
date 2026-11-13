@@ -11,11 +11,11 @@ declare(strict_types=1);
 <head>
   <?php require APP_PATH . '/views/partials/head.php'; ?>
 </head>
-<body class="bg-white text-ink min-h-screen flex flex-col font-sans antialiased">
+<body class="bg-white text-ink min-h-screen flex flex-col font-sans antialiased<?= !empty($immersive) ? ' page-immersive' : '' ?>">
   <?php require APP_PATH . '/views/partials/navbar.php'; ?>
 
   <!-- Konten Utama (Layar Penuh / Full Screen Responsif) -->
-  <main class="flex-1 mx-auto w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-4 sm:py-6 pb-28">
+  <main class="<?= !empty($immersive) ? 'pt-0' : 'py-4 sm:py-6' ?> flex-1 mx-auto w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 pb-28">
     <?= $content ?? '' ?>
   </main>
 
@@ -65,13 +65,13 @@ declare(strict_types=1);
 
   <!-- Script Bersama -->
   <script src="<?= e(asset('vendor/jquery/jquery-3.7.1.min.js')) ?>"></script>
-  <script src="<?= e(asset('js/core/app.js?v=12')) ?>"></script>
-  <script src="<?= e(asset('js/core/i18n.js?v=12')) ?>"></script>
-  <script src="<?= e(asset('js/core/api.js?v=12')) ?>"></script>
-  <script src="<?= e(asset('js/core/icons.js?v=12')) ?>"></script>
-  <script src="<?= e(asset('js/core/ui.js?v=12')) ?>"></script>
-  <script src="<?= e(asset('js/core/format.js?v=12')) ?>"></script>
-  <script src="<?= e(asset('js/core/cart-store.js?v=12')) ?>"></script>
+  <script src="<?= e(asset('js/core/app.js?v=16')) ?>"></script>
+  <script src="<?= e(asset('js/core/i18n.js?v=16')) ?>"></script>
+  <script src="<?= e(asset('js/core/api.js?v=16')) ?>"></script>
+  <script src="<?= e(asset('js/core/icons.js?v=16')) ?>"></script>
+  <script src="<?= e(asset('js/core/ui.js?v=16')) ?>"></script>
+  <script src="<?= e(asset('js/core/format.js?v=16')) ?>"></script>
+  <script src="<?= e(asset('js/core/cart-store.js?v=16')) ?>"></script>
 
   <!-- Script Halaman -->
   <?php if (!empty($scripts) && is_array($scripts)): ?>

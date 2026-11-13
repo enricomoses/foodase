@@ -113,12 +113,12 @@ $userName = $authUser['name'] ?? 'Kasir';
 
   <!-- Script Bersama -->
   <script src="<?= e(asset('vendor/jquery/jquery-3.7.1.min.js')) ?>"></script>
-  <script src="<?= e(asset('js/core/app.js?v=12')) ?>"></script>
-  <script src="<?= e(asset('js/core/i18n.js?v=12')) ?>"></script>
-  <script src="<?= e(asset('js/core/api.js?v=12')) ?>"></script>
-  <script src="<?= e(asset('js/core/icons.js?v=12')) ?>"></script>
-  <script src="<?= e(asset('js/core/ui.js?v=12')) ?>"></script>
-  <script src="<?= e(asset('js/core/format.js?v=12')) ?>"></script>
+  <script src="<?= e(asset('js/core/app.js?v=16')) ?>"></script>
+  <script src="<?= e(asset('js/core/i18n.js?v=16')) ?>"></script>
+  <script src="<?= e(asset('js/core/api.js?v=16')) ?>"></script>
+  <script src="<?= e(asset('js/core/icons.js?v=16')) ?>"></script>
+  <script src="<?= e(asset('js/core/ui.js?v=16')) ?>"></script>
+  <script src="<?= e(asset('js/core/format.js?v=16')) ?>"></script>
 
   <!-- Script Halaman -->
   <?php if (!empty($scripts) && is_array($scripts)): ?>

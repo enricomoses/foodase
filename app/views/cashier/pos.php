@@ -148,40 +148,46 @@ declare(strict_types=1);
 
           <!-- Tipe Pesanan: Toggle Pil Segmented -->
           <div>
-            <label class="block text-xs font-medium text-subtle mb-1">Tipe Pesanan</label>
-            <div class="rounded-xl bg-surface p-1 flex gap-1">
+            <label class="block text-xs font-medium text-subtle mb-1.5">Tipe Pesanan</label>
+            <div class="flex p-1 rounded-full bg-surface gap-1" id="pos-order-type-toggle" role="radiogroup" aria-label="Tipe pesanan">
               <button
                 type="button"
                 id="pos-type-dine-in"
+                role="radio"
+                aria-checked="true"
                 data-type="dine_in"
-                class="pos-type-btn flex-1 h-9 rounded-lg text-xs font-medium transition-all cursor-pointer bg-white text-ink shadow-sm"
+                class="pos-type-btn is-active flex-1 h-9 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center justify-center"
               >
-                Makan di tempat
+                <span>Makan di Tempat</span>
               </button>
               <button
                 type="button"
                 id="pos-type-takeaway"
+                role="radio"
+                aria-checked="false"
                 data-type="takeaway"
-                class="pos-type-btn flex-1 h-9 rounded-lg text-xs font-medium transition-all cursor-pointer text-subtle hover:text-ink"
+                class="pos-type-btn flex-1 h-9 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center justify-center"
               >
-                Bawa pulang
+                <span>Bawa Pulang</span>
               </button>
             </div>
           </div>
 
           <!-- Nomor Meja (Hanya muncul jika makan di tempat) -->
           <div id="pos-table-group">
-            <label for="pos-table-number" class="block text-xs font-medium text-subtle mb-1">
+            <label for="pos-table-number" class="block text-xs font-medium text-subtle mb-1.5">
               Nomor Meja <span class="text-danger">*</span>
             </label>
-            <input
-              type="number"
+            <select
               id="pos-table-number"
-              min="1"
-              max="30"
-              placeholder="1 - 30"
-              class="h-10 w-full rounded-lg bg-surface px-3 text-sm text-ink placeholder-subtle border border-transparent focus:bg-white focus:border-ink focus:outline-none transition-colors"
+              name="table_number"
+              class="h-10 w-full rounded-lg bg-surface px-3 border border-transparent focus:bg-white focus:border-ink focus:outline-none text-sm text-ink transition-colors appearance-none cursor-pointer"
             >
+              <option value="" disabled selected>Pilih nomor meja anda</option>
+              <?php for ($t = 1; $t <= 30; $t++): ?>
+                <option value="<?= $t ?>">Meja <?= $t ?></option>
+              <?php endfor; ?>
+            </select>
             <p id="pos-error-table" class="hidden text-xs text-danger mt-1"></p>
           </div>
 
@@ -238,20 +244,24 @@ declare(strict_types=1);
             <button
               type="button"
               id="pos-btn-save"
-              class="h-12 rounded-full bg-surface text-ink text-sm font-medium hover:bg-neutral-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-center"
+              class="h-11 rounded-full bg-surface border border-line text-ink text-xs font-bold hover:bg-neutral-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-center"
               disabled
             >
               Simpan
             </button>
 
-            <!-- Tombol Simpan & Bayar (Utama) -->
+            <!-- Tombol Simpan & Bayar (Utama - Hijau Aksen) -->
             <button
               type="button"
               id="pos-btn-save-pay"
-              class="h-12 rounded-full bg-black text-white text-sm font-medium hover:bg-neutral-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-center"
+              style="background-color: #06C167 !important; color: #ffffff !important;"
+              class="h-11 rounded-full text-white text-xs font-bold transition-all shadow-sm hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-center flex items-center justify-center gap-1.5"
               disabled
             >
-              Simpan &amp; Bayar
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Simpan &amp; Bayar</span>
             </button>
           </div>
         </div>

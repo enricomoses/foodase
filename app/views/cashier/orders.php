@@ -376,7 +376,6 @@ declare(strict_types=1);
                 <button
                   type="button"
                   id="btn-terminal-submit-cash"
-                  style="background-color: #06C167 !important; color: #ffffff !important;"
                   class="w-full h-11 rounded-full text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -390,7 +389,7 @@ declare(strict_types=1);
               <div id="terminal-qris-section" class="hidden space-y-3 text-center">
                 <div class="p-4 rounded-xl border border-line bg-surface/50 flex flex-col items-center justify-center">
                   <!-- QR Mockup SVG -->
-                  <div class="w-36 h-36 bg-white p-2 rounded-xl border border-line flex items-center justify-center shadow-sm">
+                  <div class="qr-mockup w-36 h-36 bg-white p-2 rounded-xl border border-line flex items-center justify-center shadow-sm">
                     <svg class="w-full h-full text-ink" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm10-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm14-2h4v2h-4v-2zm-4 0h2v4h-2v-4zm2 2h2v2h-2v-2zm2 2h2v4h-2v-4zm-4 2h2v2h-2v-2zm-2-2h2v2h-2v-2zm8 0h2v2h-2v-2z"/>
                     </svg>
@@ -402,7 +401,6 @@ declare(strict_types=1);
                 <button
                   type="button"
                   id="btn-terminal-submit-qris"
-                  style="background-color: #06C167 !important; color: #ffffff !important;"
                   class="w-full h-11 rounded-full text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:opacity-90"
                 >
                   <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -417,7 +415,6 @@ declare(strict_types=1);
                 <button
                   type="button"
                   id="btn-terminal-open-cancel"
-                  style="background-color: #E11900 !important; color: #ffffff !important;"
                   class="w-full h-10 rounded-full text-white text-xs font-bold hover:bg-red-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
                 >
                   <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">

@@ -153,10 +153,9 @@ $csrfToken = csrf_token();
     <button
       type="button"
       id="btn-submit-order"
-      style="background-color: #06C167 !important; color: #ffffff !important;"
-      class="w-full h-12 rounded-full text-white text-sm font-bold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm"
+      class="w-full h-12 rounded-full bg-black text-white text-sm font-bold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm"
     >
-      <span id="btn-submit-text" style="color: #ffffff !important; font-weight: 700 !important;" data-i18n="btn_submit_order"><?= e(__('btn_submit_order')) ?></span>
+      <span id="btn-submit-text" data-i18n="btn_submit_order"><?= e(__('btn_submit_order')) ?></span>
       <!-- Spinner tersembunyi saat tidak loading -->
       <svg id="btn-submit-spinner" class="hidden h-4 w-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
@@ -175,7 +174,7 @@ $csrfToken = csrf_token();
 
     <!-- Ikon Centang Besar -->
     <div class="w-20 h-20 rounded-full bg-accent-light flex items-center justify-center mb-6">
-      <svg class="h-10 w-10 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <svg class="h-10 w-10 text-accent-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="20 6 9 17 4 12"/>
       </svg>
     </div>
@@ -184,7 +183,7 @@ $csrfToken = csrf_token();
     <p class="text-sm text-subtle mb-6">Tunjukkan kode ini kepada kasir dan lakukan pembayaran.</p>
 
     <!-- Kode Pesanan Besar -->
-    <div class="w-full rounded-2xl border-2 border-ink bg-black text-white py-8 px-6 mb-6">
+    <div class="checkout-code-card w-full rounded-2xl border-2 border-ink bg-black text-white py-8 px-6 mb-6">
       <p class="text-xs font-medium text-white/60 mb-1 tracking-widest uppercase" data-i18n="order_code"><?= e(__('order_code')) ?></p>
       <p id="success-order-code" class="text-4xl sm:text-5xl font-bold tracking-tight tabular-nums">—</p>
     </div>
