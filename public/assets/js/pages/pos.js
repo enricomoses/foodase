@@ -187,7 +187,7 @@ $(function () {
         // Label Habis
         const $habisBadge = $('<span>')
           .addClass('absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-bold bg-danger text-white shadow')
-          .text('Habis');
+          .text(window.I18n ? I18n.t('badge_out_of_stock', 'Habis') : 'Habis');
         $card.append($habisBadge);
       }
 

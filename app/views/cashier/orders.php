@@ -2,18 +2,18 @@
 declare(strict_types=1);
 
 /**
- * View Halaman Pesanan Masuk Kasir.
- * FR-COR-01..04, prd.md §6.9, §12.3, §12.4.
+ * View Halaman Pesanan Masuk Kasir — POS Terminal Workspace.
+ * FR-COR-01..04, FR-PAY-01..04, prd.md §6.9, §6.11, §12.3, §12.4.
  */
 ?>
 
-<div id="cashier-orders-page" class="space-y-6" data-user-role="<?= e(\App\Core\Auth::role() ?? 'cashier') ?>">
+<div id="cashier-orders-page" class="space-y-4" data-user-role="<?= e(\App\Core\Auth::role() ?? 'cashier') ?>">
 
   <!-- ── BARIS JUDUL & INDIKATOR REFRESH ── -->
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
     <div>
       <h1 class="text-2xl font-bold tracking-tight text-ink">Pesanan Masuk</h1>
-      <p class="text-xs text-subtle mt-0.5">Kelola antrean dan pantau alur pesanan secara real-time.</p>
+      <p class="text-xs text-subtle mt-0.5">Kelola antrean kasir dan proses pembayaran secara instan.</p>
     </div>
 
     <div class="flex items-center gap-3">
@@ -140,188 +140,396 @@ declare(strict_types=1);
     </div>
   </div>
 
-  <!-- ── TABEL PESANAN ── -->
-  <div class="rounded-2xl border border-line bg-white overflow-hidden">
-    <div class="overflow-x-auto">
-      <table class="w-full text-left text-xs sm:text-sm">
-        <thead class="bg-surface/50 border-b border-line text-xs text-subtle font-medium">
-          <tr>
-            <th class="py-3 px-4 sm:px-6">Kode</th>
-            <th class="py-3 px-4">Pelanggan</th>
-            <th class="py-3 px-4">Tipe / Meja</th>
-            <th class="py-3 px-4 text-right">Total</th>
-            <th class="py-3 px-4">Waktu</th>
-            <th class="py-3 px-4">Status</th>
-            <th class="py-3 px-4 sm:px-6 text-center">Aksi</th>
-          </tr>
-        </thead>
-        <tbody id="orders-table-body" class="divide-y divide-line">
-          <!-- Diisi JS -->
-        </tbody>
-      </table>
-    </div>
+  <!-- ── POS WORKSPACE (DUAL-PANE: ANTREAN + TERMINAL CEPAT) ── -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
-    <!-- State Loading Skeleton -->
-    <div id="table-loading" class="p-6 space-y-4">
-      <div class="h-10 w-full bg-surface rounded animate-pulse"></div>
-      <div class="h-10 w-full bg-surface rounded animate-pulse"></div>
-      <div class="h-10 w-full bg-surface rounded animate-pulse"></div>
-      <div class="h-10 w-full bg-surface rounded animate-pulse"></div>
-    </div>
+    <!-- ── KOLOM KIRI: DAFTAR ANTREAN PESANAN (lg:col-span-7) ── -->
+    <div class="lg:col-span-7 space-y-3">
+      <div class="rounded-2xl border border-line bg-white overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead class="bg-surface/50 border-b border-line text-xs text-subtle font-medium">
+              <tr>
+                <th class="py-3 px-3.5 sm:px-4">Kode</th>
+                <th class="py-3 px-3">Pelanggan</th>
+                <th class="py-3 px-3 text-right">Total</th>
+                <th class="py-3 px-3">Waktu</th>
+                <th class="py-3 px-3">Status</th>
+                <th class="py-3 px-3 sm:px-4 text-right">Aksi Cepat</th>
+              </tr>
+            </thead>
+            <tbody id="orders-table-body" class="divide-y divide-line">
+              <!-- Diisi JS -->
+            </tbody>
+          </table>
+        </div>
 
-    <!-- State Kosong -->
-    <div id="table-empty" class="hidden py-16 text-center">
-      <div class="w-14 h-14 rounded-full bg-surface flex items-center justify-center mx-auto mb-3 text-subtle">
-        <svg class="h-7 w-7 text-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
+        <!-- State Loading Skeleton -->
+        <div id="table-loading" class="p-6 space-y-3">
+          <div class="h-10 w-full bg-surface rounded animate-pulse"></div>
+          <div class="h-10 w-full bg-surface rounded animate-pulse"></div>
+          <div class="h-10 w-full bg-surface rounded animate-pulse"></div>
+          <div class="h-10 w-full bg-surface rounded animate-pulse"></div>
+        </div>
+
+        <!-- State Kosong -->
+        <div id="table-empty" class="hidden py-14 text-center">
+          <div class="w-12 h-12 rounded-full bg-surface flex items-center justify-center mx-auto mb-3 text-subtle">
+            <svg class="h-6 w-6 text-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <p class="text-sm font-bold text-ink">Tidak ada pesanan</p>
+          <p class="text-xs text-subtle mt-0.5">Tidak ditemukan pesanan pada status/filter ini.</p>
+        </div>
+
+        <!-- State Error -->
+        <div id="table-error" class="hidden py-10 text-center">
+          <p class="text-xs text-danger mb-3" id="table-error-text">Gagal memuat daftar pesanan.</p>
+          <button
+            type="button"
+            id="btn-retry-orders"
+            class="h-9 px-4 rounded-full bg-black text-white text-xs font-medium hover:bg-neutral-800 transition-colors cursor-pointer"
+          >
+            Coba Lagi
+          </button>
+        </div>
+
+        <!-- Paginasi Bersih -->
+        <div id="table-pagination" class="hidden border-t border-line px-4 py-2.5 flex items-center justify-between text-xs text-subtle">
+          <span id="pagination-info">Menampilkan 0 pesanan</span>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              id="btn-prev-page"
+              class="h-7 px-2.5 rounded-lg bg-surface text-ink hover:bg-neutral-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            >
+              Sebelumnya
+            </button>
+            <span id="current-page-text" class="font-medium text-ink">1</span>
+            <button
+              type="button"
+              id="btn-next-page"
+              class="h-7 px-2.5 rounded-lg bg-surface text-ink hover:bg-neutral-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            >
+              Berikutnya
+            </button>
+          </div>
+        </div>
       </div>
-      <p class="text-sm font-bold text-ink">Tidak ada pesanan</p>
-      <p class="text-xs text-subtle mt-0.5">Tidak ditemukan pesanan yang sesuai dengan filter saat ini.</p>
     </div>
 
-    <!-- State Error -->
-    <div id="table-error" class="hidden py-12 text-center">
-      <p class="text-xs text-danger mb-3" id="table-error-text">Gagal memuat daftar pesanan.</p>
-      <button
-        type="button"
-        id="btn-retry-orders"
-        class="h-9 px-4 rounded-full bg-black text-white text-xs font-medium hover:bg-neutral-800 transition-colors cursor-pointer"
-      >
-        Coba Lagi
-      </button>
-    </div>
+    <!-- ── KOLOM KANAN: POS TERMINAL & DIRECT PAYMENT (lg:col-span-5) ── -->
+    <div id="pos-terminal-wrapper" class="lg:col-span-5 lg:sticky lg:top-4 z-10">
 
-    <!-- Paginasi Bersih -->
-    <div id="table-pagination" class="hidden border-t border-line px-4 sm:px-6 py-3 flex items-center justify-between text-xs text-subtle">
-      <span id="pagination-info">Menampilkan 0 pesanan</span>
-      <div class="flex items-center gap-2">
-        <button
-          type="button"
-          id="btn-prev-page"
-          class="h-8 px-3 rounded-lg bg-surface text-ink hover:bg-neutral-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
-        >
-          Sebelumnya
-        </button>
-        <span id="current-page-text" class="font-medium text-ink">1</span>
-        <button
-          type="button"
-          id="btn-next-page"
-          class="h-8 px-3 rounded-lg bg-surface text-ink hover:bg-neutral-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
-        >
-          Berikutnya
-        </button>
+      <!-- Mobile Backdrop Drawer -->
+      <div id="pos-terminal-backdrop" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
+
+      <!-- State Kosong / Belum Ada Pesanan Terpilih -->
+      <div id="pos-terminal-empty" class="rounded-2xl border border-dashed border-line bg-surface/60 p-8 text-center flex flex-col items-center justify-center min-h-[360px]">
+        <div class="w-12 h-12 rounded-full bg-white border border-line flex items-center justify-center text-subtle mb-3">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+          </svg>
+        </div>
+        <p class="text-sm font-bold text-ink">Pilih Pesanan</p>
+        <p class="text-xs text-subtle mt-1 max-w-xs">
+          Klik baris pesanan di sebelah kiri untuk melihat rincian item dan memproses pembayaran langsung.
+        </p>
       </div>
-    </div>
-  </div>
+
+      <!-- Kartu Terminal Pesanan & Pembayaran Langsung -->
+      <div id="pos-terminal-panel" class="hidden rounded-2xl border border-line bg-white shadow-lg overflow-hidden flex flex-col transition-all">
+
+        <!-- Header Panel -->
+        <div class="px-5 py-3.5 border-b border-line bg-surface/50 flex items-center justify-between shrink-0">
+          <div>
+            <div class="flex items-center gap-2">
+              <span id="terminal-order-code" class="font-mono text-sm font-bold text-ink tracking-tight"></span>
+              <span id="terminal-order-type-badge"></span>
+            </div>
+            <p id="terminal-order-time" class="text-[11px] text-subtle mt-0.5"></p>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button
+              type="button"
+              id="btn-terminal-close"
+              title="Tutup rincian"
+              class="p-1.5 rounded-full hover:bg-neutral-200 text-subtle hover:text-ink transition-colors cursor-pointer"
+            >
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Scrollable Body Terminal -->
+        <div class="p-5 space-y-4 max-h-[calc(100vh-220px)] overflow-y-auto">
+
+          <!-- Ringkasan Pelanggan & Status -->
+          <div class="grid grid-cols-2 gap-2 p-3 rounded-xl bg-surface text-xs border border-line">
+            <div>
+              <span class="text-[11px] text-subtle">Nama Pelanggan</span>
+              <p id="terminal-customer-name" class="font-bold text-ink text-xs mt-0.5 truncate">—</p>
+            </div>
+            <div>
+              <span class="text-[11px] text-subtle">Status Bayar</span>
+              <div id="terminal-payment-badge" class="mt-0.5"></div>
+            </div>
+          </div>
+
+          <!-- Catatan Pesanan (Jika Ada) -->
+          <div id="terminal-notes-box" class="hidden rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-950/30 p-2.5 text-xs text-amber-900 dark:text-amber-200">
+            <div class="flex items-start gap-1.5">
+              <svg class="h-4 w-4 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+              </svg>
+              <div>
+                <span class="font-bold text-[11px] uppercase tracking-wide">Catatan Khusus:</span>
+                <p id="terminal-notes" class="mt-0.5 font-medium"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daftar Rincian Item Menu -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[11px] font-bold text-subtle uppercase tracking-wider">Item Pesanan</span>
+              <span id="terminal-items-count" class="text-[11px] text-subtle">0 item</span>
+            </div>
+            <div id="terminal-items-list" class="divide-y divide-line border border-line rounded-xl px-3 py-1 bg-surface/30 max-h-48 overflow-y-auto">
+              <!-- Diisi JS -->
+            </div>
+          </div>
+
+          <!-- Grand Total Pembayaran -->
+          <div class="flex items-center justify-between py-2 border-t border-b border-line">
+            <span class="text-xs font-bold text-subtle">Total Pembayaran</span>
+            <span id="terminal-total-amount" class="text-xl font-bold text-ink tabular-nums tracking-tight">Rp 0</span>
+          </div>
+
+          <!-- ── TERMINAL AKSI / PEMBAYARAN LANGSUNG ── -->
+          <div id="terminal-action-container">
+
+            <!-- 1. MODE BAYAR (Jika status 'pending' / belum bayar) -->
+            <div id="terminal-pay-mode" class="space-y-3.5 hidden">
+              <!-- Segmented Control: Tunai / QRIS -->
+              <div class="grid grid-cols-2 p-1 rounded-xl bg-surface border border-line text-xs font-bold">
+                <button
+                  type="button"
+                  id="terminal-method-cash"
+                  class="h-8 rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer bg-black text-white shadow-sm"
+                >
+                  <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+                  </svg>
+                  <span>Tunai (Cash)</span>
+                </button>
+                <button
+                  type="button"
+                  id="terminal-method-qris"
+                  class="h-8 rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer text-subtle hover:text-ink"
+                >
+                  <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+                  </svg>
+                  <span>QRIS</span>
+                </button>
+              </div>
+
+              <!-- Bagian Pembayaran Tunai -->
+              <div id="terminal-cash-section" class="space-y-3">
+                <!-- Tombol Nominal Cepat -->
+                <div>
+                  <label class="block text-[11px] font-medium text-subtle mb-1.5">Pilih Nominal Cepat</label>
+                  <div id="terminal-quick-amounts" class="flex flex-wrap gap-1.5">
+                    <!-- Diisi JS -->
+                  </div>
+                </div>
+
+                <!-- Input Nominal Diterima -->
+                <div>
+                  <label for="terminal-cash-input" class="block text-[11px] font-medium text-subtle mb-1">
+                    Uang Diterima (Rp)
+                  </label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-xs font-bold text-subtle pointer-events-none">Rp</span>
+                    <input
+                      type="text"
+                      id="terminal-cash-input"
+                      inputmode="numeric"
+                      autocomplete="off"
+                      placeholder="0"
+                      class="h-11 w-full rounded-xl bg-surface pl-10 pr-4 text-base font-bold text-ink tabular-nums border border-line focus:bg-white focus:border-ink focus:outline-none transition-colors"
+                    >
+                  </div>
+                </div>
+
+                <!-- Indikator Kembalian Live -->
+                <div id="terminal-change-box" class="p-2.5 rounded-xl bg-surface border border-line flex items-center justify-between text-xs">
+                  <span class="text-subtle font-medium" id="terminal-change-label">Kembalian:</span>
+                  <span id="terminal-change-amount" class="text-sm font-bold text-ink tabular-nums">Rp 0</span>
+                </div>
+
+                <!-- Tombol Konfirmasi Bayar Tunai (Warna Hijau Aksen) -->
+                <button
+                  type="button"
+                  id="btn-terminal-submit-cash"
+                  style="background-color: #06C167 !important; color: #ffffff !important;"
+                  class="w-full h-11 rounded-full text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span>Konfirmasi Pembayaran Tunai (Enter)</span>
+                </button>
+              </div>
+
+              <!-- Bagian QRIS -->
+              <div id="terminal-qris-section" class="hidden space-y-3 text-center">
+                <div class="p-4 rounded-xl border border-line bg-surface/50 flex flex-col items-center justify-center">
+                  <!-- QR Mockup SVG -->
+                  <div class="w-36 h-36 bg-white p-2 rounded-xl border border-line flex items-center justify-center shadow-sm">
+                    <svg class="w-full h-full text-ink" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm10-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm14-2h4v2h-4v-2zm-4 0h2v4h-2v-4zm2 2h2v2h-2v-2zm2 2h2v4h-2v-4zm-4 2h2v2h-2v-2zm-2-2h2v2h-2v-2zm8 0h2v2h-2v-2z"/>
+                    </svg>
+                  </div>
+                  <p class="text-xs font-bold text-ink mt-2">Scan QRIS Kafe</p>
+                  <p class="text-[11px] text-subtle mt-0.5">Tunjukkan kode QR kepada pelanggan untuk scan via e-wallet/mobile banking.</p>
+                </div>
+
+                <button
+                  type="button"
+                  id="btn-terminal-submit-qris"
+                  style="background-color: #06C167 !important; color: #ffffff !important;"
+                  class="w-full h-11 rounded-full text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:opacity-90"
+                >
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span>Konfirmasi Pembayaran QRIS</span>
+                </button>
+              </div>
+
+              <!-- Batalkan Pesanan (Tombol Merah Tegas) -->
+              <div class="pt-2">
+                <button
+                  type="button"
+                  id="btn-terminal-open-cancel"
+                  style="background-color: #E11900 !important; color: #ffffff !important;"
+                  class="w-full h-10 rounded-full text-white text-xs font-bold hover:bg-red-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                >
+                  <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                  <span>Batalkan Pesanan</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. MODE STATUS: DIPROSES -->
+            <div id="terminal-processing-mode" class="space-y-2.5 hidden">
+              <div class="p-3 rounded-xl bg-surface border border-line text-xs text-subtle text-center">
+                Pesanan sudah dibayar dan sedang disiapkan di dapur.
+              </div>
+              <button
+                type="button"
+                id="btn-terminal-mark-ready"
+                class="w-full h-11 rounded-full bg-accent hover:opacity-90 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+              >
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <span>Tandai Siap Saji</span>
+              </button>
+              <div class="flex gap-2">
+                <a
+                  id="btn-terminal-print-receipt-proc"
+                  href="#"
+                  target="_blank"
+                  class="flex-1 h-10 rounded-full bg-surface hover:bg-neutral-200 text-ink text-xs font-bold transition-all inline-flex items-center justify-center gap-1.5 border border-line"
+                >
+                  <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+                  </svg>
+                  <span>Cetak Struk</span>
+                </a>
+                <button
+                  type="button"
+                  id="btn-terminal-cancel-admin-proc"
+                  class="hidden h-10 px-4 rounded-full bg-surface text-danger hover:bg-neutral-200 text-xs font-medium cursor-pointer"
+                >
+                  Batal
+                </button>
+              </div>
+            </div>
+
+            <!-- 3. MODE STATUS: SIAP SAJI -->
+            <div id="terminal-ready-mode" class="space-y-2.5 hidden">
+              <div class="p-3 rounded-xl bg-surface border border-line text-xs text-subtle text-center">
+                Pesanan siap disajikan ke meja atau diambil oleh pelanggan.
+              </div>
+              <button
+                type="button"
+                id="btn-terminal-mark-completed"
+                class="w-full h-11 rounded-full bg-accent hover:opacity-90 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+              >
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>Tandai Selesai</span>
+              </button>
+              <a
+                id="btn-terminal-print-receipt-ready"
+                href="#"
+                target="_blank"
+                class="w-full h-10 rounded-full bg-surface hover:bg-neutral-200 text-ink text-xs font-bold transition-all inline-flex items-center justify-center gap-1.5 border border-line"
+              >
+                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+                </svg>
+                <span>Cetak Struk</span>
+              </a>
+            </div>
+
+            <!-- 4. MODE STATUS: SELESAI -->
+            <div id="terminal-completed-mode" class="space-y-2.5 hidden">
+              <div class="p-3 rounded-xl bg-accent-light/50 border border-accent/20 text-xs text-accent-dark text-center font-medium">
+                ✓ Pesanan telah selesai dan lunas.
+              </div>
+              <a
+                id="btn-terminal-print-receipt-done"
+                href="#"
+                target="_blank"
+                class="w-full h-11 rounded-full bg-surface hover:bg-neutral-200 text-ink text-xs font-bold transition-all inline-flex items-center justify-center gap-1.5 border border-line"
+              >
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+                </svg>
+                <span>Cetak Ulang Struk</span>
+              </a>
+            </div>
+
+            <!-- 5. MODE STATUS: DIBATALKAN -->
+            <div id="terminal-cancelled-mode" class="hidden p-3 rounded-xl border border-danger-light bg-danger-light/30 text-xs text-danger">
+              <p class="font-bold">Pesanan Dibatalkan</p>
+              <p id="terminal-cancel-reason" class="mt-0.5"></p>
+            </div>
+
+          </div><!-- /terminal-action-container -->
+
+        </div><!-- /scrollable body -->
+
+      </div><!-- /pos-terminal-panel -->
+
+    </div><!-- /lg:col-span-5 -->
+
+  </div><!-- /grid -->
 
 </div><!-- /cashier-orders-page -->
 
-
-<!-- ============================================================
-     MODAL DETAIL PESANAN KASIR (FR-COR-04)
-     ============================================================ -->
-<div id="modal-order-detail" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
-  <div class="fixed inset-0 bg-black/50 transition-opacity" data-modal-dismiss></div>
-
-  <div class="flex min-h-full items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="relative w-full sm:max-w-xl rounded-t-2xl sm:rounded-2xl bg-white shadow-xl overflow-hidden max-h-[90vh] flex flex-col">
-
-      <!-- Garis pegangan mobile (sheet handle) -->
-      <div class="w-10 h-1 bg-line rounded-full mx-auto my-3 sm:hidden"></div>
-
-      <!-- Header Modal -->
-      <div class="flex items-center justify-between px-6 py-4 border-b border-line shrink-0">
-        <div>
-          <h2 class="text-base font-bold text-ink flex items-center gap-2">
-            <span>Detail Pesanan</span>
-            <span id="modal-order-code" class="font-mono text-ink"></span>
-          </h2>
-          <p id="modal-order-time" class="text-xs text-subtle mt-0.5"></p>
-        </div>
-        <button
-          type="button"
-          data-modal-dismiss
-          class="p-2 rounded-full hover:bg-surface text-subtle hover:text-ink transition-colors cursor-pointer"
-        >
-          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-      </div>
-
-      <!-- Konten Modal (Scrollable) -->
-      <div class="flex-1 overflow-y-auto p-6 space-y-5">
-
-        <!-- Informasi Pelanggan & Status -->
-        <div class="rounded-xl border border-line bg-surface p-4 grid grid-cols-2 gap-3 text-xs">
-          <div>
-            <span class="text-subtle">Nama Pelanggan</span>
-            <p id="modal-customer-name" class="font-bold text-ink text-sm mt-0.5">—</p>
-          </div>
-          <div>
-            <span class="text-subtle">Tipe & Meja</span>
-            <p id="modal-order-type" class="font-bold text-ink text-sm mt-0.5">—</p>
-          </div>
-          <div>
-            <span class="text-subtle">Status Pesanan</span>
-            <div id="modal-status-badge" class="mt-0.5">—</div>
-          </div>
-          <div>
-            <span class="text-subtle">Status Pembayaran</span>
-            <div id="modal-pay-badge" class="mt-0.5">—</div>
-          </div>
-        </div>
-
-        <!-- Catatan Pesanan -->
-        <div id="modal-notes-box" class="hidden rounded-xl border border-line p-3 text-xs">
-          <p class="font-medium text-subtle">Catatan:</p>
-          <p id="modal-notes" class="text-ink mt-0.5 italic"></p>
-        </div>
-
-        <!-- Alasan Pembatalan (Jika dibatalkan) -->
-        <div id="modal-cancel-box" class="hidden rounded-xl border border-danger-light bg-danger-light/40 p-3 text-xs">
-          <p class="font-bold text-danger">Pesanan Dibatalkan</p>
-          <p id="modal-cancel-reason" class="text-danger/90 mt-0.5"></p>
-        </div>
-
-        <!-- Daftar Item Menu -->
-        <div>
-          <h3 class="text-xs font-bold text-subtle uppercase tracking-wider mb-2">Item Menu</h3>
-          <div id="modal-items-list" class="divide-y divide-line border border-line rounded-xl px-4 py-1">
-            <!-- Diisi JS -->
-          </div>
-        </div>
-
-        <!-- Ringkasan Total -->
-        <div class="flex items-center justify-between py-2 border-t border-line">
-          <span class="text-sm font-bold text-ink">Total Pembayaran</span>
-          <span id="modal-total-amount" class="text-lg font-bold text-ink tabular-nums">Rp 0</span>
-        </div>
-
-        <!-- ── Tempat Tombol Aksi (dikelola oleh cashier-orders.js) ── -->
-        <div class="pt-2">
-          <div id="modal-action-buttons" class="flex flex-wrap gap-2">
-            <!-- Tombol aksi diisi JS sesuai status pesanan -->
-          </div>
-        </div>
-
-      </div><!-- /konten modal -->
-
-      <!-- Footer Modal -->
-      <div class="px-6 py-3 border-t border-line bg-surface flex justify-end shrink-0">
-        <button
-          type="button"
-          data-modal-dismiss
-          class="h-10 px-5 rounded-full bg-surface text-ink text-xs font-medium hover:bg-neutral-200 transition-colors cursor-pointer"
-        >
-          Tutup
-        </button>
-      </div>
-
-    </div>
-  </div>
-</div>
 
 <!-- ============================================================
      MODAL KONFIRMASI PEMBATALAN PESANAN (FR-STS-02, FR-STS-03)

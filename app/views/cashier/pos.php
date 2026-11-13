@@ -108,9 +108,9 @@ declare(strict_types=1);
 
     </div>
 
-    <!-- ── KOLOM KANAN (Panel Pesanan Sticky) ────────────────────── -->
-    <div class="lg:col-span-5 xl:col-span-4 sticky top-20">
-      <div id="pos-order-panel" class="border border-line rounded-xl bg-white shadow-sm flex flex-col overflow-hidden">
+    <!-- ── KOLOM KANAN (Panel Pesanan Sticky / Stay) ────────────────────── -->
+    <div class="lg:col-span-5 xl:col-span-4 sticky top-0 self-start z-10">
+      <div id="pos-order-panel" class="border border-line rounded-xl bg-white shadow-sm flex flex-col max-h-[calc(100vh-5.5rem)] overflow-hidden">
 
         <!-- Header Panel Pesanan -->
         <div class="px-5 py-4 border-b border-line flex items-center justify-between shrink-0 bg-white">

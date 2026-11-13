@@ -11,5 +11,5 @@ Auth::requireRole(['admin']);
 echo View::render('cashier/orders', [
     'title'      => 'Kelola Pesanan',
     'activeMenu' => 'orders',
-    'scripts'    => ['js/pages/payment.js?v=1', 'js/pages/cashier-orders.js?v=4'],
+    'scripts'    => ['js/pages/payment.js?v=12', 'js/pages/cashier-orders.js?v=12'],
 ], 'admin');
