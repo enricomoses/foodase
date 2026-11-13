@@ -12,12 +12,14 @@ if (Auth::check()) {
     $role = Auth::role();
     if ($role === 'admin') {
         Response::redirect('admin/');
-    } else {
+    } elseif ($role === 'cashier') {
         Response::redirect('cashier/');
+    } else {
+        Response::redirect('');
     }
 }
 
-echo View::render('auth/login', [
-    'title'   => 'Masuk',
-    'scripts' => ['js/pages/login.js'],
+echo View::render('admin/login', [
+    'title'   => 'Login Portal Staf & Administrator',
+    'scripts' => ['js/pages/admin-login.js?v=12'],
 ], 'auth');

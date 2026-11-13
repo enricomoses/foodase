@@ -60,25 +60,14 @@ final class AuthController
         $user = Auth::user();
         $actualRole = (string) ($user['role'] ?? 'cashier');
         $requestedRole = trim((string) ($input['role'] ?? ''));
+        $scope = trim((string) ($input['scope'] ?? ''));
 
-        // Jika user memilih spesifik role, cocokkan dengan data akun
-        if ($requestedRole !== '' && $requestedRole !== $actualRole) {
-            Auth::logout();
-            $roleLabels = [
-                'admin'    => 'Administrator',
-                'cashier'  => 'Kasir',
-                'customer' => 'Customer',
-            ];
-            $roleLabel = $roleLabels[$requestedRole] ?? $requestedRole;
-            Response::error("Akun ini bukan merupakan akun {$roleLabel}.", 403);
-        }
-
+        // Arahkan ke dashboard sesuai role akun pengguna
         $redirectMap = [
             'admin'    => url('admin/'),
             'cashier'  => url('cashier/'),
-            'customer' => url('menu.php'),
         ];
-        $redirectUrl = $redirectMap[$actualRole] ?? url('menu.php');
+        $redirectUrl = $redirectMap[$actualRole] ?? url('');
 
         Response::json([
             'user'     => $user,
@@ -115,7 +104,7 @@ final class AuthController
             $errors['username'] = 'Username hanya boleh huruf, angka, dan underscore.';
         }
 
-        if (!in_array($role, ['cashier', 'admin', 'customer'], true)) {
+        if (!in_array($role, ['cashier', 'admin'], true)) {
             $errors['role'] = 'Peran akun tidak valid.';
         }
 

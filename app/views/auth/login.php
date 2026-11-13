@@ -20,14 +20,14 @@ if ($flashError) {
       class="btn-cancel-login inline-flex items-center gap-1.5 text-xs font-medium text-subtle hover:text-ink transition-colors cursor-pointer"
     >
       <?= icon('arrow-left', 'h-4 w-4') ?>
-      <span>Kembali ke Beranda</span>
+      <span data-i18n="login_back_home"><?= e(__('login_back_home')) ?></span>
     </a>
   </div>
 
   <!-- Header / Wordmark Identitas -->
   <div>
-    <h1 class="text-2xl font-bold tracking-tight text-ink">Masuk</h1>
-    <p class="mt-1 text-sm text-subtle">Gunakan akun staf atau administrator kafe Anda.</p>
+    <h1 class="text-2xl font-bold tracking-tight text-ink" data-i18n="login_title"><?= e(__('login_title')) ?></h1>
+    <p class="mt-1 text-sm text-subtle" data-i18n="login_subtitle"><?= e(__('login_subtitle')) ?></p>
   </div>
 
   <?php if ($flashError): ?>
@@ -50,39 +50,11 @@ if ($flashError) {
   <!-- Form Login -->
   <form id="form-login" action="<?= e(url('api/auth/login.php')) ?>" method="POST" novalidate autocomplete="off" class="space-y-4">
     <?= csrf_field() ?>
-
-    <!-- Pilihan Masuk Sebagai (Role Selector: Semua, Kasir, Admin) -->
-    <div>
-      <label class="block text-xs font-medium text-subtle mb-1.5">Masuk Sebagai</label>
-      <input type="hidden" name="role" id="login-role" value="customer">
-      <div class="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-surface border border-line" id="role-pill-group">
-        <button
-          type="button"
-          class="role-btn h-9 rounded-lg text-xs font-semibold transition-all bg-black text-white shadow-sm cursor-pointer"
-          data-role="customer"
-        >
-          Customer
-        </button>
-        <button
-          type="button"
-          class="role-btn h-9 rounded-lg text-xs font-semibold text-subtle hover:text-ink transition-all cursor-pointer"
-          data-role="cashier"
-        >
-          Kasir
-        </button>
-        <button
-          type="button"
-          class="role-btn h-9 rounded-lg text-xs font-semibold text-subtle hover:text-ink transition-all cursor-pointer"
-          data-role="admin"
-        >
-          Admin
-        </button>
-      </div>
-    </div>
+    <input type="hidden" name="role" id="login-role" value="">
 
     <!-- Username -->
     <div>
-      <label for="username" class="block text-xs font-medium text-subtle mb-1.5">Username</label>
+      <label for="username" class="block text-xs font-medium text-subtle mb-1.5" data-i18n="login_username"><?= e(__('login_username')) ?></label>
       <input
         type="text"
         id="username"
@@ -90,14 +62,15 @@ if ($flashError) {
         autocomplete="off"
         autofocus
         class="h-12 w-full rounded-lg bg-surface px-4 text-sm text-ink placeholder-subtle border border-transparent focus:bg-white focus:border-ink focus:outline-none transition-colors"
-        placeholder="Masukkan username"
+        placeholder="<?= e(__('login_username')) ?>"
+        data-i18n-placeholder="login_username"
       >
       <p id="error-username" class="hidden mt-1 text-xs font-medium text-danger"></p>
     </div>
 
     <!-- Password Container -->
     <div>
-      <label for="password" class="block text-xs font-medium text-subtle mb-1.5">Password</label>
+      <label for="password" class="block text-xs font-medium text-subtle mb-1.5" data-i18n="login_password"><?= e(__('login_password')) ?></label>
       <div class="relative">
         <input
           type="password"
@@ -105,7 +78,8 @@ if ($flashError) {
           name="password"
           autocomplete="new-password"
           class="h-12 w-full rounded-lg bg-surface px-4 pr-11 text-sm text-ink placeholder-subtle border border-transparent focus:bg-white focus:border-ink focus:outline-none transition-colors"
-          placeholder="Masukkan password"
+          placeholder="<?= e(__('login_password')) ?>"
+          data-i18n-placeholder="login_password"
         >
         <button
           type="button"
@@ -124,8 +98,9 @@ if ($flashError) {
           type="button"
           id="btn-open-forgot"
           class="text-xs font-medium text-subtle hover:text-ink underline cursor-pointer"
+          data-i18n="login_forgot"
         >
-          Lupa password?
+          <?= e(__('login_forgot')) ?>
         </button>
       </div>
       <p id="error-password" class="hidden mt-1 text-xs font-medium text-danger"></p>
@@ -137,22 +112,24 @@ if ($flashError) {
         type="submit"
         id="btn-login"
         class="h-12 w-full rounded-full bg-black px-6 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-2 transition-colors cursor-pointer"
+        data-i18n="login_btn"
       >
-        Masuk
+        <?= e(__('login_btn')) ?>
       </button>
     </div>
   </form>
 
   <!-- Bagian Buat Akun Baru -->
-  <div class="border-t border-line pt-4 text-center">
-    <p class="text-xs text-subtle">
-      Belum memiliki akun staf?
+  <div class="border-t border-line pt-4 text-center text-xs">
+    <p class="text-subtle">
+      <span data-i18n="login_no_account"><?= e(__('login_no_account')) ?></span>
       <button
         type="button"
         id="btn-open-register"
         class="font-semibold text-ink underline hover:opacity-80 transition-opacity ml-1 cursor-pointer"
+        data-i18n="login_register_link"
       >
-        Buat akun baru
+        <?= e(__('login_register_link')) ?>
       </button>
     </p>
   </div>
@@ -169,8 +146,8 @@ if ($flashError) {
       <div class="w-10 h-1 bg-line rounded-full mx-auto mb-4 sm:hidden"></div>
 
       <div class="pb-4 border-b border-line">
-        <h3 class="text-xl font-bold tracking-tight text-ink">Buat Akun Baru</h3>
-        <p class="text-xs text-subtle mt-0.5">Daftarkan akun kasir atau staf kafe baru.</p>
+        <h3 class="text-xl font-bold tracking-tight text-ink" data-i18n="register_title"><?= e(__('register_title')) ?></h3>
+        <p class="text-xs text-subtle mt-0.5" data-i18n="register_subtitle"><?= e(__('register_subtitle')) ?></p>
       </div>
 
       <form id="form-register" action="<?= e(url('api/auth/register.php')) ?>" method="POST" novalidate autocomplete="off" class="mt-4 space-y-4">
@@ -182,7 +159,7 @@ if ($flashError) {
 
         <!-- Nama Lengkap -->
         <div>
-          <label for="reg-name" class="block text-xs font-medium text-subtle mb-1.5">Nama Lengkap <span class="text-danger">*</span></label>
+          <label for="reg-name" class="block text-xs font-medium text-subtle mb-1.5"><span data-i18n="register_name"><?= e(__('register_name')) ?></span> <span class="text-danger">*</span></label>
           <input
             type="text"
             id="reg-name"
@@ -198,7 +175,7 @@ if ($flashError) {
 
         <!-- Username -->
         <div>
-          <label for="reg-username" class="block text-xs font-medium text-subtle mb-1.5">Username <span class="text-danger">*</span></label>
+          <label for="reg-username" class="block text-xs font-medium text-subtle mb-1.5"><span data-i18n="register_username"><?= e(__('register_username')) ?></span> <span class="text-danger">*</span></label>
           <input
             type="text"
             id="reg-username"
@@ -215,22 +192,24 @@ if ($flashError) {
 
         <!-- Peran / Role Akun -->
         <div>
-          <label class="block text-xs font-medium text-subtle mb-1.5">Peran Akun <span class="text-danger">*</span></label>
+          <label class="block text-xs font-medium text-subtle mb-1.5"><span data-i18n="register_role"><?= e(__('register_role')) ?></span> <span class="text-danger">*</span></label>
           <input type="hidden" name="role" id="reg-role" value="cashier">
           <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-surface border border-line" id="reg-role-group">
             <button
               type="button"
               class="reg-role-btn h-9 rounded-lg text-xs font-semibold transition-all bg-black text-white shadow-sm cursor-pointer"
               data-role="cashier"
+              data-i18n="register_cashier"
             >
-              Kasir
+              <?= e(__('register_cashier')) ?>
             </button>
             <button
               type="button"
               class="reg-role-btn h-9 rounded-lg text-xs font-semibold text-subtle hover:text-ink transition-all cursor-pointer"
               data-role="admin"
+              data-i18n="register_admin"
             >
-              Administrator
+              <?= e(__('register_admin')) ?>
             </button>
           </div>
         </div>

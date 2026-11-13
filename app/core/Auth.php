@@ -129,7 +129,7 @@ final class Auth
     }
 
     /**
-     * Wajibkan login. Jika belum, redirect ke login.php (web) atau balas 401 JSON (API/AJAX).
+     * Wajibkan login. Jika belum, redirect ke login.php / admin/login.php (web) atau balas 401 JSON (API/AJAX).
      */
     public static function requireLogin(): void
     {
@@ -137,14 +137,19 @@ final class Auth
             if (self::isApiRequest()) {
                 Response::error('Silakan login terlebih dahulu.', 401);
             } else {
-                Response::redirect('login.php');
+                $uri = $_SERVER['REQUEST_URI'] ?? '';
+                if (str_contains($uri, '/admin') || str_contains($uri, '/cashier')) {
+                    Response::redirect('admin/login.php');
+                } else {
+                    Response::redirect('login.php');
+                }
             }
         }
     }
 
     /**
      * Wajibkan salah satu role yang ditentukan. Jika tidak sesuai, tolak akses.
-     * Untuk web tampilkan 403, untuk API balas 403 JSON.
+     * Untuk web tampilkan 403 / redirect portal admin, untuk API balas 403 JSON.
      */
     public static function requireRole(array $roles): void
     {
@@ -155,6 +160,11 @@ final class Auth
             if (self::isApiRequest()) {
                 Response::error('Akses ditolak. Anda tidak memiliki izin untuk tindakan ini.', 403);
             } else {
+                $uri = $_SERVER['REQUEST_URI'] ?? '';
+                if (str_contains($uri, '/admin') || str_contains($uri, '/cashier')) {
+                    Session::set('auth_flash_error', 'Akun Anda tidak memiliki izin untuk mengakses area ini.');
+                    Response::redirect('admin/login.php');
+                }
                 http_response_code(403);
                 echo 'Akses ditolak: Anda tidak memiliki izin untuk halaman ini.';
                 exit;

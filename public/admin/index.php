@@ -8,7 +8,17 @@ declare(strict_types=1);
 require __DIR__ . '/../../app/bootstrap.php';
 
 use App\Core\Auth;
+use App\Core\Response;
 use App\Core\View;
+
+if (!Auth::check()) {
+    Response::redirect('admin/login.php');
+}
+
+$role = Auth::role();
+if ($role === 'cashier') {
+    Response::redirect('cashier/');
+}
 
 Auth::requireRole(['admin']);
 
