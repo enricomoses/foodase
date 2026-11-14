@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 400" fill="none">
+  <defs>
+    <!-- Gradien Badan Cangkir Hitam Matte Keramik -->
+    <radialGradient id="cupBody" cx="30%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#2D231E"/>
+      <stop offset="35%" stop-color="#1A130F"/>
+      <stop offset="75%" stop-color="#0E0907"/>
+      <stop offset="100%" stop-color="#050302"/>
+    </radialGradient>
+    <linearGradient id="cupRimHighlight" x1="0%" y1="0%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#6F503D" stop-opacity="0.9"/>
+      <stop offset="40%" stop-color="#3A281E" stop-opacity="0.6"/>
+      <stop offset="80%" stop-color="#A87B56" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#2E1C13" stop-opacity="0.4"/>
+    </linearGradient>
+    <linearGradient id="cupRimEdge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2B1E17"/>
+      <stop offset="100%" stop-color="#0F0906"/>
+    </linearGradient>
+
+    <!-- Gradien Kopi Espresso -->
+    <radialGradient id="espressoLiquid" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#7A4B29"/>
+      <stop offset="45%" stop-color="#4F2E17"/>
+      <stop offset="85%" stop-color="#2A170A"/>
+      <stop offset="100%" stop-color="#150B05"/>
+    </radialGradient>
+
+    <!-- Gradien Busa Susu Latte Art -->
+    <linearGradient id="latteCream" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFDF8"/>
+      <stop offset="40%" stop-color="#F2DFCB"/>
+      <stop offset="80%" stop-color="#D7A97E"/>
+      <stop offset="100%" stop-color="#A56E42"/>
+    </linearGradient>
+
+    <!-- Gradien Handle Cangkir -->
+    <linearGradient id="handleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2D221D"/>
+      <stop offset="40%" stop-color="#19120E"/>
+      <stop offset="80%" stop-color="#0C0806"/>
+      <stop offset="100%" stop-color="#050302"/>
+    </linearGradient>
+
+    <!-- Filter Bayangan Drop Shadow Halus -->
+    <filter id="cupShadow" x="-20%" y="-15%" width="140%" height="140%">
+      <feDropShadow dx="-10" dy="25" stdDeviation="20" flood-color="#000000" flood-opacity="0.95"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#cupShadow)" transform="rotate(-5 230 200)">
+    <!-- Pegangan Cangkir (Handle) Kanan -->
+    <path d="M290 120 C370 125, 395 180, 375 235 C355 285, 290 270, 260 260 C270 245, 285 240, 310 245 C345 250, 360 215, 350 175 C340 140, 295 140, 280 140 Z" fill="url(#handleGrad)"/>
+    <path d="M292 122 C368 127, 392 180, 372 233" stroke="url(#cupRimHighlight)" stroke-width="2.5" stroke-linecap="round" opacity="0.65"/>
+
+    <!-- Badan Cangkir Utama (Miring Artistik) -->
+    <path d="M75 110 C90 230, 140 310, 215 315 C290 315, 315 225, 320 110 Z" fill="url(#cupBody)"/>
+
+    <!-- Rim Light Tepi Badan Cangkir -->
+    <path d="M318 115 C313 220, 285 305, 215 314" stroke="#8E6548" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+    <path d="M78 115 C92 225, 140 300, 205 314" stroke="#3A271D" stroke-width="2" opacity="0.4"/>
+
+    <!-- Wordmark Elegan "BREW." pada Badan Cangkir -->
+    <text x="185" y="225" font-family="'Arial', 'Helvetica Neue', sans-serif" font-size="16" font-weight="700" letter-spacing="4" fill="#A87B56" opacity="0.65" transform="rotate(8 185 225)">BREW.</text>
+
+    <!-- Mulut Cangkir Oval (Bibir Cangkir) -->
+    <ellipse cx="198" cy="110" rx="122" ry="58" fill="url(#cupRimEdge)"/>
+    <ellipse cx="198" cy="110" rx="122" ry="58" stroke="url(#cupRimHighlight)" stroke-width="3"/>
+
+    <!-- Cairan Espresso di Dalam Cangkir -->
+    <ellipse cx="198" cy="112" rx="114" ry="52" fill="url(#espressoLiquid)"/>
+
+    <!-- Lingkaran Crema Emas -->
+    <ellipse cx="198" cy="112" rx="108" ry="48" fill="none" stroke="#A86D3B" stroke-width="4" opacity="0.65"/>
+
+    <!-- Latte Art: Daun Jantung Barista Berlapis (Rosetta Foam Art) -->
+    <!-- Daun Luar -->
+    <path d="M198 80 C155 85, 135 125, 198 145 C260 125, 240 85, 198 80 Z" fill="url(#latteCream)" opacity="0.95"/>
+    <path d="M198 86 C165 92, 150 120, 198 138 C245 120, 230 92, 198 86 Z" fill="#663A1D" opacity="0.45"/>
+
+    <!-- Daun Tengah -->
+    <path d="M198 88 C168 94, 158 120, 198 135 C238 120, 228 94, 198 88 Z" fill="url(#latteCream)" opacity="0.95"/>
+    <path d="M198 94 C178 98, 170 115, 198 128 C225 115, 218 98, 198 94 Z" fill="#583116" opacity="0.4"/>
+
+    <!-- Hati Mahkota Atas -->
+    <path d="M198 98 C182 102, 175 114, 198 124 C220 114, 214 102, 198 98 Z" fill="url(#latteCream)"/>
+    <circle cx="198" cy="74" r="5" fill="url(#latteCream)"/>
+    <circle cx="198" cy="65" r="3" fill="url(#latteCream)"/>
+
+    <!-- Tarikan Garis Barista Tengah -->
+    <path d="M198 62 L198 148" stroke="#482710" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+</svg>
+

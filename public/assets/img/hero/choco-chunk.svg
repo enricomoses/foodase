@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="chocoTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5C3624"/>
+      <stop offset="100%" stop-color="#3A1F13"/>
+    </linearGradient>
+    <linearGradient id="chocoLeft" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2D170D"/>
+      <stop offset="100%" stop-color="#140905"/>
+    </linearGradient>
+    <linearGradient id="chocoRight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#422416"/>
+      <stop offset="100%" stop-color="#1C0D07"/>
+    </linearGradient>
+    <filter id="chocoShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="8" stdDeviation="12" flood-color="#070302" flood-opacity="0.8"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#chocoShadow)">
+    <!-- Balok Cokelat Mewah 3D Isometric -->
+    <path d="M60 16 L102 38 L60 62 L18 38 Z" fill="url(#chocoTop)"/>
+    <path d="M18 38 L60 62 L60 98 L18 74 Z" fill="url(#chocoLeft)"/>
+    <path d="M60 62 L102 38 L102 74 L60 98 Z" fill="url(#chocoRight)"/>
+
+    <!-- Bevel & Kilau Cokelat Belgia -->
+    <path d="M22 40 L58 60" stroke="#8C583E" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+    <path d="M60 18 L98 38" stroke="#7A4B33" stroke-width="1.8" stroke-linecap="round" opacity="0.7"/>
+    <path d="M60 64 L60 95" stroke="#3D1E11" stroke-width="1.5"/>
+  </g>
+</svg>
+

@@ -490,154 +490,239 @@ $(function () {
   });
 
   // ============================================================
-  // HERO EDITORIAL: DOTS, AUTO-ROTATE, SWIPE
+  // GLACÉ CAFÉ HERO STAGE: 4 SIGNATURE DRINKS SWAP (PINTEREST PIN 1082693566762069480)
   // ============================================================
-  const HERO_SLIDES = [
+  const GLACE_SLIDES = [
     {
-      theme: 'choco',
-      display1: 'Chocolate',
-      display2: 'Delight!',
-      image: 'uploads/menus/menu_42_milo_dinosaur.jpg',
-      menuName: 'Milo Dinosaur',
-      descKey: 'hero_feat_choco'
+      index: 0,
+      ghostText: 'Iced Latte Espresso',
+      title1: 'Iced Latte',
+      title2: '& Double Espresso',
+      desc: 'Two shots of house espresso poured over fresh milk and clear ice, silky, balanced and gently sweet.',
+      ctaText: 'Order Now',
+      menuId: 37,
+      menuName: 'Iced Latte',
+      menuPrice: 35000,
+      cupImage: 'assets/img/hero/cup_latte.png',
+      tagline: 'Slow Brewed, Served Cold',
+      subDesc: 'Small-batch ingredients over crystal-clear ice. Refreshing, smooth and made to order.',
+      particles: [
+        'assets/img/hero/coffee-bean.svg',
+        'assets/img/hero/coffee-bean.svg',
+        'assets/img/hero/coffee-bean.svg',
+        'assets/img/hero/coffee-bean.svg',
+        'assets/img/hero/coffee-bean.svg',
+        'assets/img/hero/coffee-bean.svg'
+      ]
     },
     {
-      theme: 'citrus',
-      display1: 'Citrus',
-      display2: 'Breeze!',
-      image: 'uploads/menus/menu_5_teh_lemon.jpg',
-      menuName: 'Teh Lemon',
-      descKey: 'hero_feat_citrus'
+      index: 1,
+      ghostText: 'Espresso Dark Cocoa',
+      title1: 'Iced Chocolate',
+      title2: '& Dark Cocoa',
+      desc: 'Small-batch ingredients over crystal-clear ice. Refreshing, smooth and made to order with rich Belgian cocoa.',
+      ctaText: 'Order Now',
+      menuId: 6,
+      menuName: 'Iced Chocolate',
+      menuPrice: 26000,
+      cupImage: 'assets/img/hero/cup_choco.png',
+      tagline: 'Slow Brewed, Served Cold',
+      subDesc: 'Small-batch ingredients over crystal-clear ice. Refreshing, smooth and made to order.',
+      particles: [
+        'assets/img/hero/choco-chunk.svg',
+        'assets/img/hero/coffee-bean.svg',
+        'assets/img/hero/choco-chunk.svg',
+        'assets/img/hero/coffee-bean.svg',
+        'assets/img/hero/choco-chunk.svg',
+        'assets/img/hero/coffee-bean.svg'
+      ]
     },
     {
-      theme: 'matcha',
-      display1: 'Matcha',
-      display2: 'Moment!',
-      image: 'uploads/menus/menu_7_matcha_latte.jpg',
-      menuName: 'Matcha Latte',
-      descKey: 'hero_feat_matcha'
+      index: 2,
+      ghostText: 'Ceremonial Matcha',
+      title1: 'Iced Matcha',
+      title2: '& Ceremonial Green',
+      desc: 'Stone-ground ceremonial matcha whisked to a bright, creamy green and layered over milk and ice.',
+      ctaText: 'Order Now',
+      menuId: 7,
+      menuName: 'Iced Matcha',
+      menuPrice: 28000,
+      cupImage: 'assets/img/hero/cup_matcha.png',
+      tagline: 'Slow Brewed, Served Cold',
+      subDesc: 'Small-batch ingredients over crystal-clear ice. Refreshing, smooth and made to order.',
+      particles: [
+        'assets/img/hero/tea-leaf.svg',
+        'assets/img/hero/tea-leaf.svg',
+        'assets/img/hero/tea-leaf.svg',
+        'assets/img/hero/tea-leaf.svg',
+        'assets/img/hero/tea-leaf.svg',
+        'assets/img/hero/tea-leaf.svg'
+      ]
     },
     {
-      theme: 'berry',
-      display1: 'Berry',
-      display2: 'Blast!',
-      image: 'uploads/menus/menu_41_strawberry_smoothie.jpg',
-      menuName: 'Strawberry Smoothie',
-      descKey: 'hero_feat_berry'
+      index: 3,
+      ghostText: 'Iced Tea Sicilian Lemon',
+      title1: 'Iced Tea',
+      title2: '& Sicilian Lemon',
+      desc: 'Cold-steeped black tea with fresh lemon slices and a hint of wildflower honey, clean and endlessly refreshing.',
+      ctaText: 'Order Now',
+      menuId: 5,
+      menuName: 'Iced Lemon Tea',
+      menuPrice: 18000,
+      cupImage: 'assets/img/hero/cup_lemon.png',
+      tagline: 'Slow Brewed, Served Cold',
+      subDesc: 'Small-batch ingredients over crystal-clear ice. Refreshing, smooth and made to order.',
+      particles: [
+        'assets/img/hero/tea-leaf.svg',
+        'assets/img/hero/ice-cube.svg',
+        'assets/img/hero/tea-leaf.svg',
+        'assets/img/hero/ice-cube.svg',
+        'assets/img/hero/tea-leaf.svg',
+        'assets/img/hero/ice-cube.svg'
+      ]
     }
   ];
 
-  let currentHeroSlide = 0;
-  let heroTimer = null;
+  let currentGlaceSlide = 0;
+  let glaceTimer = null;
 
-  function showHeroSlide(index, instant) {
-    if (!HERO_SLIDES.length) return;
-    if (index >= HERO_SLIDES.length) index = 0;
-    if (index < 0) index = HERO_SLIDES.length - 1;
-    currentHeroSlide = index;
+  function showGlaceSlide(index, instant) {
+    if (!GLACE_SLIDES.length) return;
+    if (index >= GLACE_SLIDES.length) index = 0;
+    if (index < 0) index = GLACE_SLIDES.length - 1;
+    currentGlaceSlide = index;
 
-    const slide = HERO_SLIDES[index];
-    const menuName = window.I18n ? window.I18n.translateMenuName(slide.menuName) : slide.menuName;
+    const slide = GLACE_SLIDES[index];
 
-    $('#hero-carousel-wrap').attr('data-theme', slide.theme);
-    $('#hero-title-line1').text(slide.display1);
-    $('#hero-title-line2').text(slide.display2);
-    $('#hero-menu-name').text(menuName);
-    $('#hero-desc').text(t(slide.descKey, ''));
-    $('#hero-slide-counter').text(
-      String(index + 1).padStart(2, '0') + ' / ' + String(HERO_SLIDES.length).padStart(2, '0')
-    );
+    // Update kontainer data-active-slide (memicu background gradient transition)
+    $('#glace-hero-stage').attr('data-active-slide', String(index));
 
-    const $img = $('#hero-product-image');
-    if ($img.attr('src') !== slide.image) {
+    // Update Ghost Typography Watermark di Belakang
+    $('#glace-ghost-text').text(slide.ghostText);
+
+    // Update Teks Headline Serif, Deskripsi, dan CTA Button
+    $('#glace-title-1').text(slide.title1);
+    $('#glace-title-2').text(slide.title2);
+    $('#glace-desc').text(slide.desc);
+    $('#glace-order-text').text(slide.ctaText);
+    $('#glace-order-btn')
+      .attr('data-menu-id', String(slide.menuId))
+      .attr('data-menu-name', slide.menuName)
+      .attr('data-menu-price', String(slide.menuPrice));
+
+    // Update Tagline Italic dan Sub-Deskripsi di Sisi Kanan
+    $('.glace-tagline-italic').text(slide.tagline);
+    $('#glace-sub-desc').text(slide.subDesc);
+
+    // Update Gambar Cup Minuman Tengah dengan transisi halus
+    const $cupImg = $('#glace-cup-img');
+    if ($cupImg.length && $cupImg.attr('src') !== slide.cupImage) {
       if (instant) {
-        $img.attr('src', slide.image).attr('alt', menuName);
+        $cupImg.attr('src', slide.cupImage).attr('alt', slide.title1 + ' ' + slide.title2);
       } else {
-        const img = $img[0];
-        let settled = false;
-        const finish = function () {
-          if (settled) return;
-          settled = true;
-          $img.removeClass('is-switching');
-          img.removeEventListener('load', finish);
-        };
-        img.addEventListener('load', finish);
-        $img.addClass('is-switching').attr('src', slide.image).attr('alt', menuName);
-        setTimeout(finish, 450);
+        $cupImg.css({ opacity: 0, transform: 'scale(0.94) translateY(8px)' });
+        setTimeout(function () {
+          $cupImg
+            .attr('src', slide.cupImage)
+            .attr('alt', slide.title1 + ' ' + slide.title2)
+            .css({ opacity: 1, transform: 'scale(1) translateY(0)' });
+        }, 160);
       }
-    } else {
-      $img.attr('alt', menuName);
     }
 
-    $('#hero-dots .hero-dot').each(function (i) {
-      const isActive = i === currentHeroSlide;
-      $(this).toggleClass('is-active', isActive).attr('aria-selected', isActive ? 'true' : 'false');
+    // Update 6 Partikel Melayang (Biji Kopi, Es Batu, Daun Teh, Cokelat)
+    slide.particles.forEach(function (particleSrc, pIdx) {
+      const $particle = $(`#glace-p-${pIdx + 1}`);
+      if ($particle.length && $particle.attr('src') !== particleSrc) {
+        $particle.attr('src', particleSrc);
+      }
+    });
+
+    // Update 4 Kartu Thumbnail Selector Horisontal
+    $('#glace-selectors-row .glace-thumb-card').each(function () {
+      const sIdx = parseInt($(this).data('slide'), 10);
+      const isActive = sIdx === index;
+      $(this)
+        .toggleClass('is-active', isActive)
+        .attr('aria-selected', isActive ? 'true' : 'false');
     });
   }
 
-  function startHeroTimer() {
-    stopHeroTimer();
-    heroTimer = setInterval(function () {
-      showHeroSlide(currentHeroSlide + 1);
-    }, 7000);
+  function startGlaceTimer() {
+    stopGlaceTimer();
+    glaceTimer = setInterval(function () {
+      showGlaceSlide(currentGlaceSlide + 1);
+    }, 6500);
   }
 
-  function stopHeroTimer() {
-    if (heroTimer) {
-      clearInterval(heroTimer);
-      heroTimer = null;
+  function stopGlaceTimer() {
+    if (glaceTimer) {
+      clearInterval(glaceTimer);
+      glaceTimer = null;
     }
   }
 
-  $('#btn-hero-slide-prev').on('click', function (e) {
-    e.preventDefault();
-    showHeroSlide(currentHeroSlide - 1);
-    startHeroTimer();
-  });
-
-  $('#btn-hero-slide-next').on('click', function (e) {
-    e.preventDefault();
-    showHeroSlide(currentHeroSlide + 1);
-    startHeroTimer();
-  });
-
-  $('#hero-dots').on('click', '.hero-dot', function (e) {
+  // Event Klik Kartu Thumbnail Selector di Kanan
+  $(document).on('click', '.glace-thumb-card', function (e) {
     e.preventDefault();
     const idx = parseInt($(this).data('slide'), 10) || 0;
-    showHeroSlide(idx);
-    startHeroTimer();
+    showGlaceSlide(idx);
+    startGlaceTimer();
   });
 
-  $('#hero-carousel-wrap')
-    .on('mouseenter', stopHeroTimer)
-    .on('mouseleave', startHeroTimer);
+  // Pause Timer saat Hover di Area Hero Stage
+  $('#glace-hero-stage')
+    .on('mouseenter', stopGlaceTimer)
+    .on('mouseleave', startGlaceTimer);
 
-  // Geser (swipe) pada layar sentuh
-  let heroTouchStartX = null;
-  $('#hero-carousel-wrap')
+  // Swipe Gesture di Layar Sentuh Mobile
+  let glaceTouchStartX = null;
+  $('#glace-hero-stage')
     .on('touchstart', function (e) {
       const touch = e.originalEvent.touches[0];
-      heroTouchStartX = touch ? touch.clientX : null;
+      glaceTouchStartX = touch ? touch.clientX : null;
     })
     .on('touchend', function (e) {
-      if (heroTouchStartX === null) return;
+      if (glaceTouchStartX === null) return;
       const touch = e.originalEvent.changedTouches[0];
-      const deltaX = touch ? touch.clientX - heroTouchStartX : 0;
-      heroTouchStartX = null;
+      const deltaX = touch ? touch.clientX - glaceTouchStartX : 0;
+      glaceTouchStartX = null;
       if (Math.abs(deltaX) < 40) return;
-      showHeroSlide(currentHeroSlide + (deltaX < 0 ? 1 : -1));
-      startHeroTimer();
+      showGlaceSlide(currentGlaceSlide + (deltaX < 0 ? 1 : -1));
+      startGlaceTimer();
     });
 
-  // Tombol "Pesan Sekarang" menggulir ke katalog menu
-  $('#hero-cta').on('click', function (e) {
-    const $target = $('#menu-start');
-    if (!$target.length) return;
+  // Tombol "Order Now" langsung tambahkan menu terkait ke keranjang
+  $('#glace-order-btn').on('click', function (e) {
     e.preventDefault();
-    $('html, body').animate({ scrollTop: Math.max(0, $target.offset().top - 72) }, 450);
+    const $btn = $(this);
+    const menuId = parseInt($btn.attr('data-menu-id'), 10);
+    const menuName = $btn.attr('data-menu-name') || 'Glacé Drink';
+
+    // Cek ketersediaan di cache allMenus jika ada
+    const targetMenu = allMenus.find(function (m) { return Number(m.id) === menuId; });
+
+    if (targetMenu && !targetMenu.is_available) {
+      UI.toast('danger', `Maaf, ${menuName} baru saja habis!`, 'Stok Habis');
+      return;
+    }
+
+    if (window.CartStore) {
+      CartStore.add(menuId || 37, 1);
+      const totalInCart = CartStore.getItem(menuId || 37) ? CartStore.getItem(menuId || 37).qty : 1;
+      UI.toast('success', `${menuName} × ${totalInCart}`, 'Berhasil Ditambahkan');
+
+      // Animasi feedback pada tombol keranjang di navbar
+      $('#navbar-cart-btn, #btn-cart').addClass('scale-110');
+      setTimeout(function () {
+        $('#navbar-cart-btn, #btn-cart').removeClass('scale-110');
+      }, 300);
+    }
   });
 
-  startHeroTimer();
+  // Inisialisasi slide pertama
+  showGlaceSlide(0, true);
+  startGlaceTimer();
 
   // Tombol filter cepat kategori di dalam slide
   $(document).on('click', '.btn-filter-category-quick', function (e) {
@@ -737,7 +822,7 @@ $(function () {
     renderCategoryChips();
     renderMenuCatalog();
     checkActiveOrder();
-    showHeroSlide(currentHeroSlide, true);
+    showGlaceSlide(currentGlaceSlide, true);
     if (activeDetailMenu) {
       const menuName = window.I18n ? window.I18n.translateMenuName(activeDetailMenu.name) : activeDetailMenu.name;
       const menuCategory = window.I18n ? window.I18n.translateCategory(activeDetailMenu.category_name || 'Kafe') : (activeDetailMenu.category_name || 'Kafe');

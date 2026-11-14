@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 460" fill="none">
+  <defs>
+    <!-- Gradien Gelas Kaca Bening Berembun -->
+    <linearGradient id="glassBody" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35"/>
+      <stop offset="10%" stop-color="#FFFFFF" stop-opacity="0.08"/>
+      <stop offset="90%" stop-color="#FFFFFF" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.4"/>
+    </linearGradient>
+
+    <!-- Gradien Kopi Cold Brew & Susu Es -->
+    <linearGradient id="coldBrewLiquid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2D170D"/>
+      <stop offset="35%" stop-color="#462514"/>
+      <stop offset="65%" stop-color="#8E5B37"/>
+      <stop offset="90%" stop-color="#F2DFCB"/>
+      <stop offset="100%" stop-color="#FFFFFF"/>
+    </linearGradient>
+
+    <filter id="drinkShadow" x="-20%" y="-10%" width="140%" height="130%">
+      <feDropShadow dx="-5" dy="25" stdDeviation="22" flood-color="#000000" flood-opacity="0.95"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#drinkShadow)" transform="rotate(-3 170 230)">
+    <!-- Siluet Gelas Tinggi -->
+    <path d="M70 70 L95 400 C98 420, 242 420, 245 400 L270 70 Z" fill="url(#coldBrewLiquid)"/>
+
+    <!-- Lapisan Kaca Transparan & Refleksi Pantulan Cahaya -->
+    <path d="M70 70 L95 400 C98 420, 242 420, 245 400 L270 70 Z" fill="url(#glassBody)"/>
+    <path d="M78 80 L100 395" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity="0.65"/>
+    <path d="M262 80 L240 395" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+
+    <!-- Es Batu di Atas & Tengah -->
+    <rect x="110" y="85" width="60" height="55" rx="10" transform="rotate(12 110 85)" fill="#FFFFFF" fill-opacity="0.4" stroke="#FFFFFF" stroke-width="1.5"/>
+    <rect x="170" y="110" width="55" height="50" rx="8" transform="rotate(-18 170 110)" fill="#FFFFFF" fill-opacity="0.35" stroke="#FFFFFF" stroke-width="1.5"/>
+    <rect x="125" y="180" width="55" height="50" rx="8" transform="rotate(25 125 180)" fill="#FFFFFF" fill-opacity="0.25" stroke="#FFFFFF" stroke-width="1.5"/>
+
+    <!-- Bibir Gelas Atas -->
+    <ellipse cx="170" cy="70" rx="100" ry="25" fill="#3D2012" opacity="0.5"/>
+    <ellipse cx="170" cy="70" rx="100" ry="25" stroke="#FFFFFF" stroke-width="3" opacity="0.8"/>
+
+    <!-- Tetesan Embun Dingin (Condensation Droplets) -->
+    <circle cx="100" cy="160" r="3" fill="#FFFFFF" opacity="0.75"/>
+    <circle cx="102" cy="180" r="2" fill="#FFFFFF" opacity="0.6"/>
+    <circle cx="105" cy="240" r="3.5" fill="#FFFFFF" opacity="0.75"/>
+    <circle cx="235" cy="190" r="3" fill="#FFFFFF" opacity="0.7"/>
+    <circle cx="230" cy="280" r="2.5" fill="#FFFFFF" opacity="0.6"/>
+  </g>
+</svg>
+

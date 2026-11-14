@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160" fill="none">
+  <defs>
+    <radialGradient id="beanGlow" cx="40%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#5A3A26"/>
+      <stop offset="45%" stop-color="#341E12"/>
+      <stop offset="85%" stop-color="#190C06"/>
+      <stop offset="100%" stop-color="#080301"/>
+    </radialGradient>
+    <linearGradient id="beanCrease" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#120703"/>
+      <stop offset="50%" stop-color="#050201"/>
+      <stop offset="100%" stop-color="#1A0A04"/>
+    </linearGradient>
+    <linearGradient id="beanHighlight" x1="30%" y1="0%" x2="70%" y2="100%">
+      <stop offset="0%" stop-color="#A5734C" stop-opacity="0.85"/>
+      <stop offset="50%" stop-color="#6F452A" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#381D0F" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="beanShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="3" dy="10" stdDeviation="12" flood-color="#000000" flood-opacity="0.8"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#beanShadow)">
+    <!-- Badan Oval Biji Kopi -->
+    <path d="M60 8 C92 8, 114 38, 114 80 C114 122, 92 152, 60 152 C28 152, 6 122, 6 80 C6 38, 28 8, 60 8 Z" fill="url(#beanGlow)"/>
+
+    <!-- Pantulan Kilau Minyak Sangrai -->
+    <path d="M35 22 C48 14, 72 14, 85 24 C72 26, 42 36, 30 55 C22 42, 26 28, 35 22 Z" fill="url(#beanHighlight)"/>
+    <ellipse cx="40" cy="50" rx="14" ry="24" transform="rotate(-20 40 50)" fill="#B68054" opacity="0.25"/>
+
+    <!-- Celah Belahan Tengah Arabika Khas S-Curve -->
+    <path d="M59 14 C55 35, 66 58, 64 80 C62 102, 53 125, 59 146" stroke="url(#beanCrease)" stroke-width="7" stroke-linecap="round"/>
+    <path d="M59 14 C55 35, 66 58, 64 80 C62 102, 53 125, 59 146" stroke="#000000" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Highlight Halus pada Bibir Celah -->
+    <path d="M62 25 C68 48, 69 70, 68 85" stroke="#8C5C38" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>
+  </g>
+</svg>
+

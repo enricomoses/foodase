@@ -6,6 +6,7 @@ require __DIR__ . '/../app/bootstrap.php';
 use App\Core\View;
 
 echo View::render('customer/menu', [
-    'title'   => 'Menu',
-    'scripts' => ['js/pages/menu.js?v=12'],
+    'title'     => 'Glacé — Artisan Café & Coffee',
+    'immersive' => true,
+    'scripts'   => ['js/pages/menu.js?v=50'],
 ], 'public');

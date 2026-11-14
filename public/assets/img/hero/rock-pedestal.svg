@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 240" fill="none">
+  <defs>
+    <radialGradient id="rockGlow" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#3A281E" stop-opacity="0.8"/>
+      <stop offset="40%" stop-color="#1E140E" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#0A0604" stop-opacity="1"/>
+    </radialGradient>
+    <linearGradient id="rockHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6B4F3B"/>
+      <stop offset="30%" stop-color="#3A281E"/>
+      <stop offset="70%" stop-color="#1A100B"/>
+      <stop offset="100%" stop-color="#080402"/>
+    </linearGradient>
+    <linearGradient id="rockEdge" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8C6549"/>
+      <stop offset="50%" stop-color="#4A3222"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </linearGradient>
+    <filter id="rockShadow" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000000" flood-opacity="0.95"/>
+    </filter>
+  </defs>
+
+  <!-- Bayangan Dasar Tebing Batu -->
+  <ellipse cx="300" cy="210" rx="260" ry="28" fill="#000000" opacity="0.9" filter="url(#rockShadow)"/>
+
+  <!-- Badan Utama Tebing Batu (Tekstur Berlapis & Rusuk Batuan Alami) -->
+  <g filter="url(#rockShadow)">
+    <!-- Lapisan Bawah / Belakang Batu -->
+    <path d="M70 170 L140 135 L210 148 L310 120 L420 138 L490 125 L540 165 L510 205 L410 220 L270 225 L130 215 Z" fill="url(#rockGlow)"/>
+
+    <!-- Faset Permukaan Batu Kiri -->
+    <path d="M70 170 L140 135 L200 165 L160 210 L85 195 Z" fill="#140D09"/>
+    <path d="M140 135 L210 148 L270 180 L200 165 Z" fill="#241710"/>
+    <path d="M140 135 L210 148 L180 140 Z" fill="url(#rockHighlight)"/>
+
+    <!-- Puncak Dataran Tengah Batu (Tempat Berdirinya Cangkir) -->
+    <path d="M210 148 L310 120 L420 138 L360 175 L270 180 Z" fill="url(#rockHighlight)"/>
+    <path d="M270 138 L340 125 L390 135 L330 150 Z" fill="#5A3E2C" opacity="0.65"/>
+    <path d="M240 142 L310 122 L360 128 L290 145 Z" fill="#7D573E" opacity="0.5"/>
+
+    <!-- Faset Permukaan Kanan -->
+    <path d="M310 120 L420 138 L490 125 L470 170 L360 175 Z" fill="#2C1D14"/>
+    <path d="M420 138 L490 125 L540 165 L480 185 L470 170 Z" fill="#180F0A"/>
+    <path d="M490 125 L540 165 L510 205 L470 190 Z" fill="#0F0906"/>
+
+    <!-- Lereng Tebing Bawah Bertekstur -->
+    <path d="M160 210 L270 180 L360 175 L470 170 L480 185 L410 220 L270 225 L160 210 Z" fill="#100A06"/>
+    <path d="M270 180 L360 175 L340 215 L260 218 Z" fill="#1C120C"/>
+
+    <!-- Garis Tepian Tajam & Highlight Puncak Batuan -->
+    <path d="M70 170 L140 135 L210 148 L310 120 L420 138 L490 125 L540 165" stroke="url(#rockEdge)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+    <path d="M210 148 L270 180 L360 175 L470 170" stroke="#5A3E2C" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+    <path d="M290 122 L330 124" stroke="#D08445" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
+    <path d="M195 145 L220 150" stroke="#A86D40" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+  </g>
+</svg>
+

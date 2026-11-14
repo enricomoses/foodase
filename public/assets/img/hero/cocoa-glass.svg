@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 460" fill="none">
+  <defs>
+    <!-- Gradien Cokelat Belgia Gelap Pekat & Cream -->
+    <linearGradient id="cocoaLiquid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#341A0E"/>
+      <stop offset="45%" stop-color="#4F2A19"/>
+      <stop offset="75%" stop-color="#6F3F27"/>
+      <stop offset="100%" stop-color="#241008"/>
+    </linearGradient>
+
+    <linearGradient id="cocoaGlass" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.38"/>
+      <stop offset="15%" stop-color="#FFFFFF" stop-opacity="0.08"/>
+      <stop offset="85%" stop-color="#FFFFFF" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.42"/>
+    </linearGradient>
+
+    <!-- Whipped Cream & Ganache Leleh di Puncak -->
+    <linearGradient id="whippedCream" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFDF9"/>
+      <stop offset="60%" stop-color="#F2E6D8"/>
+      <stop offset="100%" stop-color="#D9BEA7"/>
+    </linearGradient>
+
+    <filter id="cocoaShadow" x="-20%" y="-10%" width="140%" height="130%">
+      <feDropShadow dx="-5" dy="25" stdDeviation="22" flood-color="#000000" flood-opacity="0.95"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#cocoaShadow)" transform="rotate(-3 170 230)">
+    <!-- Siluet Gelas -->
+    <path d="M70 100 L95 400 C98 420, 242 420, 245 400 L270 100 Z" fill="url(#cocoaLiquid)"/>
+
+    <!-- Lapisan Kaca Transparan & Refleksi Pantulan -->
+    <path d="M70 100 L95 400 C98 420, 242 420, 245 400 L270 100 Z" fill="url(#cocoaGlass)"/>
+    <path d="M78 110 L100 395" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity="0.65"/>
+    <path d="M262 110 L240 395" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+
+    <!-- Lelehan Ganache Cokelat Meluncur di Dinding Kaca -->
+    <path d="M120 100 C125 150, 115 180, 122 220 C126 240, 132 250, 130 270" stroke="#1A0B05" stroke-width="8" stroke-linecap="round" opacity="0.85"/>
+    <path d="M190 100 C185 140, 195 170, 190 210" stroke="#1A0B05" stroke-width="6" stroke-linecap="round" opacity="0.8"/>
+
+    <!-- Gunungan Whipped Cream Mewah di Puncak Gelas -->
+    <path d="M85 100 C80 65, 120 40, 170 35 C220 40, 260 65, 255 100 Z" fill="url(#whippedCream)"/>
+    <path d="M140 38 C155 15, 185 15, 200 38" fill="url(#whippedCream)"/>
+
+    <!-- Taburan Bubuk Cokelat & Chocolate Shavings di Atas Cream -->
+    <ellipse cx="170" cy="55" rx="35" ry="12" fill="#3D1E11" opacity="0.7"/>
+    <rect x="155" y="45" width="12" height="6" rx="1.5" transform="rotate(25 155 45)" fill="#1A0C06"/>
+    <rect x="175" y="48" width="10" height="5" rx="1.5" transform="rotate(-15 175 48)" fill="#1A0C06"/>
+
+    <!-- Bibir Gelas -->
+    <ellipse cx="170" cy="100" rx="100" ry="25" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.8"/>
+  </g>
+</svg>
+

@@ -464,6 +464,7 @@ final class I18n
     private static array $translations = [
         'id' => [
             'app_name' => 'FoodEase',
+            'nav_home' => 'Home',
             'nav_menu' => 'Menu',
             'nav_search' => 'Cari',
             'nav_track' => 'Lacak',
@@ -607,6 +608,7 @@ final class I18n
         ],
         'en' => [
             'app_name' => 'FoodEase',
+            'nav_home' => 'Home',
             'nav_menu' => 'Menu',
             'nav_search' => 'Search',
             'nav_track' => 'Track',
@@ -750,6 +752,7 @@ final class I18n
         ],
         'zh' => [
             'app_name' => 'FoodEase',
+            'nav_home' => '首页',
             'nav_menu' => '菜单',
             'nav_search' => '搜索',
             'nav_track' => '追踪',

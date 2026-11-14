@@ -42,138 +42,166 @@ declare(strict_types=1);
     </div>
   </div>
 
-  <!-- Hero Cafe Showcase Carousel (Interaktif & Appetizing dengan Background Foto Jelas & Promo Visual) -->
-  <div class="relative overflow-hidden rounded-2xl border border-line bg-neutral-900 text-white shadow-lg group" id="hero-carousel-wrap">
-    <!-- Slides Container -->
-    <div id="hero-carousel-slides" class="relative w-full h-[360px] sm:h-[330px] md:h-[360px] overflow-hidden">
-
-      <!-- Slide 1: Cafe Utama & Kopi Pilihan -->
-      <div class="hero-slide active absolute inset-0 w-full h-full flex items-center justify-between transition-all duration-700 opacity-100 z-10">
-        <!-- Background Foto dengan Gradien Halus Agar Foto Jelas & Cerah -->
-        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= e(url('uploads/banners/hero_slide_1.jpg')) ?>');"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/20"></div>
-
-        <!-- Konten Slide 1 -->
-        <div class="relative z-10 max-w-xl p-6 sm:p-8 lg:p-10">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/25 text-xs font-semibold text-white mb-3">
-            <span class="h-2 w-2 rounded-full bg-accent animate-pulse"></span>
-            <span data-i18n="hero_badge_open"><?= e(__('hero_badge_open')) ?></span>
-          </div>
-          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight drop-shadow-sm" data-i18n="hero_slide1_title">
-            <?= e(__('hero_slide1_title')) ?>
-          </h1>
-          <p class="text-xs sm:text-sm text-neutral-200 mt-2 leading-relaxed drop-shadow-sm max-w-md" data-i18n="hero_slide1_desc">
-            <?= e(__('hero_slide1_desc')) ?>
-          </p>
-          <div class="mt-4 flex flex-wrap items-center gap-2 text-[11px] font-medium text-white/95">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 border border-white/20">
-              <?= icon('clock', 'h-3.5 w-3.5 text-accent') ?>
-              <span data-i18n="hero_badge_fast"><?= e(__('hero_badge_fast')) ?></span>
-            </span>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 border border-white/20">
-              <?= icon('check', 'h-3.5 w-3.5 text-accent') ?>
-              <span data-i18n="hero_badge_beans"><?= e(__('hero_badge_beans')) ?></span>
-            </span>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 border border-white/20">
-              <?= icon('receipt', 'h-3.5 w-3.5 text-accent') ?>
-              <span data-i18n="hero_badge_payment"><?= e(__('hero_badge_payment')) ?></span>
-            </span>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Slide 2: Promo Sarapan & Cold Brew -->
-      <div class="hero-slide absolute inset-0 w-full h-full flex items-center justify-between transition-all duration-700 opacity-0 pointer-events-none z-0">
-        <!-- Background Foto Slide 2 Cerah -->
-        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= e(url('uploads/banners/hero_slide_2.jpg')) ?>');"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/20"></div>
-
-        <!-- Konten Slide 2 -->
-        <div class="relative z-10 max-w-xl p-6 sm:p-8 lg:p-10">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 border border-white/20 text-xs font-semibold text-white mb-3">
-            <span data-i18n="hero_promo_badge"><?= e(__('hero_promo_badge')) ?></span>
-          </div>
-          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight drop-shadow-sm" data-i18n="hero_slide2_title">
-            <?= e(__('hero_slide2_title')) ?>
-          </h2>
-          <p class="text-xs sm:text-sm text-neutral-200 mt-2 leading-relaxed drop-shadow-sm max-w-md" data-i18n="hero_slide2_desc">
-            <?= e(__('hero_slide2_desc')) ?>
-          </p>
-          <div class="mt-4 flex items-center gap-3">
-            <button
-              type="button"
-              class="btn-filter-category-quick h-10 px-5 rounded-full bg-white text-black text-xs font-bold hover:bg-neutral-200 transition-colors cursor-pointer flex items-center gap-1.5 shadow"
-              data-cat-name="Kopi"
-            >
-              <span data-i18n="hero_btn_explore_coffee"><?= e(__('hero_btn_explore_coffee')) ?></span>
-              <span>&rarr;</span>
-            </button>
-            <span class="text-[11px] text-neutral-300" data-i18n="hero_avail_morning"><?= e(__('hero_avail_morning')) ?></span>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Slide 3: Makan Siang & Rice Bowl -->
-      <div class="hero-slide absolute inset-0 w-full h-full flex items-center justify-between transition-all duration-700 opacity-0 pointer-events-none z-0">
-        <!-- Background Foto Slide 3 Cerah -->
-        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= e(url('uploads/banners/hero_slide_3.jpg')) ?>');"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/20"></div>
-
-        <!-- Konten Slide 3 -->
-        <div class="relative z-10 max-w-xl p-6 sm:p-8 lg:p-10">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 border border-white/20 text-xs font-semibold text-white mb-3">
-            <span data-i18n="hero_slide3_badge"><?= e(__('hero_slide3_badge')) ?></span>
-          </div>
-          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight drop-shadow-sm" data-i18n="hero_slide3_title">
-            <?= e(__('hero_slide3_title')) ?>
-          </h2>
-          <p class="text-xs sm:text-sm text-neutral-200 mt-2 leading-relaxed drop-shadow-sm max-w-md" data-i18n="hero_slide3_desc">
-            <?= e(__('hero_slide3_desc')) ?>
-          </p>
-          <div class="mt-4 flex items-center gap-3">
-            <button
-              type="button"
-              class="btn-filter-category-quick h-10 px-5 rounded-full bg-white text-black text-xs font-bold hover:bg-neutral-200 transition-colors cursor-pointer flex items-center gap-1.5 shadow"
-              data-cat-name="Makanan Berat"
-            >
-              <span data-i18n="hero_btn_explore_food"><?= e(__('hero_btn_explore_food')) ?></span>
-              <span>&rarr;</span>
-            </button>
-            <span class="text-[11px] text-neutral-300" data-i18n="hero_freshly_cooked"><?= e(__('hero_freshly_cooked')) ?></span>
-          </div>
-        </div>
-
-      </div>
-
+  <!-- GLACÉ Cafe Landing Page (Full Motion Graphics & 4-Slide Stage — Pinterest Pin 1082693566762069480) -->
+  <section
+    id="glace-hero-stage"
+    class="glace-hero-container -mx-4 sm:-mx-8 lg:-mx-12 xl:-mx-16 2xl:-mx-20 -mt-4 sm:-mt-6 mb-8 rounded-none sm:rounded-2xl border-b sm:border border-white/10"
+    data-active-slide="0"
+    aria-roledescription="carousel"
+    aria-label="Glacé Specialty Cafe Showcase"
+  >
+    <!-- Watermark Tipografi Raksasa di Latar Belakang (Ghost Typography) -->
+    <div class="glace-bg-text-wrap" aria-hidden="true">
+      <div id="glace-ghost-text" class="glace-bg-text">Iced Latte Espresso</div>
     </div>
 
-    <!-- Tombol Navigasi Panah Kiri & Kanan (Muncul saat Hover di Layar Lebar) -->
-    <button
-      type="button"
-      id="btn-hero-slide-prev"
-      class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-sm border border-white/20 flex items-center justify-center transition-all opacity-80 hover:opacity-100 cursor-pointer shadow"
-      aria-label="Slide sebelumnya"
-    >
-      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-    </button>
-    <button
-      type="button"
-      id="btn-hero-slide-next"
-      class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-sm border border-white/20 flex items-center justify-center transition-all opacity-80 hover:opacity-100 cursor-pointer shadow"
-      aria-label="Slide berikutnya"
-    >
-      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-    </button>
-
-    <!-- Indikator Dots Slide di Bawah -->
-    <div class="absolute bottom-3.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5" id="hero-carousel-dots">
-      <button type="button" class="hero-dot w-7 h-1.5 rounded-full bg-white transition-all cursor-pointer" data-slide="0" aria-label="Slide 1"></button>
-      <button type="button" class="hero-dot w-2 h-1.5 rounded-full bg-white/40 hover:bg-white/70 transition-all cursor-pointer" data-slide="1" aria-label="Slide 2"></button>
-      <button type="button" class="hero-dot w-2 h-1.5 rounded-full bg-white/40 hover:bg-white/70 transition-all cursor-pointer" data-slide="2" aria-label="Slide 3"></button>
+    <!-- Header Top Minimalis Glacé -->
+    <div class="glace-top-bar">
+      <a href="<?= e(url()) ?>" class="glace-brand-logo">
+        Glac&eacute;
+      </a>
+      <nav class="flex items-center gap-6 sm:gap-8 glace-nav-menu">
+        <a href="<?= e(url()) ?>" class="glace-nav-item is-active" data-i18n="nav_home"><?= e(__('nav_home')) ?></a>
+        <a href="#category-chips" class="glace-nav-item" data-i18n="nav_menu"><?= e(__('nav_menu')) ?></a>
+        <a href="#category-chips" class="glace-nav-item">Shop</a>
+        <a href="<?= e(url('orders.php')) ?>" class="glace-nav-item" data-i18n="nav_track"><?= e(__('nav_track')) ?></a>
+      </nav>
     </div>
-  </div>
+
+    <!-- Panggung Hero Stage Tiga Kolom: Kiri, Tengah, Kanan -->
+    <div class="glace-stage-grid">
+      <!-- Kolom Kiri: Headline Serif, Deskripsi, Tombol Order Now -->
+      <div class="glace-col-left">
+        <h1 class="glace-title-headline">
+          <span id="glace-title-1">Iced Latte</span>
+          <span id="glace-title-2">&amp; Double Espresso</span>
+        </h1>
+        <p id="glace-desc" class="glace-product-desc">
+          Two shots of house espresso poured over fresh milk and clear ice, silky, balanced and gently sweet.
+        </p>
+        <div class="pt-2">
+          <button
+            type="button"
+            id="glace-order-btn"
+            class="glace-btn-order"
+            data-menu-id="37"
+            data-menu-name="Iced Latte"
+            data-menu-price="35000"
+          >
+            <span id="glace-order-text">Order Now</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Kolom Tengah: Wadah Cup Melayang & Floating Ingredients -->
+      <div class="glace-col-center">
+        <div class="glace-center-stage">
+          <!-- Wadah Cup Minuman Utama Glacé -->
+          <div class="glace-cup-box">
+            <img
+              id="glace-cup-img"
+              src="<?= e(asset('img/hero/cup_latte.png')) ?>"
+              alt="Iced Latte & Double Espresso"
+              class="glace-cup-img"
+            >
+          </div>
+
+          <!-- 6 Partikel Melayang dengan Efek Depth-of-Field (Biji Kopi, Daun Teh, Cokelat, Lemon) -->
+          <img id="glace-p-1" src="<?= e(asset('img/hero/coffee-bean.svg')) ?>" class="glace-particle glace-p-1" alt="" aria-hidden="true">
+          <img id="glace-p-2" src="<?= e(asset('img/hero/coffee-bean.svg')) ?>" class="glace-particle glace-p-2" alt="" aria-hidden="true">
+          <img id="glace-p-3" src="<?= e(asset('img/hero/coffee-bean.svg')) ?>" class="glace-particle glace-p-3" alt="" aria-hidden="true">
+          <img id="glace-p-4" src="<?= e(asset('img/hero/coffee-bean.svg')) ?>" class="glace-particle glace-p-4" alt="" aria-hidden="true">
+          <img id="glace-p-5" src="<?= e(asset('img/hero/coffee-bean.svg')) ?>" class="glace-particle glace-p-5" alt="" aria-hidden="true">
+          <img id="glace-p-6" src="<?= e(asset('img/hero/coffee-bean.svg')) ?>" class="glace-particle glace-p-6" alt="" aria-hidden="true">
+        </div>
+      </div>
+
+      <!-- Kolom Kanan: Tagline Italic Serif, Deskripsi Kecil, 4 Kartu Thumbnail Selector Horisontal -->
+      <div class="glace-col-right">
+        <p class="glace-tagline-italic">
+          Slow Brewed, Served Cold
+        </p>
+        <p id="glace-sub-desc" class="glace-tagline-sub">
+          Small-batch ingredients over crystal-clear ice. Refreshing, smooth and made to order.
+        </p>
+
+        <!-- 4 Kartu Thumbnail Selector Horisontal -->
+        <div class="glace-selectors-row" id="glace-selectors-row" role="tablist" aria-label="Pilih Minuman Khas Glacé">
+          <!-- Slide 1: Iced Latte -->
+          <button
+            type="button"
+            class="glace-thumb-card is-active"
+            data-slide="0"
+            role="tab"
+            aria-selected="true"
+            title="Iced Latte &amp; Double Espresso"
+          >
+            <img src="<?= e(asset('img/hero/thumb_latte.png')) ?>" class="glace-thumb-img" alt="Iced Latte">
+          </button>
+
+          <!-- Slide 2: Iced Chocolate & Dark Cocoa -->
+          <button
+            type="button"
+            class="glace-thumb-card"
+            data-slide="1"
+            role="tab"
+            aria-selected="false"
+            title="Iced Chocolate &amp; Dark Cocoa"
+          >
+            <img src="<?= e(asset('img/hero/thumb_choco.png')) ?>" class="glace-thumb-img" alt="Iced Chocolate">
+          </button>
+
+          <!-- Slide 3: Iced Matcha & Ceremonial Green -->
+          <button
+            type="button"
+            class="glace-thumb-card"
+            data-slide="2"
+            role="tab"
+            aria-selected="false"
+            title="Iced Matcha &amp; Ceremonial Green"
+          >
+            <img src="<?= e(asset('img/hero/thumb_matcha.png')) ?>" class="glace-thumb-img" alt="Iced Matcha">
+          </button>
+
+          <!-- Slide 4: Iced Tea & Sicilian Lemon -->
+          <button
+            type="button"
+            class="glace-thumb-card"
+            data-slide="3"
+            role="tab"
+            aria-selected="false"
+            title="Iced Tea &amp; Sicilian Lemon"
+          >
+            <img src="<?= e(asset('img/hero/thumb_lemon.png')) ?>" class="glace-thumb-img" alt="Iced Tea &amp; Lemon">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Bawah Glacé Minimalis (Sosial Media & Kategori Pintas) -->
+    <div class="glace-bottom-bar">
+      <div class="flex items-center gap-2 text-xs text-neutral-400">
+        <span class="h-2 w-2 rounded-full bg-[#D2A066] animate-pulse"></span>
+        <span class="tracking-wide text-white/80">Fresh Daily &bull; Dine-in &amp; Takeaway</span>
+      </div>
+
+      <!-- Ikon Sosial Media Minimalis -->
+      <div class="glace-social-links">
+        <a href="https://instagram.com" target="_blank" rel="noopener" class="glace-social-link" title="Instagram" aria-label="Instagram">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+        </a>
+        <a href="https://tiktok.com" target="_blank" rel="noopener" class="glace-social-link" title="TikTok" aria-label="TikTok">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
 
   <!-- Kolom Cari Pil di Layar Mobile (di desktop tampil di navbar) -->
   <div class="block md:hidden">
