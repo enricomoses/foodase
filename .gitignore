@@ -1,24 +1,36 @@
-# environment
+# Environment & Secrets
 .env
 .env.*
 !.env.example
 
-# config lokal
+# Local Configuration Overrides
 app/config/config.local.php
 
-# runtime
+# Storage & Runtime Logs
 storage/logs/*
 !storage/logs/.gitkeep
 public/uploads/menus/*
 !public/uploads/menus/.gitkeep
 
-# file uji sementara
+# Temporary & Test Files
 public/_*.php
+*.tmp
+*.bak
 
-# editor / OS
+# IDE & Editor Files
 .vscode/
 .idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS Generated Files
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Dependencies & Build Output
 node_modules/
+vendor/
+dist/
+build/
 tailwindcss.exe
