@@ -6,7 +6,7 @@ use App\Core\Config;
 
 $currentRole = Auth::role();
 $active = $activeMenu ?? '';
-$appName = (string) Config::get('app.name', 'FoodEase');
+$appName = (string) Config::get('app.name', 'Nola');
 
 if ($currentRole === 'admin') {
     $menus = [
@@ -32,8 +32,9 @@ if ($currentRole === 'admin') {
 <aside class="flex w-64 flex-col border-r border-line bg-white shrink-0 h-screen sticky top-0">
   <!-- Brand Header -->
   <div class="flex h-16 items-center justify-between border-b border-line px-5">
-    <a href="<?= e(url()) ?>" class="font-bold text-ink text-lg tracking-tight hover:opacity-80 transition-opacity">
-      <?= e($appName) ?>
+    <a href="<?= e(url()) ?>" class="flex items-center gap-2 hover:opacity-90 transition-opacity">
+      <span class="tile-n">N</span>
+      <span class="font-ui font-bold text-ink text-base tracking-tight"><?= e($appName) ?></span>
     </a>
     <span class="rounded-full bg-surface px-2.5 py-0.5 text-[11px] font-medium text-subtle uppercase">
       <?= e((string) $currentRole) ?>
@@ -46,7 +47,7 @@ if ($currentRole === 'admin') {
       <?php $isActive = ($active === $item['key']); ?>
       <a
         href="<?= e($item['url']) ?>"
-        class="flex h-11 items-center px-3.5 text-sm transition-colors rounded-lg <?= $isActive ? 'bg-surface font-bold text-ink' : 'font-medium text-subtle hover:bg-surface hover:text-ink' ?>"
+        class="flex h-10 items-center px-3.5 text-xs transition-colors rounded-lg <?= $isActive ? 'bg-azure text-white font-semibold shadow-sm' : 'font-medium text-subtle hover:bg-surface hover:text-ink' ?>"
         data-i18n="sidebar_<?= e($item['key']) ?>"
       >
         <?= e($item['label']) ?>
@@ -56,7 +57,7 @@ if ($currentRole === 'admin') {
 
   <!-- Footer Sidebar: Versi + Tombol Dark Mode -->
   <div class="border-t border-line p-4 flex items-center justify-between">
-    <span class="text-[11px] text-subtle">FoodEase v1.0</span>
+    <span class="text-[11px] text-subtle">Nola v1.0</span>
     <!-- Tombol Toggle Tema -->
     <button
       type="button"

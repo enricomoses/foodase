@@ -38,12 +38,12 @@
     $loginRole.val(selectedRole);
 
     $('#staff-role-pill-group .staff-role-btn')
-      .removeClass('bg-black text-white shadow-sm dark:bg-white dark:text-black')
+      .removeClass('bg-azure text-white shadow-sm bg-black dark:bg-white dark:text-black')
       .addClass('text-subtle hover:text-ink');
 
     $btn
       .removeClass('text-subtle hover:text-ink')
-      .addClass('bg-black text-white shadow-sm dark:bg-white dark:text-black');
+      .addClass('bg-azure text-white shadow-sm');
   });
 
   // 3. Submit Form

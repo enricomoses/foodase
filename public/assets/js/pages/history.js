@@ -12,7 +12,7 @@ $(function () {
 
   function getBaseUrl() {
     const baseEl = document.querySelector('base');
-    return baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/foodease/';
+    return baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/Kopi Nusa/';
   }
 
   let cachedOrders = [];
@@ -24,7 +24,7 @@ $(function () {
       loadMyOrders();
     });
 
-    $(document).on('foodease:lang-changed', function () {
+    $(document).on('nola:lang-changed kopinusa:lang-changed', function () {
       if (cachedOrders && cachedOrders.length) {
         renderOrdersList(cachedOrders);
       }

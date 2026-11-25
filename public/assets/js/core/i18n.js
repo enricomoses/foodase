@@ -1,5 +1,5 @@
 /**
- * Pengelola Multi-Bahasa FoodEase (Indonesian, English, Mandarin).
+ * Pengelola Multi-Bahasa Kopi Nusa (Indonesian, English, Mandarin).
  */
 (function ($) {
   'use strict';
@@ -148,6 +148,22 @@
       name: { id: 'Air Kelapa Muda', en: 'Fresh Young Coconut', zh: '天然清凉椰子水' },
       desc: { id: 'Kelapa muda segar langsung dari buahnya', en: 'Pure natural chilled young coconut water straight from the shell', zh: '天然现开新鲜青椰子水配嫩椰肉' }
     },
+    'Iced Latte': {
+      name: { id: 'Iced Latte', en: 'Iced Latte', zh: '冰拿铁' },
+      desc: { id: 'Espresso ganda dengan susu segar dan es batu, lembut dan seimbang.', en: 'Double espresso poured over fresh milk and ice, silky and balanced.', zh: '双份浓缩咖啡配鲜牛奶与冰块，口感丝滑平衡。' }
+    },
+    'Iced Chocolate': {
+      name: { id: 'Iced Chocolate', en: 'Iced Chocolate', zh: '冰巧克力' },
+      desc: { id: 'Cokelat dingin pekat dengan susu creamy dan topping krim lembut.', en: 'Rich iced chocolate with creamy milk and a soft cream topping.', zh: '浓郁冰巧克力配香滑牛奶与绵密奶油。' }
+    },
+    'Iced Matcha': {
+      name: { id: 'Iced Matcha', en: 'Iced Matcha', zh: '冰抹茶拿铁' },
+      desc: { id: 'Matcha ceremonial digiling halus, dikocok hingga creamy lalu disajikan dingin.', en: 'Stone-ground ceremonial matcha whisked creamy and served over ice.', zh: '石磨仪式级抹茶现打顺滑，冰镇呈现。' }
+    },
+    'Iced Lemon Tea': {
+      name: { id: 'Iced Lemon Tea', en: 'Iced Lemon Tea', zh: '冰柠檬茶' },
+      desc: { id: 'Teh hitam seduh dingin dengan irisan lemon segar dan madu.', en: 'Cold-steeped black tea with fresh lemon slices and honey.', zh: '冷泡红茶配新鲜柠檬片与蜂蜜。' }
+    },
     'Kopi Antigravity Test Edit': {
       name: { id: 'Kopi Antigravity Test Edit', en: 'Antigravity Signature Coffee', zh: '反重力特调咖啡' },
       desc: { id: 'Updated deskripsi', en: 'Special house blend coffee.', zh: '咖啡厅特调招牌咖啡。' }
@@ -156,6 +172,7 @@
 
   const TRANSLATIONS = {
     id: {
+      nav_home: 'Beranda',
       nav_menu: 'Menu',
       nav_search: 'Cari',
       nav_track: 'Lacak',
@@ -286,9 +303,26 @@
       sidebar_categories: 'Kategori',
       sidebar_users: 'Pengguna',
       sidebar_reports: 'Laporan',
-      sidebar_cashier: 'Pesanan Masuk'
+      sidebar_cashier: 'Pesanan Masuk',
+      lp_badge: 'Tur 3D tersedia di outlet terpilih',
+      lp_title_1: 'Masuk ke outlet',
+      lp_title_2: 'Nola',
+      lp_title_3: 'dari layar kamu.',
+      lp_desc: 'Rasakan suasana Nola sebelum datang. Berjalan menyusuri ruang, melihat menu, lalu pesan langsung dari layar kamu.',
+      lp_tour_cta: 'Mulai Tur 3D',
+      lp_service_cta: 'Lihat Cara Kami Melayani',
+      lp_hint_scroll: 'Scroll untuk berjalan',
+      lp_hint_drag: 'Seret untuk melihat sekeliling',
+      lp_nav_service: 'Layanan',
+      lp_nav_outlet: 'Outlet',
+      lp_nav_catalog: 'Katalog',
+      lp_tour_badge: 'Tur 3D · Nola',
+      lp_tour_exit: 'Keluar',
+      lp_tour_auto: 'Otomatis',
+      lp_tour_hint: 'Gulir untuk berjalan · Seret untuk melihat'
     },
     en: {
+      nav_home: 'Home',
       nav_menu: 'Menu',
       nav_search: 'Search',
       nav_track: 'Track',
@@ -419,9 +453,26 @@
       sidebar_categories: 'Categories',
       sidebar_users: 'Users',
       sidebar_reports: 'Reports',
-      sidebar_cashier: 'Incoming Orders'
+      sidebar_cashier: 'Incoming Orders',
+      lp_badge: '3D tour available at selected outlets',
+      lp_title_1: 'Step into',
+      lp_title_2: 'Nola',
+      lp_title_3: 'from your screen.',
+      lp_desc: 'Feel the Nola atmosphere before you arrive. Walk through the room, explore the menu, and order right from your screen.',
+      lp_tour_cta: 'Start 3D Tour',
+      lp_service_cta: 'See How We Serve',
+      lp_hint_scroll: 'Scroll to walk',
+      lp_hint_drag: 'Drag to look around',
+      lp_nav_service: 'Services',
+      lp_nav_outlet: 'Outlets',
+      lp_nav_catalog: 'Catalog',
+      lp_tour_badge: '3D Tour · Nola',
+      lp_tour_exit: 'Exit',
+      lp_tour_auto: 'Auto walk',
+      lp_tour_hint: 'Scroll to walk · Drag to look'
     },
     zh: {
+      nav_home: '首页',
       nav_menu: '菜单',
       nav_search: '搜索',
       nav_track: '追踪',
@@ -552,7 +603,23 @@
       sidebar_categories: '分类管理',
       sidebar_users: '用户管理',
       sidebar_reports: '销售报表',
-      sidebar_cashier: '待处理订单'
+      sidebar_cashier: '待处理订单',
+      lp_badge: '部分门店提供 3D 导览',
+      lp_title_1: '走进',
+      lp_title_2: 'Nola',
+      lp_title_3: '从你的屏幕。',
+      lp_desc: '在到店前感受 Nola 的氛围。漫步空间、浏览菜单，并直接从屏幕下单。',
+      lp_tour_cta: '开始 3D 导览',
+      lp_service_cta: '了解我们的服务',
+      lp_hint_scroll: '滚动前进',
+      lp_hint_drag: '拖动环顾四周',
+      lp_nav_service: '服务',
+      lp_nav_outlet: '门店',
+      lp_nav_catalog: '菜单目录',
+      lp_tour_badge: '3D 导览 · Nola',
+      lp_tour_exit: '退出',
+      lp_tour_auto: '自动漫游',
+      lp_tour_hint: '滚动前进 · 拖动环顾'
     }
   };
 
@@ -560,7 +627,7 @@
     getLang: function () {
       let lang = 'id';
       try {
-        lang = localStorage.getItem('foodease_lang') || document.documentElement.lang || 'id';
+        lang = localStorage.getItem('kopinusa_lang') || document.documentElement.lang || 'id';
       } catch (e) {}
       if (!TRANSLATIONS[lang]) lang = 'id';
       return lang;
@@ -624,9 +691,9 @@
     setLang: function (lang, reload = false) {
       if (!TRANSLATIONS[lang]) return;
       try {
-        localStorage.setItem('foodease_lang', lang);
+        localStorage.setItem('kopinusa_lang', lang);
       } catch (e) {}
-      document.cookie = 'foodease_lang=' + lang + '; path=/; max-age=31536000; SameSite=Lax';
+      document.cookie = 'kopinusa_lang=' + lang + '; path=/; max-age=31536000; SameSite=Lax';
       document.documentElement.lang = lang;
 
       // Sync backend (gunakan base URL absolut agar aman dari subpath mana pun)
@@ -640,7 +707,8 @@
 
       // Terapkan terjemahan ke DOM secara in-place (tanpa reload, tetap di posisi dan halaman saat ini)
       this.applyDOM();
-      $(document).trigger('foodease:lang-changed', [lang]);
+      $(document).trigger('nola:lang-changed', [lang]);
+      $(document).trigger('kopinusa:lang-changed', [lang]);
 
       if (reload === true) {
         window.location.reload();
@@ -697,6 +765,15 @@
       const selected = $(this).data('lang');
       $('#lang-dropdown-menu').addClass('hidden');
       I18n.setLang(selected, false);
+    });
+
+    // Pill ID/EN (navbar floating Calf-style: data-l="id" / data-l="en")
+    $(document).on('click', '[data-lang-switch] button[data-l]', function () {
+      const lang = $(this).attr('data-l');
+      if (!lang) return;
+      $('[data-lang-switch] button[data-l]').attr('aria-pressed', 'false');
+      $(this).attr('aria-pressed', 'true');
+      I18n.setLang(lang, false);
     });
   });
 

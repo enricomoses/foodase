@@ -73,5 +73,5 @@ echo View::render('receipt/receipt', [
     'order'    => $order ?? [],
     'payment'  => $payment ?? [],
     'items'    => $items,
-    'cafeName' => 'FoodEase',
+    'cafeName' => 'Kopi Nusa',
 ], 'print');

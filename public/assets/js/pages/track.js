@@ -19,7 +19,7 @@ $(function () {
 
   function getBaseUrl() {
     const baseEl = document.querySelector('base');
-    return baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/foodease/';
+    return baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/Kopi Nusa/';
   }
 
   let currentCode    = '';
@@ -55,7 +55,7 @@ $(function () {
      EVENT LISTENERS
      ============================================================ */
   function bindEvents() {
-    $(document).on('foodease:lang-changed', function () {
+    $(document).on('nola:lang-changed kopinusa:lang-changed', function () {
       if (cachedOrderData) {
         renderOrderData(cachedOrderData);
       }
@@ -237,7 +237,7 @@ $(function () {
 
       case 'completed':
         title = 'Pesanan telah selesai';
-        subtitle = 'Terima kasih telah berkunjung dan menikmati sajian FoodEase.';
+        subtitle = 'Terima kasih telah berkunjung dan menikmati sajian Nola.';
         break;
 
       case 'cancelled':

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1200" height="450" viewBox="0.000 0 409.600 768">
+  <title>Calf Cafe Panorama - Panel 1</title>
+  <image x="0" y="0" width="2048" height="768"
+         xlink:href="cafe-panorama-source.png"
+         preserveAspectRatio="none"/>
+</svg>

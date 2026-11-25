@@ -60,7 +60,7 @@ if ($flashError) {
       <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-surface border border-line" id="staff-role-pill-group">
         <button
           type="button"
-          class="staff-role-btn h-9 rounded-lg text-xs font-semibold transition-all bg-black text-white shadow-sm cursor-pointer"
+          class="staff-role-btn h-9 rounded-lg text-xs font-semibold transition-all bg-azure text-white shadow-sm cursor-pointer"
           data-role="cashier"
           data-i18n="register_cashier"
         >
@@ -124,7 +124,7 @@ if ($flashError) {
       <button
         type="submit"
         id="btn-admin-login"
-        class="h-12 w-full rounded-full bg-black text-white dark:bg-white dark:text-black px-6 text-sm font-semibold shadow-md hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-2 transition-all cursor-pointer"
+        class="h-11 w-full rounded-lg bg-azure hover:bg-azure-600 text-white px-6 text-sm font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-azure focus:ring-offset-2 transition-all cursor-pointer flex items-center justify-center gap-2"
         data-i18n="admin_login_btn"
       >
         <?= e(__('admin_login_btn')) ?>

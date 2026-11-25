@@ -3,14 +3,15 @@ declare(strict_types=1);
 
 use App\Core\Config;
 
-$appName = (string) Config::get('app.name', 'FoodEase');
+$appName = (string) Config::get('app.name', 'Nola');
 ?>
 <!-- Navbar Lengket Gaya Uber Eats -->
 <header class="sticky top-0 z-30 border-b border-line bg-white">
   <div class="mx-auto flex h-16 w-full items-center justify-between px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 gap-4">
-    <!-- Wordmark FoodEase Tebal di Kiri -->
-    <a href="<?= e(url()) ?>" class="text-xl font-bold tracking-tight text-ink hover:opacity-80 transition-opacity shrink-0">
-      <?= e($appName) ?>
+    <!-- Wordmark Nola dengan Tile Brand Badge di Kiri -->
+    <a href="<?= e(url()) ?>" class="flex items-center gap-2.5 hover:opacity-90 transition-opacity shrink-0">
+      <span class="tile-n">N</span>
+      <span class="wordmark text-lg font-ui font-bold tracking-tight text-ink"><?= e($appName) ?></span>
     </a>
 
     <!-- Kolom Cari Pil di Tengah (Tampil di Desktop, disembunyikan di layar kecil) -->
@@ -98,10 +99,10 @@ $appName = (string) Config::get('app.name', 'FoodEase');
         </svg>
       </button>
 
-      <!-- Tombol Pil Hitam Keranjang · n (dengan Icon Keranjang) -->
+      <!-- Tombol Azure Keranjang · n (dengan Icon Keranjang) -->
       <a
         href="<?= e(url('cart.php')) ?>"
-        class="h-10 px-3.5 sm:px-4 rounded-full bg-black text-white text-sm font-medium inline-flex items-center gap-2 hover:bg-neutral-800 transition-colors shrink-0 shadow-sm"
+        class="h-9 px-3.5 sm:px-4 rounded-lg bg-azure text-white text-xs font-semibold inline-flex items-center gap-2 hover:bg-azure-600 transition-colors shrink-0 shadow-sm"
         aria-label="Keranjang Belanja"
       >
         <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

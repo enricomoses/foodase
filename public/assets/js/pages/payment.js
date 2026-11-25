@@ -17,7 +17,7 @@ window.PaymentModal = (function ($) {
   /* ── Helpers ──────────────────────────────────────────────── */
   function getBaseUrl() {
     const baseEl = document.querySelector('base');
-    return baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/foodease/';
+    return baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/Kopi Nusa/';
   }
 
   function getCsrfToken() {

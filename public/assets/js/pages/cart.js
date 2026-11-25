@@ -66,7 +66,7 @@ $(function () {
     const params = ids.map(function (id) { return 'ids[]=' + encodeURIComponent(id); }).join('&');
     const url = (function () {
       const baseEl = document.querySelector('base');
-      const base = baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/foodease/';
+      const base = baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/Kopi Nusa/';
       return base + 'api/menus/list.php?' + params + '&include_unavailable=1&per_page=100';
     })();
 
@@ -372,14 +372,14 @@ $(function () {
      ============================================================ */
   $(window).on('storage', function (e) {
     const orig = e.originalEvent || e;
-    if (orig && orig.key === 'foodease_cart') {
+    if (orig && (orig.key === 'nola_cart' || orig.key === 'kopinusa_cart')) {
       // Re-init saat localStorage berubah dari tab lain
       init();
     }
   });
 
   // Re-render keranjang jika bahasa berubah
-  $(document).on('foodease:lang-changed', function () {
+  $(document).on('nola:lang-changed kopinusa:lang-changed', function () {
     if (cartItems && cartItems.length) {
       renderCart();
     }

@@ -447,6 +447,54 @@ final class I18n
                 'zh' => '天然现开新鲜青椰子水配嫩椰肉',
             ],
         ],
+        'Iced Latte' => [
+            'name' => [
+                'id' => 'Iced Latte',
+                'en' => 'Iced Latte',
+                'zh' => '冰拿铁',
+            ],
+            'desc' => [
+                'id' => 'Espresso ganda dengan susu segar dan es batu, lembut dan seimbang.',
+                'en' => 'Double espresso poured over fresh milk and ice, silky and balanced.',
+                'zh' => '双份浓缩咖啡配鲜牛奶与冰块，口感丝滑平衡。',
+            ],
+        ],
+        'Iced Chocolate' => [
+            'name' => [
+                'id' => 'Iced Chocolate',
+                'en' => 'Iced Chocolate',
+                'zh' => '冰巧克力',
+            ],
+            'desc' => [
+                'id' => 'Cokelat dingin pekat dengan susu creamy dan topping krim lembut.',
+                'en' => 'Rich iced chocolate with creamy milk and a soft cream topping.',
+                'zh' => '浓郁冰巧克力配香滑牛奶与绵密奶油。',
+            ],
+        ],
+        'Iced Matcha' => [
+            'name' => [
+                'id' => 'Iced Matcha',
+                'en' => 'Iced Matcha',
+                'zh' => '冰抹茶拿铁',
+            ],
+            'desc' => [
+                'id' => 'Matcha ceremonial digiling halus, dikocok hingga creamy lalu disajikan dingin.',
+                'en' => 'Stone-ground ceremonial matcha whisked creamy and served over ice.',
+                'zh' => '石磨仪式级抹茶现打顺滑，冰镇呈现。',
+            ],
+        ],
+        'Iced Lemon Tea' => [
+            'name' => [
+                'id' => 'Iced Lemon Tea',
+                'en' => 'Iced Lemon Tea',
+                'zh' => '冰柠檬茶',
+            ],
+            'desc' => [
+                'id' => 'Teh hitam seduh dingin dengan irisan lemon segar dan madu.',
+                'en' => 'Cold-steeped black tea with fresh lemon slices and honey.',
+                'zh' => '冷泡红茶配新鲜柠檬片与蜂蜜。',
+            ],
+        ],
         'Kopi Antigravity Test Edit' => [
             'name' => [
                 'id' => 'Kopi Antigravity Test Edit',
@@ -463,8 +511,8 @@ final class I18n
 
     private static array $translations = [
         'id' => [
-            'app_name' => 'FoodEase',
-            'nav_home' => 'Home',
+            'app_name' => 'Kopi Nusa',
+            'nav_home' => 'Beranda',
             'nav_menu' => 'Menu',
             'nav_search' => 'Cari',
             'nav_track' => 'Lacak',
@@ -602,12 +650,28 @@ final class I18n
             'sidebar_reports' => 'Laporan',
             'sidebar_cashier' => 'Pesanan Masuk',
             'footer_copyright' => 'FoodEase — Sistem Pemesanan & Kasir Kafe',
+            'lp_badge' => 'Diseduh Segar Setiap Hari',
+            'lp_title_1' => 'Masuk ke outlet',
+            'lp_title_2' => 'Nola',
+            'lp_title_3' => 'dari layar kamu.',
+            'lp_desc' => 'Rasakan suasana Nola sebelum datang. Berjalan menyusuri ruang, melihat menu, lalu pesan langsung dari layar kamu.',
+            'lp_tour_cta' => 'Pesan Sekarang',
+            'lp_service_cta' => 'Lihat Cara Kami Melayani',
+            'lp_hint_scroll' => 'Scroll ke bawah untuk melihat menu',
+            'lp_hint_drag' => 'Seret untuk melihat sekeliling',
+            'lp_nav_service' => 'Layanan',
+            'lp_nav_outlet' => 'Outlet',
+            'lp_nav_catalog' => 'Katalog',
+            'lp_tour_badge' => 'Tur 3D · Nola',
+            'lp_tour_exit' => 'Keluar',
+            'lp_tour_auto' => 'Otomatis',
+            'lp_tour_hint' => 'Gulir untuk berjalan · Seret untuk melihat',
             'lang_id' => 'Indonesia',
             'lang_en' => 'English',
             'lang_zh' => '中文 (Mandarin)',
         ],
         'en' => [
-            'app_name' => 'FoodEase',
+            'app_name' => 'Kopi Nusa',
             'nav_home' => 'Home',
             'nav_menu' => 'Menu',
             'nav_search' => 'Search',
@@ -746,12 +810,28 @@ final class I18n
             'sidebar_reports' => 'Reports',
             'sidebar_cashier' => 'Incoming Orders',
             'footer_copyright' => 'FoodEase — Café Ordering & Cashier System',
+            'lp_badge' => '3D tour available at selected outlets',
+            'lp_title_1' => 'Step into',
+            'lp_title_2' => 'Nola',
+            'lp_title_3' => 'from your screen.',
+            'lp_desc' => 'Feel the Nola atmosphere before you arrive. Walk through the room, explore the menu, and order right from your screen.',
+            'lp_tour_cta' => 'Start 3D Tour',
+            'lp_service_cta' => 'See How We Serve',
+            'lp_hint_scroll' => 'Scroll to walk',
+            'lp_hint_drag' => 'Drag to look around',
+            'lp_nav_service' => 'Services',
+            'lp_nav_outlet' => 'Outlets',
+            'lp_nav_catalog' => 'Catalog',
+            'lp_tour_badge' => '3D Tour · Nola',
+            'lp_tour_exit' => 'Exit',
+            'lp_tour_auto' => 'Auto walk',
+            'lp_tour_hint' => 'Scroll to walk · Drag to look',
             'lang_id' => 'Indonesia',
             'lang_en' => 'English',
             'lang_zh' => '中文 (Mandarin)',
         ],
         'zh' => [
-            'app_name' => 'FoodEase',
+            'app_name' => 'Kopi Nusa',
             'nav_home' => '首页',
             'nav_menu' => '菜单',
             'nav_search' => '搜索',
@@ -890,6 +970,22 @@ final class I18n
             'sidebar_reports' => '销售报表',
             'sidebar_cashier' => '待处理订单',
             'footer_copyright' => 'FoodEase — 咖啡厅点餐与收银系统',
+            'lp_badge' => '部分门店提供 3D 导览',
+            'lp_title_1' => '走进',
+            'lp_title_2' => 'Nola',
+            'lp_title_3' => '从你的屏幕。',
+            'lp_desc' => '在到店前感受 Nola 的氛围。漫步空间、浏览菜单，并直接从屏幕下单。',
+            'lp_tour_cta' => '开始 3D 导览',
+            'lp_service_cta' => '了解我们的服务',
+            'lp_hint_scroll' => '滚动前进',
+            'lp_hint_drag' => '拖动环顾四周',
+            'lp_nav_service' => '服务',
+            'lp_nav_outlet' => '门店',
+            'lp_nav_catalog' => '菜单目录',
+            'lp_tour_badge' => '3D 导览 · Nola',
+            'lp_tour_exit' => '退出',
+            'lp_tour_auto' => '自动漫游',
+            'lp_tour_hint' => '滚动前进 · 拖动环顾',
             'lang_id' => 'Indonesia',
             'lang_en' => 'English',
             'lang_zh' => '中文 (Mandarin)',
@@ -907,14 +1003,14 @@ final class I18n
             return self::$currentLang;
         }
 
-        $sessionLang = Session::get('foodease_lang');
+        $sessionLang = Session::get('kopinusa_lang');
         if (is_string($sessionLang) && in_array($sessionLang, ['id', 'en', 'zh'], true)) {
             self::$currentLang = $sessionLang;
             return self::$currentLang;
         }
 
-        if (isset($_COOKIE['foodease_lang']) && in_array($_COOKIE['foodease_lang'], ['id', 'en', 'zh'], true)) {
-            self::$currentLang = (string) $_COOKIE['foodease_lang'];
+        if (isset($_COOKIE['kopinusa_lang']) && in_array($_COOKIE['kopinusa_lang'], ['id', 'en', 'zh'], true)) {
+            self::$currentLang = (string) $_COOKIE['kopinusa_lang'];
             return self::$currentLang;
         }
 
@@ -926,8 +1022,8 @@ final class I18n
     {
         if (in_array($lang, ['id', 'en', 'zh'], true)) {
             self::$currentLang = $lang;
-            Session::set('foodease_lang', $lang);
-            @setcookie('foodease_lang', $lang, time() + (365 * 86400), '/');
+            Session::set('kopinusa_lang', $lang);
+            @setcookie('kopinusa_lang', $lang, time() + (365 * 86400), '/');
         }
     }
 

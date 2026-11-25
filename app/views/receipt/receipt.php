@@ -11,7 +11,7 @@ declare(strict_types=1);
  * Variabel yang tersedia: $order, $payment, $items, $cafeName
  */
 
-$cafeName   = $cafeName   ?? 'FoodEase';
+$cafeName   = $cafeName   ?? 'Nola';
 $order      = $order      ?? [];
 $payment    = $payment    ?? [];
 $items      = $items      ?? [];

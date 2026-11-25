@@ -69,7 +69,11 @@ final class Menu
         $offset  = ($page - 1) * $perPage;
         $dataSql = "SELECT m.id, m.category_id, m.name, m.description, m.price,
                            m.image, m.is_available, m.deleted_at, m.created_at, m.updated_at,
-                           c.name AS category_name
+                           COALESCE(m.badge, '')         AS badge,
+                           COALESCE(m.serving_tag, 'Iced') AS serving_tag,
+                           COALESCE(m.svg_illustration, '') AS svg_illustration,
+                           c.name AS category_name,
+                           COALESCE(c.subtitle, 'UNGGULAN') AS category_subtitle
                     FROM menus m
                     LEFT JOIN categories c ON c.id = m.category_id
                     {$whereClause}
@@ -102,7 +106,11 @@ final class Menu
         $pdo = Database::connection();
         $sql = 'SELECT m.id, m.category_id, m.name, m.description, m.price,
                        m.image, m.is_available, m.deleted_at, m.created_at, m.updated_at,
-                       c.name AS category_name
+                       COALESCE(m.badge, \'\')           AS badge,
+                       COALESCE(m.serving_tag, \'Iced\') AS serving_tag,
+                       COALESCE(m.svg_illustration, \'\') AS svg_illustration,
+                       c.name AS category_name,
+                       COALESCE(c.subtitle, \'UNGGULAN\') AS category_subtitle
                 FROM menus m
                 LEFT JOIN categories c ON c.id = m.category_id
                 WHERE m.id = :id';

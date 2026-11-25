@@ -1,28 +1,28 @@
 <?php
 declare(strict_types=1);
 
-// Default config. Override per mesin lewat config.local.php (tidak di-commit).
+// Default config. Override per mesin lewat .env di root atau config.local.php (tidak di-commit).
 $local = is_file(__DIR__ . '/config.local.php') ? require __DIR__ . '/config.local.php' : [];
 
 return array_replace_recursive([
     'app' => [
-        'name'     => 'FoodEase',
-        'env'      => 'development',      // development | production
-        'debug'    => true,               // false saat demo/produksi
-        'base_url' => '/foodease',         // URL folder project di htdocs (tanpa slash akhir)
-        'timezone' => 'Asia/Jakarta',
+        'name'     => (string) env('APP_NAME', 'Nola'),
+        'env'      => (string) env('APP_ENV', 'development'),      // development | production
+        'debug'    => (bool) env('APP_DEBUG', true),               // false saat demo/produksi
+        'base_url' => (string) env('APP_BASE_URL', '/foodease'),    // URL folder project di htdocs (tanpa slash akhir)
+        'timezone' => (string) env('APP_TIMEZONE', 'Asia/Jakarta'),
     ],
     'db' => [
-        'host'    => '127.0.0.1',
-        'port'    => 3306,
-        'name'    => 'foodease',
-        'user'    => 'root',
-        'pass'    => '',                  // default XAMPP: kosong
-        'charset' => 'utf8mb4',
+        'host'    => (string) env('DB_HOST', '127.0.0.1'),
+        'port'    => (int) env('DB_PORT', 3306),
+        'name'    => (string) env('DB_NAME', 'foodease'),
+        'user'    => (string) env('DB_USER', 'root'),
+        'pass'    => (string) env('DB_PASS', ''),                  // default XAMPP: kosong
+        'charset' => (string) env('DB_CHARSET', 'utf8mb4'),
     ],
     'session' => [
-        'name'     => 'foodease_session',
-        'lifetime' => 7200,               // idle timeout (detik)
+        'name'     => (string) env('SESSION_NAME', 'nola_session'),
+        'lifetime' => (int) env('SESSION_LIFETIME', 7200),         // idle timeout (detik)
     ],
     'upload' => [
         'dir'      => 'uploads/menus',    // relatif terhadap public/
@@ -33,6 +33,6 @@ return array_replace_recursive([
         'max_table'     => 30,
         'max_item_kind' => 30,
         'max_qty'       => 99,
-        'code_prefix'   => 'FE',
+        'code_prefix'   => 'NL',
     ],
 ], $local);

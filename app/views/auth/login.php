@@ -111,7 +111,7 @@ if ($flashError) {
       <button
         type="submit"
         id="btn-login"
-        class="h-12 w-full rounded-full bg-black px-6 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-2 transition-colors cursor-pointer"
+        class="h-11 w-full rounded-lg bg-azure hover:bg-azure-600 px-6 text-sm font-semibold text-white shadow-md focus:outline-none focus:ring-2 focus:ring-azure focus:ring-offset-2 transition-colors cursor-pointer"
         data-i18n="login_btn"
       >
         <?= e(__('login_btn')) ?>

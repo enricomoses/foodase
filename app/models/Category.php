@@ -21,6 +21,7 @@ final class Category
     {
         $pdo = Database::connection();
         $sql = 'SELECT c.id, c.name, c.sort_order, c.created_at, c.updated_at,
+                       COALESCE(c.subtitle, \'UNGGULAN\') AS subtitle,
                        COUNT(m.id) AS menu_count
                 FROM categories c
                 LEFT JOIN menus m ON m.category_id = c.id
@@ -39,6 +40,7 @@ final class Category
     {
         $pdo = Database::connection();
         $sql = 'SELECT c.id, c.name, c.sort_order, c.created_at, c.updated_at,
+                       COALESCE(c.subtitle, \'UNGGULAN\') AS subtitle,
                        COUNT(m.id) AS menu_count
                 FROM categories c
                 LEFT JOIN menus m ON m.category_id = c.id

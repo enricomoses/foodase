@@ -18,7 +18,7 @@ final class Session
             return;
         }
 
-        $name = (string) Config::get('session.name', 'foodease_session');
+        $name = (string) Config::get('session.name', 'kopinusa_session');
 
         if (!headers_sent()) {
             session_name($name);

@@ -5,6 +5,13 @@
 $(function () {
   'use strict';
 
+  // Pastikan halaman menu pelanggan SELALU bertema putih bersih (Clean Light Mode)
+  document.documentElement.classList.remove('dark');
+  try {
+    localStorage.setItem('nola_theme', 'light');
+    localStorage.setItem('foodease_theme', 'light');
+  } catch (e) {}
+
   // SVG Ikon Plus
   const SVG_PLUS = '<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
 
@@ -49,6 +56,16 @@ $(function () {
       });
   }
 
+  function getCategoryEmoji(name) {
+    const n = (name || '').toLowerCase();
+    if (n.includes('kopi') || n.includes('coffee') || n.includes('espresso')) return '☕';
+    if (n.includes('smooth') || n.includes('shake') || n.includes('ice cream') || n.includes('milk')) return '🍦';
+    if (n.includes('side') || n.includes('camilan') || n.includes('snack') || n.includes('toast') || n.includes('pastry')) return '🍰';
+    if (n.includes('makan') || n.includes('food') || n.includes('meal') || n.includes('rice') || n.includes('dimsum')) return '🍱';
+    if (n.includes('tea') || n.includes('teh') || n.includes('non') || n.includes('beverage') || n.includes('juice')) return '🥤';
+    return '🍽️';
+  }
+
   function renderCategoryChips() {
     const $chipsContainer = $('#category-chips');
     // Hapus chip selain "Semua"
@@ -57,16 +74,18 @@ $(function () {
     allCategories.forEach(function (cat) {
       const catDisplayName = window.I18n ? window.I18n.translateCategory(cat.name) : cat.name;
       const isActive = String(cat.id) === String(currentCategoryId);
+      const emoji = getCategoryEmoji(cat.name);
       const activeClass = isActive
-        ? 'bg-black text-white'
-        : 'bg-surface text-subtle hover:bg-neutral-200 hover:text-ink';
+        ? 'is-active bg-blue-600 text-white shadow-sm font-semibold'
+        : 'bg-[#F1F5F9] text-[#475569] hover:bg-gray-200 hover:text-gray-900 font-medium';
       const chipHtml = `
         <button
           type="button"
-          class="category-chip h-9 px-4 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${activeClass} cursor-pointer"
+          class="category-chip h-10 px-5 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${activeClass} flex items-center gap-2 cursor-pointer"
           data-category-id="${cat.id}"
         >
-          ${UI.escape(catDisplayName)}
+          <span class="text-sm">${emoji}</span>
+          <span>${UI.escape(catDisplayName)}</span>
         </button>
       `;
       $chipsContainer.append(chipHtml);
@@ -75,9 +94,51 @@ $(function () {
     // Perbarui style chip "Semua"
     const isAllActive = !currentCategoryId;
     $chipsContainer.find('.category-chip[data-category-id=""]')
-      .toggleClass('bg-black text-white', isAllActive)
-      .toggleClass('bg-surface text-subtle hover:bg-neutral-200 hover:text-ink', !isAllActive);
+      .toggleClass('is-active bg-blue-600 text-white shadow-sm font-semibold', isAllActive)
+      .toggleClass('bg-[#F1F5F9] text-[#475569] hover:bg-gray-200 hover:text-gray-900 font-medium', !isAllActive);
+
+    setTimeout(updateChipsScrollButtons, 100);
   }
+
+  // Kontrol Navigasi Scroll Horizontal Chip Kategori
+  function updateChipsScrollButtons() {
+    const $area = $('#category-chips-scroll-area');
+    if (!$area.length) return;
+    const el = $area[0];
+    const scrollLeft = el.scrollLeft;
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    const hasOverflow = maxScroll > 4;
+
+    const $wrapper = $('.category-chips-wrapper');
+    const canScrollLeft = scrollLeft > 10;
+    const canScrollRight = (maxScroll - scrollLeft) > 10;
+
+    $wrapper.toggleClass('has-scroll-left', hasOverflow && canScrollLeft);
+    $wrapper.toggleClass('has-scroll-right', hasOverflow && canScrollRight);
+
+    $('#btn-chips-scroll-left')
+      .css({ opacity: canScrollLeft ? 1 : 0, 'pointer-events': canScrollLeft ? 'auto' : 'none' });
+    $('#btn-chips-scroll-right')
+      .css({ opacity: canScrollRight ? 1 : 0, 'pointer-events': canScrollRight ? 'auto' : 'none' });
+  }
+
+  $('#btn-chips-scroll-left').on('click', function () {
+    const $area = $('#category-chips-scroll-area');
+    $area.animate({ scrollLeft: $area.scrollLeft() - 240 }, 250);
+  });
+
+  $('#btn-chips-scroll-right').on('click', function () {
+    const $area = $('#category-chips-scroll-area');
+    $area.animate({ scrollLeft: $area.scrollLeft() + 240 }, 250);
+  });
+
+  $('#category-chips-scroll-area').on('scroll', function () {
+    updateChipsScrollButtons();
+  });
+
+  $(window).on('resize', function () {
+    updateChipsScrollButtons();
+  });
 
   // Klik chip kategori
   $('#category-chips').on('click', '.category-chip', function () {
@@ -85,16 +146,35 @@ $(function () {
     const catId = $btn.data('category-id');
     currentCategoryId = catId ? String(catId) : '';
 
-    // Perbarui style chip aktif (aktif hitam, tidak aktif abu surface)
+    // Perbarui style chip aktif (aktif biru, tidak aktif abu terang)
     $('#category-chips .category-chip')
-      .removeClass('bg-black text-white')
-      .addClass('bg-surface text-subtle hover:bg-neutral-200 hover:text-ink');
+      .removeClass('is-active bg-blue-600 text-white shadow-sm font-semibold')
+      .addClass('bg-[#F1F5F9] text-[#475569] hover:bg-gray-200 hover:text-gray-900 font-medium');
 
     $btn
-      .removeClass('bg-surface text-subtle hover:bg-neutral-200 hover:text-ink')
-      .addClass('bg-black text-white');
+      .removeClass('bg-[#F1F5F9] text-[#475569] hover:bg-gray-200 hover:text-gray-900 font-medium')
+      .addClass('is-active bg-blue-600 text-white shadow-sm font-semibold');
+
+    // Scroll chip ke tengah area scroll jika terpotong
+    if (this.scrollIntoView) {
+      this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
 
     loadMenus();
+
+    // Smooth scroll ke section kategori yang dipilih (setelah render selesai)
+    if (catId) {
+      var targetCatName = $btn.find('span:last').text().trim();
+      setTimeout(function () {
+        var $section = $('#menu-container').find('.category-section').filter(function () {
+          return $(this).attr('data-category') === targetCatName;
+        });
+        if (!$section.length) $section = $('#menu-catalog-section');
+        if ($section.length) {
+          $('html, body').animate({ scrollTop: $section.offset().top - 100 }, 450);
+        }
+      }, 400);
+    }
   });
 
   // ============================================================
@@ -112,23 +192,22 @@ $(function () {
   $('#global-search-input').on('input', function () {
     const val = $(this).val();
     $('#mobile-search-input').val(val);
+    $('#btn-clear-search').toggleClass('hidden', !val);
     handleSearchInput(val);
   });
 
   $('#mobile-search-input').on('input', function () {
     const val = $(this).val();
     $('#global-search-input').val(val);
+    $('#btn-clear-search').toggleClass('hidden', !val);
     handleSearchInput(val);
   });
 
-  $(document).on('click', '#btn-mobile-nav-search', function (e) {
-    e.preventDefault();
-    const $search = $('#mobile-search-input:visible, #global-search-input:visible').first();
-    if ($search.length) {
-      $('html, body').animate({ scrollTop: Math.max(0, $search.offset().top - 80) }, 300, function () {
-        $search.trigger('focus');
-      });
-    }
+  $('#btn-clear-search').on('click', function () {
+    $('#global-search-input, #mobile-search-input').val('');
+    $(this).addClass('hidden');
+    handleSearchInput('');
+    $('#global-search-input').focus();
   });
 
   // Reset filter dari state kosong
@@ -136,14 +215,15 @@ $(function () {
     currentSearchQuery = '';
     currentCategoryId = '';
     $('#global-search-input, #mobile-search-input').val('');
+    $('#btn-clear-search').addClass('hidden');
 
     $('#category-chips .category-chip')
-      .removeClass('bg-black text-white')
-      .addClass('bg-surface text-subtle hover:bg-neutral-200 hover:text-ink');
+      .removeClass('is-active bg-blue-600 text-white shadow-sm font-semibold')
+      .addClass('bg-[#F1F5F9] text-[#475569] hover:bg-gray-200 hover:text-gray-900 font-medium');
 
     $('#category-chips .category-chip[data-category-id=""]')
-      .removeClass('bg-surface text-subtle hover:bg-neutral-200 hover:text-ink')
-      .addClass('bg-black text-white');
+      .removeClass('bg-[#F1F5F9] text-[#475569] hover:bg-gray-200 hover:text-gray-900 font-medium')
+      .addClass('is-active bg-blue-600 text-white shadow-sm font-semibold');
 
     loadMenus();
   });
@@ -172,6 +252,7 @@ $(function () {
       .then(function (res) {
         $('#menu-loading').addClass('hidden');
         allMenus = (res && res.data && res.data.data) ? res.data.data : [];
+        syncHeroMenus(allMenus);
         renderMenuCatalog();
       })
       .catch(function (err) {
@@ -218,38 +299,46 @@ $(function () {
           const menuDesc = window.I18n ? window.I18n.translateMenuDesc(m.description, m.name) : m.description;
           slidesHtml += `
             <div
-              class="carousel-slide menu-card fe-menu-card relative w-56 sm:w-64 rounded-xl border border-line bg-white p-3 hover:border-black/30 transition-all cursor-pointer group flex flex-col justify-between shrink-0"
+              class="carousel-slide menu-card fe-menu-card relative w-56 sm:w-64 rounded-3xl border border-gray-100 bg-white p-3.5 hover:border-blue-500/30 transition-all cursor-pointer group flex flex-col justify-between shrink-0 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
               data-id="${m.id}"
+              tabindex="0"
+              role="button"
+              aria-label="${UI.escape(menuName)} - ${formatRupiah(m.price)}"
             >
-              <!-- Container Foto Menu Favorit (Bersih tanpa badge AI slop) -->
-              <div class="relative w-full h-36 sm:h-40 rounded-lg overflow-hidden bg-surface mb-2.5">
+              <!-- Container Foto Menu Favorit (Foto Real, Bersih, Proporsional) -->
+              <div class="relative w-full h-36 sm:h-40 rounded-2xl overflow-hidden bg-gray-100 mb-3">
                 <img
                   src="${imgSrc}"
                   alt="${UI.escape(menuName)}"
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                   onerror="this.src='${defaultPlaceholder}'"
+                  loading="lazy"
+                  decoding="async"
                 >
               </div>
 
               <!-- Deskripsi & Info Menu -->
               <div class="flex-1 flex flex-col justify-between">
                 <div>
-                  <span class="text-[10px] font-bold text-subtle uppercase tracking-wider">${UI.escape(menuCategory)}</span>
-                  <h3 class="font-bold text-ink text-sm sm:text-base leading-snug line-clamp-1 mt-0.5">
+                  <span class="text-[11px] font-bold text-blue-600 uppercase tracking-wider">${UI.escape(menuCategory)}</span>
+                  <h3 class="font-bold text-[#0F172A] text-sm sm:text-base leading-snug line-clamp-1 mt-0.5 group-hover:text-blue-600 transition-colors">
                     ${UI.escape(menuName)}
                   </h3>
-                  ${menuDesc ? `<p class="mt-1 text-xs text-subtle line-clamp-2 leading-relaxed">${UI.escape(menuDesc)}</p>` : ''}
+                  <p class="mt-1 text-xs text-[#64748B] line-clamp-2 leading-relaxed min-h-[2rem]">
+                    ${menuDesc ? UI.escape(menuDesc) : 'Racikan istimewa khas racikan kafe.'}
+                  </p>
                 </div>
 
-                <div class="mt-3 pt-2.5 border-t border-line flex items-center justify-between">
-                  <span class="menu-price font-bold text-xs sm:text-sm text-ink tabular-nums">
+                <div class="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between">
+                  <span class="menu-price font-bold text-sm sm:text-base text-blue-600 font-mono tabular-nums">
                     ${formatRupiah(m.price)}
                   </span>
                   <button
                     type="button"
-                    class="btn-card-add h-8 px-3 rounded-full bg-black text-white text-xs font-semibold hover:bg-neutral-800 transition-colors flex items-center gap-1 cursor-pointer"
+                    class="btn-card-add h-8 px-3.5 rounded-full bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer shadow-sm hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1"
                     data-id="${m.id}"
-                    title="Tambah ke pesanan"
+                    title="${t('btn_add', '+ Tambah')}"
+                    aria-label="${t('btn_add', 'Tambah')} ${UI.escape(menuName)}"
                   >
                     <span>${t('btn_add', '+ Tambah')}</span>
                   </button>
@@ -260,36 +349,36 @@ $(function () {
         });
 
         const carouselSectionHtml = `
-          <section class="favorite-carousel-section mb-6">
-            <div class="flex items-center justify-between mb-3 sm:mb-4">
+          <section class="favorite-carousel-section mb-8">
+            <div class="flex items-center justify-between mb-4">
               <div>
-                <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-ink">
+                <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#0F172A]">
                   ${t('favorite_title', 'Menu Favorit & Paling Laris')}
                 </h2>
-                <p class="text-xs text-subtle mt-0.5">${t('favorite_desc', 'Paling sering dipesan oleh pelanggan')}</p>
+                <p class="text-xs sm:text-sm text-[#64748B] mt-0.5">${t('favorite_desc', 'Paling sering dipesan oleh pelanggan')}</p>
               </div>
 
               <!-- Tombol Navigasi Geser (Prev & Next) -->
-              <div class="flex items-center gap-1.5">
+              <div class="flex items-center gap-2">
                 <button
                   type="button"
                   id="btn-carousel-prev"
-                  class="w-8 h-8 rounded-full bg-surface border border-line text-ink hover:bg-neutral-200 transition-colors flex items-center justify-center cursor-pointer"
+                  class="w-9 h-9 rounded-full bg-[#F1F5F9] border border-gray-200 text-gray-700 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1"
                   title="Sebelumnya"
-                  aria-label="Sebelumnya"
+                  aria-label="Geser ke produk sebelumnya"
                 >
-                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <polyline points="15 18 9 12 15 6"></polyline>
                   </svg>
                 </button>
                 <button
                   type="button"
                   id="btn-carousel-next"
-                  class="w-8 h-8 rounded-full bg-surface border border-line text-ink hover:bg-neutral-200 transition-colors flex items-center justify-center cursor-pointer"
+                  class="w-9 h-9 rounded-full bg-[#F1F5F9] border border-gray-200 text-gray-700 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1"
                   title="Selanjutnya"
-                  aria-label="Selanjutnya"
+                  aria-label="Geser ke produk selanjutnya"
                 >
-                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <polyline points="9 18 15 12 9 6"></polyline>
                   </svg>
                 </button>
@@ -297,7 +386,7 @@ $(function () {
             </div>
 
             <!-- Track Geser Horizontal -->
-            <div id="favorite-carousel-track" class="carousel-track flex gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar py-1">
+            <div id="favorite-carousel-track" class="carousel-track flex gap-4 overflow-x-auto no-scrollbar py-1">
               ${slidesHtml}
             </div>
           </section>
@@ -307,64 +396,137 @@ $(function () {
     }
 
     Object.keys(grouped).forEach(function (categoryName) {
-      const items = grouped[categoryName];
+      const items = grouped[categoryName] || [];
+      var displayCategoryName = categoryName;
+      if (window.I18n && typeof window.I18n.translateCategory === 'function') {
+        try {
+          displayCategoryName = window.I18n.translateCategory(categoryName) || categoryName;
+        } catch (e) {
+          displayCategoryName = categoryName;
+        }
+      }
+
+      // Ambil subtitle dari item pertama (semua item dalam kategori punya subtitle sama)
+      var catSubtitle = (items[0] && items[0].category_subtitle) ? items[0].category_subtitle : 'UNGGULAN';
 
       let cardsHtml = '';
       items.forEach(function (m) {
         const isAvail = !!m.is_available;
         const imgSrc = m.image_url || defaultPlaceholder;
-        const disabledClass = !isAvail ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-black/30 hover:shadow-sm';
+        const disabledClass = !isAvail ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer';
         const menuName = window.I18n ? window.I18n.translateMenuName(m.name) : m.name;
         const menuDesc = window.I18n ? window.I18n.translateMenuDesc(m.description, m.name) : m.description;
 
+        // Badge dari DB (badge), fallback ke null
+        const badgeText = (m.badge && m.badge !== '') ? m.badge : null;
+
+        // Serving tag dari DB, fallback ke deteksi nama
+        let itemTag = (m.serving_tag && m.serving_tag !== '') ? m.serving_tag : 'Iced';
+        if (!m.serving_tag || m.serving_tag === '') {
+          const nameLower = (m.name || '').toLowerCase();
+          if (nameLower.includes('hot') || nameLower.includes('panas')) {
+            itemTag = 'Hot';
+          } else if (nameLower.includes('toast') || nameLower.includes('croissant') || nameLower.includes('pastry') || nameLower.includes('kentang') || nameLower.includes('dimsum')) {
+            itemTag = 'Dish';
+          }
+        }
+
+        // Warna pill serving tag berdasarkan tipe
+        let tagClass = 'bg-sky-50 text-sky-600';
+        if (itemTag === 'Hot')   tagClass = 'bg-orange-50 text-orange-600';
+        if (itemTag === 'Dish')  tagClass = 'bg-green-50 text-green-700';
+        if (itemTag === 'Snack') tagClass = 'bg-amber-50 text-amber-700';
+        if (itemTag === 'Bottle') tagClass = 'bg-purple-50 text-purple-700';
+
+        // Warna badge berdasarkan tipe
+        let badgeClass = 'bg-blue-600 text-white';
+        if (badgeText === 'Recommended') badgeClass = 'bg-green-600 text-white';
+        if (badgeText === 'Signature')   badgeClass = 'bg-purple-600 text-white';
+
         cardsHtml += `
           <div
-            class="menu-card fe-menu-card relative flex items-center justify-between p-3.5 sm:p-4 rounded-xl border border-line bg-white transition-all ${disabledClass}"
+            class="menu-card fe-menu-card group relative bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 ${disabledClass}"
             data-id="${m.id}"
+            tabindex="0"
+            role="button"
+            aria-label="${UI.escape(menuName)} - ${formatRupiah(m.price)}"
+            style="opacity:0;transform:translateY(20px)"
           >
-            <!-- Teks di Kiri -->
-            <div class="flex-1 pr-3 min-w-0">
-              <h3 class="font-bold text-ink text-sm sm:text-base leading-snug line-clamp-2">
-                ${UI.escape(menuName)}
-              </h3>
-              <div class="menu-price mt-1 font-semibold text-xs sm:text-sm text-ink tabular-nums">
-                ${formatRupiah(m.price)}
-              </div>
-              ${menuDesc ? `<p class="mt-1 text-xs text-subtle line-clamp-2 leading-relaxed">${UI.escape(menuDesc)}</p>` : ''}
-              ${!isAvail ? `<span class="inline-block mt-2 px-2 py-0.5 rounded-full text-[11px] font-bold bg-danger-light text-danger">${t('badge_out_of_stock', 'Habis')}</span>` : ''}
-            </div>
-
-            <!-- Foto Persegi 112 px di Kanan -->
-            <div class="relative w-28 h-28 shrink-0">
+            <!-- Area Foto Menu Vertikal Khas Calf (Foto Real Kopi Calf, Aspect Ratio 4:3, Object Cover Proporsional) -->
+            <div class="relative w-full aspect-[4/3] bg-gray-100 overflow-hidden">
               <img
                 src="${imgSrc}"
                 alt="${UI.escape(menuName)}"
-                class="w-28 h-28 rounded-xl object-cover bg-surface border border-line"
+                loading="lazy"
+                decoding="async"
+                class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                 onerror="this.src='${defaultPlaceholder}'"
               >
-              ${isAvail ? `
-                <!-- Tombol "+" Bulat Putih di Pojok Kanan Bawah Foto -->
-                <button
-                  type="button"
-                  class="btn-card-add absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-full bg-white text-ink shadow-md border border-line flex items-center justify-center hover:bg-black hover:text-white hover:border-black transition-all cursor-pointer"
-                  data-id="${m.id}"
-                  title="${t('btn_add_to_cart', 'Tambah ke keranjang')}"
-                >
-                  ${SVG_PLUS}
-                </button>
+
+              <!-- Badge di Pojok Kiri Atas Foto -->
+              ${badgeText ? `
+                <span class="absolute top-3.5 left-3.5 z-10 px-3.5 py-1 rounded-full text-[11px] font-extrabold tracking-wide shadow-md ${badgeClass}">
+                  ${UI.escape(badgeText)}
+                </span>
               ` : ''}
+
+              ${!isAvail ? `
+                <div class="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center">
+                  <span class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-red-600 text-white shadow-md">
+                    ${t('badge_out_of_stock', 'Habis')}
+                  </span>
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- Detail Konten Menu -->
+            <div class="p-5 flex-1 flex flex-col justify-between">
+              <div>
+                <h3 class="font-ui font-extrabold text-[#0F172A] text-base leading-snug group-hover:text-blue-600 transition-colors line-clamp-1">
+                  ${UI.escape(menuName)}
+                </h3>
+                <p class="mt-1.5 text-xs sm:text-sm text-[#64748B] line-clamp-2 leading-relaxed min-h-[2.5rem]">
+                  ${menuDesc ? UI.escape(menuDesc) : 'Racikan istimewa khas racikan kafe.'}
+                </p>
+              </div>
+
+              <!-- Baris Bawah: Harga Biru di Kiri, Serving Tag & Tombol Tambah di Kanan -->
+              <div class="mt-5 pt-3 border-t border-gray-100 flex items-center justify-between gap-3">
+                <div class="menu-price font-extrabold text-base sm:text-lg text-blue-600 font-mono tracking-tight tabular-nums">
+                  ${formatRupiah(m.price)}
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <span class="px-3 py-1 rounded-full text-xs font-bold ${tagClass}">
+                    ${UI.escape(itemTag)}
+                  </span>
+                  ${isAvail ? `
+                    <button
+                      type="button"
+                      class="btn-card-add w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-600 text-white shadow hover:bg-blue-700 transition-all flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                      data-id="${m.id}"
+                      title="${t('btn_add_to_cart', 'Tambah ke keranjang')}"
+                      aria-label="${t('btn_add_to_cart', 'Tambah ke keranjang')} ${UI.escape(menuName)}"
+                    >
+                      ${SVG_PLUS}
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
             </div>
           </div>
         `;
       });
 
-      const displayCategoryName = window.I18n ? window.I18n.translateCategory(categoryName) : categoryName;
       const sectionHtml = `
-        <section class="category-section">
-          <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-ink mb-3 sm:mb-4">
-            ${UI.escape(displayCategoryName)}
-          </h2>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4">
+        <section class="category-section space-y-4" data-category="${UI.escape(categoryName)}">
+          <div>
+            <p class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-1">— ${UI.escape(catSubtitle)}</p>
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-gray-900 font-ui">
+              ${UI.escape(displayCategoryName)}
+            </h2>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6 lg:gap-7">
             ${cardsHtml}
           </div>
         </section>
@@ -374,6 +536,19 @@ $(function () {
     });
 
     $container.removeClass('hidden');
+
+    // ---- Stagger entrance animation ----
+    var $cards = $container.find('.menu-card');
+    $cards.each(function (i) {
+      var $card = $(this);
+      setTimeout(function () {
+        $card.css({
+          transition: 'opacity 0.4s cubic-bezier(0.32,0.72,0,1), transform 0.4s cubic-bezier(0.32,0.72,0,1)',
+          opacity: 1,
+          transform: 'translateY(0)'
+        });
+      }, i * 55);
+    });
   }
 
   // Tombol Coba Lagi pada state error
@@ -490,104 +665,117 @@ $(function () {
   });
 
   // ============================================================
-  // GLACÉ CAFÉ HERO STAGE: 4 SIGNATURE DRINKS SWAP (PINTEREST PIN 1082693566762069480)
+  // KOPI NUSA HERO STAGE: 4 SIGNATURE DRINKS (FOTO PRODUK ASLI)
   // ============================================================
   const GLACE_SLIDES = [
     {
       index: 0,
-      ghostText: 'Iced Latte Espresso',
-      title1: 'Iced Latte',
-      title2: '& Double Espresso',
-      desc: 'Two shots of house espresso poured over fresh milk and clear ice, silky, balanced and gently sweet.',
-      ctaText: 'Order Now',
-      menuId: 37,
-      menuName: 'Iced Latte',
-      menuPrice: 35000,
-      cupImage: 'assets/img/hero/cup_latte.png',
-      tagline: 'Slow Brewed, Served Cold',
-      subDesc: 'Small-batch ingredients over crystal-clear ice. Refreshing, smooth and made to order.',
-      particles: [
-        'assets/img/hero/coffee-bean.svg',
-        'assets/img/hero/coffee-bean.svg',
-        'assets/img/hero/coffee-bean.svg',
-        'assets/img/hero/coffee-bean.svg',
-        'assets/img/hero/coffee-bean.svg',
-        'assets/img/hero/coffee-bean.svg'
-      ]
+      ghostText: 'Kopi Susu Nusantara',
+      title1: 'Es Kopi Susu',
+      title2: '& Gula Aren',
+      desc: 'Espresso Robusta pilihan dengan gula aren asli, creamy dan manis alami — andalan kami.',
+      ctaText: 'Pesan Sekarang',
+      menuId: 0,
+      menuNameOriginal: 'Es Kopi Susu Regular',
+      menuName: 'Es Kopi Susu Regular',
+      menuPrice: 22000,
+      cupImage: 'uploads/menus/menu_iced_latte.jpg',
+      tagline: 'Diseduh Hati, Dinikmati Hati',
+      subDesc: 'Biji kopi nusantara pilihan, diproses dengan teliti dan disajikan segar setiap hari.'
     },
     {
       index: 1,
-      ghostText: 'Espresso Dark Cocoa',
-      title1: 'Iced Chocolate',
-      title2: '& Dark Cocoa',
-      desc: 'Small-batch ingredients over crystal-clear ice. Refreshing, smooth and made to order with rich Belgian cocoa.',
-      ctaText: 'Order Now',
-      menuId: 6,
-      menuName: 'Iced Chocolate',
-      menuPrice: 26000,
-      cupImage: 'assets/img/hero/cup_choco.png',
-      tagline: 'Slow Brewed, Served Cold',
-      subDesc: 'Small-batch ingredients over crystal-clear ice. Refreshing, smooth and made to order.',
-      particles: [
-        'assets/img/hero/choco-chunk.svg',
-        'assets/img/hero/coffee-bean.svg',
-        'assets/img/hero/choco-chunk.svg',
-        'assets/img/hero/coffee-bean.svg',
-        'assets/img/hero/choco-chunk.svg',
-        'assets/img/hero/coffee-bean.svg'
-      ]
+      ghostText: 'Smooth Cold Brew',
+      title1: 'Classic Cold Brew',
+      title2: '& Nitro Smooth',
+      desc: 'Kopi hitam direndam 12 jam dalam air dingin, smooth dan tidak pahit sama sekali.',
+      ctaText: 'Pesan Sekarang',
+      menuId: 0,
+      menuNameOriginal: 'Classic Cold Brew',
+      menuName: 'Classic Cold Brew',
+      menuPrice: 32000,
+      cupImage: 'uploads/menus/menu_iced_chocolate.jpg',
+      tagline: 'Slow Steeped, Served Bold',
+      subDesc: 'Cold brew 12 jam dengan biji kopi premium, lembut dan segar tanpa rasa pahit.'
     },
     {
       index: 2,
-      ghostText: 'Ceremonial Matcha',
-      title1: 'Iced Matcha',
-      title2: '& Ceremonial Green',
-      desc: 'Stone-ground ceremonial matcha whisked to a bright, creamy green and layered over milk and ice.',
-      ctaText: 'Order Now',
-      menuId: 7,
-      menuName: 'Iced Matcha',
+      ghostText: 'Matcha Ceremonial',
+      title1: 'Matcha Latte',
+      title2: '& Ceremonial Grade',
+      desc: 'Matcha ceremonial grade digiling halus, dikocok lalu disajikan dengan susu segar.',
+      ctaText: 'Pesan Sekarang',
+      menuId: 0,
+      menuNameOriginal: 'Matcha Latte',
+      menuName: 'Matcha Latte',
       menuPrice: 28000,
-      cupImage: 'assets/img/hero/cup_matcha.png',
-      tagline: 'Slow Brewed, Served Cold',
-      subDesc: 'Small-batch ingredients over crystal-clear ice. Refreshing, smooth and made to order.',
-      particles: [
-        'assets/img/hero/tea-leaf.svg',
-        'assets/img/hero/tea-leaf.svg',
-        'assets/img/hero/tea-leaf.svg',
-        'assets/img/hero/tea-leaf.svg',
-        'assets/img/hero/tea-leaf.svg',
-        'assets/img/hero/tea-leaf.svg'
-      ]
+      cupImage: 'uploads/menus/menu_iced_matcha.jpg',
+      tagline: 'From Garden to Glass',
+      subDesc: 'Matcha upacara dengan susu lembut dan es, diseduh satu per satu dengan penuh perhatian.'
     },
     {
       index: 3,
-      ghostText: 'Iced Tea Sicilian Lemon',
-      title1: 'Iced Tea',
-      title2: '& Sicilian Lemon',
-      desc: 'Cold-steeped black tea with fresh lemon slices and a hint of wildflower honey, clean and endlessly refreshing.',
-      ctaText: 'Order Now',
-      menuId: 5,
-      menuName: 'Iced Lemon Tea',
-      menuPrice: 18000,
-      cupImage: 'assets/img/hero/cup_lemon.png',
-      tagline: 'Slow Brewed, Served Cold',
-      subDesc: 'Small-batch ingredients over crystal-clear ice. Refreshing, smooth and made to order.',
-      particles: [
-        'assets/img/hero/tea-leaf.svg',
-        'assets/img/hero/ice-cube.svg',
-        'assets/img/hero/tea-leaf.svg',
-        'assets/img/hero/ice-cube.svg',
-        'assets/img/hero/tea-leaf.svg',
-        'assets/img/hero/ice-cube.svg'
-      ]
+      ghostText: 'Smooth Pistachio Dream',
+      title1: 'Smooth Series',
+      title2: '& Pistachio Dream',
+      desc: 'Es kopi susu premium dengan pasta pistachio Italia, kaya dan nutty.',
+      ctaText: 'Pesan Sekarang',
+      menuId: 0,
+      menuNameOriginal: 'Smooth Pistachio',
+      menuName: 'Smooth Pistachio',
+      menuPrice: 36000,
+      cupImage: 'uploads/menus/menu_iced_lemon_tea.jpg',
+      tagline: 'Premium Blends, Every Sip',
+      subDesc: 'Smooth series spesial kami — perpaduan kopi dengan cream premium yang memanjakan lidah.'
     }
   ];
 
   let currentGlaceSlide = 0;
   let glaceTimer = null;
+  let signatureMenus = [];
+
+  /**
+   * Cocokkan slide hero dengan data menu dari database.
+   * Foto, harga, dan ID yang dipakai selalu berasal dari server.
+   */
+  function syncHeroMenus(items) {
+    if (!Array.isArray(items) || items.length === 0) {
+      return;
+    }
+
+    GLACE_SLIDES.forEach(function (slide, index) {
+      const wanted = slide.menuNameOriginal.toLowerCase();
+      const menu = items.find(function (item) {
+        const originalName = String(item.name_original || item.name || '').trim().toLowerCase();
+        return originalName === wanted;
+      });
+
+      if (!menu) {
+        return;
+      }
+
+      signatureMenus[index] = menu;
+      slide.menuId = parseInt(menu.id, 10) || slide.menuId;
+      slide.menuPrice = parseInt(menu.price, 10) || slide.menuPrice;
+      slide.menuName = menu.name || slide.menuName;
+
+      if (menu.image_url) {
+        slide.cupImage = menu.image_url;
+      }
+
+      const $thumb = $('#glace-selectors-row .glace-thumb-card').filter(function () {
+        return String($(this).data('menu-name') || '').toLowerCase() === wanted;
+      });
+      if (menu.image_url && $thumb.length) {
+        $thumb.find('.glace-thumb-img').attr('src', menu.image_url);
+      }
+    });
+
+    showGlaceSlide(currentGlaceSlide, true);
+  }
 
   function showGlaceSlide(index, instant) {
-    if (!GLACE_SLIDES.length) return;
+    if (!$('#glace-hero-stage').length || !GLACE_SLIDES.length) return;
     if (index >= GLACE_SLIDES.length) index = 0;
     if (index < 0) index = GLACE_SLIDES.length - 1;
     currentGlaceSlide = index;
@@ -630,14 +818,6 @@ $(function () {
       }
     }
 
-    // Update 6 Partikel Melayang (Biji Kopi, Es Batu, Daun Teh, Cokelat)
-    slide.particles.forEach(function (particleSrc, pIdx) {
-      const $particle = $(`#glace-p-${pIdx + 1}`);
-      if ($particle.length && $particle.attr('src') !== particleSrc) {
-        $particle.attr('src', particleSrc);
-      }
-    });
-
     // Update 4 Kartu Thumbnail Selector Horisontal
     $('#glace-selectors-row .glace-thumb-card').each(function () {
       const sIdx = parseInt($(this).data('slide'), 10);
@@ -650,6 +830,7 @@ $(function () {
 
   function startGlaceTimer() {
     stopGlaceTimer();
+    if (!$('#glace-hero-stage').length) return;
     glaceTimer = setInterval(function () {
       showGlaceSlide(currentGlaceSlide + 1);
     }, 6500);
@@ -692,24 +873,32 @@ $(function () {
       startGlaceTimer();
     });
 
-  // Tombol "Order Now" langsung tambahkan menu terkait ke keranjang
+  // Tombol "Pesan Sekarang" langsung tambahkan menu terkait ke keranjang
   $('#glace-order-btn').on('click', function (e) {
     e.preventDefault();
-    const $btn = $(this);
-    const menuId = parseInt($btn.attr('data-menu-id'), 10);
-    const menuName = $btn.attr('data-menu-name') || 'Glacé Drink';
 
-    // Cek ketersediaan di cache allMenus jika ada
-    const targetMenu = allMenus.find(function (m) { return Number(m.id) === menuId; });
+    const slide = GLACE_SLIDES[currentGlaceSlide];
+    const targetMenu = signatureMenus[currentGlaceSlide] || allMenus.find(function (m) {
+      return String(m.name_original || m.name || '').toLowerCase() === slide.menuNameOriginal.toLowerCase();
+    });
+    const menuName = (targetMenu && targetMenu.name) || slide.menuName || 'Minuman Kopi Nusa';
 
-    if (targetMenu && !targetMenu.is_available) {
+    if (!targetMenu) {
+      UI.toast('danger', `Maaf, ${menuName} belum tersedia di menu.`, 'Menu Tidak Ditemukan');
+      return;
+    }
+
+    if (!targetMenu.is_available) {
       UI.toast('danger', `Maaf, ${menuName} baru saja habis!`, 'Stok Habis');
       return;
     }
 
     if (window.CartStore) {
-      CartStore.add(menuId || 37, 1);
-      const totalInCart = CartStore.getItem(menuId || 37) ? CartStore.getItem(menuId || 37).qty : 1;
+      CartStore.add(targetMenu, 1);
+      const cartItem = CartStore.getItems().find(function (item) {
+        return Number(item.id) === Number(targetMenu.id);
+      });
+      const totalInCart = cartItem ? cartItem.qty : 1;
       UI.toast('success', `${menuName} × ${totalInCart}`, 'Berhasil Ditambahkan');
 
       // Animasi feedback pada tombol keranjang di navbar
@@ -762,7 +951,7 @@ $(function () {
   // ============================================================
   function checkActiveOrder() {
     try {
-      const lastOrderCode = localStorage.getItem('foodease_last_order');
+      const lastOrderCode = localStorage.getItem('nola_last_order') || localStorage.getItem('Kopi Nusa_last_order');
       if (!lastOrderCode) {
         $('#active-order-banner').addClass('hidden');
         return;
@@ -773,7 +962,8 @@ $(function () {
         .then(function (res) {
           const order = (res && res.data) ? (res.data.order || res.data) : null;
           if (!order || !order.status) {
-            localStorage.removeItem('foodease_last_order');
+            localStorage.removeItem('nola_last_order');
+            localStorage.removeItem('Kopi Nusa_last_order');
             $('#active-order-banner').addClass('hidden');
             return;
           }
@@ -794,13 +984,15 @@ $(function () {
             $('#active-order-banner').removeClass('hidden');
           } else {
             // Pesanan sudah selesai (completed) atau dibatalkan (cancelled)
-            localStorage.removeItem('foodease_last_order');
+            localStorage.removeItem('nola_last_order');
+            localStorage.removeItem('Kopi Nusa_last_order');
             $('#active-order-banner').addClass('hidden');
           }
         })
         .catch(function () {
           // Jika pesanan tidak ditemukan atau otorisasi gagal, bersihkan
-          localStorage.removeItem('foodease_last_order');
+          localStorage.removeItem('nola_last_order');
+          localStorage.removeItem('Kopi Nusa_last_order');
           $('#active-order-banner').addClass('hidden');
         });
     } catch (e) {
@@ -812,13 +1004,14 @@ $(function () {
   $(document).on('click', '#btn-dismiss-active-order', function (e) {
     e.preventDefault();
     try {
-      localStorage.removeItem('foodease_last_order');
+      localStorage.removeItem('nola_last_order');
+      localStorage.removeItem('Kopi Nusa_last_order');
     } catch (err) {}
     $('#active-order-banner').addClass('hidden');
   });
 
   // Tanggapi perubahan bahasa in-place (tanpa reload, tetap di posisi dan halaman saat ini)
-  $(document).on('foodease:lang-changed', function () {
+  $(document).on('nola:lang-changed Kopi Nusa:lang-changed', function () {
     renderCategoryChips();
     renderMenuCatalog();
     checkActiveOrder();
@@ -830,6 +1023,242 @@ $(function () {
       $('#modal-menu-title').text(menuName);
       $('#modal-menu-category').text(menuCategory);
       $('#modal-menu-desc').text(menuDesc || t('no_description', 'Tidak ada deskripsi.'));
+    }
+  });
+
+  // ============================================================
+  // LANDING REVEAL & SCROLL CONTROLS
+  // Panorama / camera engine lives in js/cafe-motion.js
+  // ============================================================
+
+  // 1. Line-by-Line Title Reveal
+  setTimeout(function () {
+    $('#lp-title').addClass('is-revealed');
+  }, 100);
+
+  // 2. Scroll Reveal Observer [data-rv]
+  if (typeof IntersectionObserver !== 'undefined') {
+    const rvObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          $(entry.target).addClass('is-in');
+          rvObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+
+    $('[data-rv]').each(function () {
+      rvObserver.observe(this);
+    });
+  } else {
+    $('[data-rv]').addClass('is-in');
+  }
+
+  // 3. Pinned Sticky Menu Track (Scroll down -> horizontal shift + blue bar)
+  const $menuSec = $('#lp-menu');
+  const $track = $('#lp-track');
+  const $mprogBar = $('#lp-mprog-bar');
+
+  let targetTrackP = 0;
+  let currentTrackP = 0;
+  let isTrackRunning = false;
+
+  function updateMenuTrackScroll() {
+    if (!$menuSec.length || !$track.length) return;
+    const secEl = $menuSec[0];
+    const rect = secEl.getBoundingClientRect();
+    const scrollableDist = secEl.offsetHeight - window.innerHeight;
+    if (scrollableDist <= 0) return;
+
+    // Progress p: 0 when top of #lp-menu hits top of window, 1 when bottom arrives
+    let p = -rect.top / scrollableDist;
+    targetTrackP = Math.min(Math.max(p, 0), 1);
+
+    if (!isTrackRunning) {
+      isTrackRunning = true;
+      requestAnimationFrame(renderTrackScroll);
+    }
+  }
+
+  function renderTrackScroll() {
+    // Lerp damping untuk pergeseran horizontal yang sangat halus (60fps)
+    currentTrackP += (targetTrackP - currentTrackP) * 0.16;
+    if (Math.abs(targetTrackP - currentTrackP) < 0.0005) {
+      currentTrackP = targetTrackP;
+    }
+
+    if ($track.length) {
+      const trackWidth = $track[0].scrollWidth || 2400;
+      const viewWidth = window.innerWidth;
+      const maxShift = Math.max(0, trackWidth - viewWidth + 80);
+      $track[0].style.transform = `translate3d(${-maxShift * currentTrackP}px, 0, 0)`;
+    }
+
+    if ($mprogBar.length) {
+      $mprogBar[0].style.transform = `scaleX(${currentTrackP})`;
+    }
+
+    if (Math.abs(targetTrackP - currentTrackP) >= 0.0005) {
+      requestAnimationFrame(renderTrackScroll);
+    } else {
+      isTrackRunning = false;
+    }
+  }
+
+  $(window).on('scroll', updateMenuTrackScroll);
+  $(window).on('resize', updateMenuTrackScroll);
+  updateMenuTrackScroll();
+
+  // 4. Timeline Scroll Fill & Active Step Highlight
+  function updateTimelineProgress() {
+    const $tl = $('#lp-timeline');
+    const $fill = $('#lp-timeline-fill');
+    if (!$tl.length || !$fill.length) return;
+
+    const tlTop = $tl.offset().top;
+    const tlHeight = $tl.outerHeight();
+    const winScroll = $(window).scrollTop();
+    const winHeight = $(window).height();
+    const focusPoint = winScroll + (winHeight * 0.55);
+
+    if (focusPoint > tlTop) {
+      const progress = Math.min(Math.max((focusPoint - tlTop) / tlHeight, 0), 1);
+      $fill.css('transform', 'scaleY(' + progress + ')');
+
+      $tl.find('li').each(function () {
+        const $li = $(this);
+        const liTop = $li.offset().top;
+        if (focusPoint >= liTop) {
+          $li.addClass('on');
+        } else {
+          $li.removeClass('on');
+        }
+      });
+    } else {
+      $fill.css('transform', 'scaleY(0)');
+      $tl.find('li').removeClass('on');
+    }
+  }
+  $(window).on('scroll', updateTimelineProgress);
+
+  // 5. Stat Counter Animation (Count-up)
+  let statsCounted = false;
+  function initStatsCounter() {
+    const $target = $('#lp-outlets-stats, #lp-statgrid, #lp-outlets');
+    if (!$target.length || statsCounted) return;
+
+    if (typeof IntersectionObserver !== 'undefined') {
+      const statsObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting && !statsCounted) {
+            statsCounted = true;
+            $('.lp-counter').each(function () {
+              const $el = $(this);
+              const target = parseInt($el.data('target'), 10) || 0;
+              const duration = 1400;
+              const startTime = performance.now();
+
+              function updateCount(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const ease = 1 - Math.pow(1 - progress, 3);
+                const current = Math.floor(ease * target);
+                $el.text(current);
+
+                if (progress < 1) {
+                  requestAnimationFrame(updateCount);
+                } else {
+                  $el.text(target);
+                }
+              }
+              requestAnimationFrame(updateCount);
+            });
+            statsObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+
+      statsObserver.observe($target[0]);
+    } else {
+      $('.lp-counter').each(function () {
+        $(this).text($(this).data('target'));
+      });
+    }
+  }
+  initStatsCounter();
+
+  // Scroll Navbar Motion (Kopi Calf inspired)
+  const $lpNav = $('#lp-nav');
+  const $categoryChipsBar = $('#category-chips-bar');
+  let lastNavScrollY = window.pageYOffset || document.documentElement.scrollTop;
+  let navTicking = false;
+
+  // Spy on active sections: #lp-menu, #lp-steps, #lp-outlets, #menu-catalog-section
+  const navSpySections = [
+    { id: '#lp-menu', el: $('#lp-menu') },
+    { id: '#lp-steps', el: $('#lp-steps') },
+    { id: '#lp-outlets', el: $('#lp-outlets') },
+    { id: '#menu-catalog-section', el: $('#menu-catalog-section') }
+  ];
+
+  function updateNavbarOnScroll() {
+    const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+    // 1. .is-scrolled saat scroll > 30px (tinggi menyusut 60px -> 52px, background solid glass)
+    if (currentScrollY > 30) {
+      $lpNav.addClass('is-scrolled solid');
+    } else {
+      $lpNav.removeClass('is-scrolled solid');
+    }
+
+    // 2. Navbar selalu terlihat stabil di atas (tidak pernah hilang saat scroll-down)
+    $lpNav.removeClass('is-hidden');
+    $('body').removeClass('nav-hidden');
+
+    // 3. Highlight active nav link dengan garis bawah biru animasi scaleX
+    const midPoint = currentScrollY + window.innerHeight * 0.35;
+    let activeSectionId = null;
+    navSpySections.forEach(function (sec) {
+      if (sec.el.length) {
+        const top = sec.el.offset().top;
+        const bottom = top + sec.el.outerHeight();
+        if (midPoint >= top && midPoint < bottom) {
+          activeSectionId = sec.id;
+        }
+      }
+    });
+
+    $('.lp-nav-links a').each(function () {
+      const href = $(this).attr('href');
+      if (href === activeSectionId) {
+        $(this).addClass('on');
+      } else {
+        $(this).removeClass('on');
+      }
+    });
+
+    lastNavScrollY = Math.max(0, currentScrollY);
+    navTicking = false;
+  }
+
+  $(window).on('scroll', function () {
+    if (!navTicking) {
+      window.requestAnimationFrame(updateNavbarOnScroll);
+      navTicking = true;
+    }
+  });
+  updateNavbarOnScroll();
+
+  // Smooth scroll anchor link
+  $(document).on('click', 'a[href^="#"]', function (e) {
+    const href = $(this).attr('href');
+    if (!href || href === '#') return;
+    const $target = $(href);
+    if ($target.length) {
+      e.preventDefault();
+      $('html, body').animate({
+        scrollTop: $target.offset().top - 80
+      }, 500);
     }
   });
 

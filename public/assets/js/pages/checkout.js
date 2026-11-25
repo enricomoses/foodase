@@ -63,7 +63,7 @@ $(function () {
     const ids    = cartItems.map(function (it) { return it.id; });
     const params = ids.map(function (id) { return 'ids[]=' + encodeURIComponent(id); }).join('&');
     const baseEl = document.querySelector('base');
-    const base   = baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/foodease/';
+    const base   = baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/Kopi Nusa/';
     const url    = base + 'api/menus/list.php?' + params + '&include_unavailable=1&per_page=100';
 
     $.ajax({ url: url, type: 'GET', dataType: 'json' })
@@ -269,7 +269,7 @@ $(function () {
     }
 
     const baseEl = document.querySelector('base');
-    const base   = baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/foodease/';
+    const base   = baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/Kopi Nusa/';
 
     $.ajax({
       url:         base + 'api/orders/create.php',
@@ -332,7 +332,10 @@ $(function () {
   function onOrderSuccess(orderCode, total) {
     // Kosongkan keranjang
     CartStore.clear();
-    try { localStorage.setItem('foodease_last_order', orderCode); } catch (e) {}
+    try {
+      localStorage.setItem('nola_last_order', orderCode);
+      localStorage.setItem('kopinusa_last_order', orderCode);
+    } catch (e) {}
 
     // Tampilkan kode pesanan dan total
     $('#success-order-code').text(orderCode);
@@ -340,7 +343,7 @@ $(function () {
 
     // Tombol lacak pesanan
     const baseEl = document.querySelector('base');
-    const base   = baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/foodease/';
+    const base   = baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/Kopi Nusa/';
     $('#btn-track-order').attr('href', base + 'track.php?code=' + encodeURIComponent(orderCode));
 
     // Ganti tampilan

@@ -6,10 +6,10 @@ $(function () {
   'use strict';
 
   const cfg = window.ReportConfig || {
-    apiSummary:     '/foodease/public/api/reports/summary.php',
-    apiBestSellers: '/foodease/public/api/reports/best-sellers.php',
-    apiDaily:       '/foodease/public/api/reports/daily.php',
-    exportUrl:      '/foodease/public/api/reports/export.php'
+    apiSummary:     '/Kopi Nusa/public/api/reports/summary.php',
+    apiBestSellers: '/Kopi Nusa/public/api/reports/best-sellers.php',
+    apiDaily:       '/Kopi Nusa/public/api/reports/daily.php',
+    exportUrl:      '/Kopi Nusa/public/api/reports/export.php'
   };
 
   /**

@@ -5,11 +5,11 @@
 window.CartStore = (function ($) {
   'use strict';
 
-  const STORAGE_KEY = 'foodease_cart';
+  const STORAGE_KEY = 'nola_cart';
 
   function readCart() {
     try {
-      const data = localStorage.getItem(STORAGE_KEY);
+      const data = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('kopinusa_cart');
       return data ? JSON.parse(data) : [];
     } catch (e) {
       return [];

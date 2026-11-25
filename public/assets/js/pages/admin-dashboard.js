@@ -7,9 +7,9 @@ $(function () {
   'use strict';
 
   const cfg = window.DashboardConfig || {
-    apiSummary:     '/foodease/public/api/reports/summary.php',
-    apiBestSellers: '/foodease/public/api/reports/best-sellers.php',
-    apiDaily:       '/foodease/public/api/reports/daily.php'
+    apiSummary:     '/Kopi Nusa/public/api/reports/summary.php',
+    apiBestSellers: '/Kopi Nusa/public/api/reports/best-sellers.php',
+    apiDaily:       '/Kopi Nusa/public/api/reports/daily.php'
   };
 
   /* ── Helpers ─────────────────────────────────────────────────────────── */

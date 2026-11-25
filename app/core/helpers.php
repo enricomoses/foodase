@@ -3,6 +3,22 @@ declare(strict_types=1);
 
 use App\Core\Config;
 
+/** Ambil nilai environment variable dengan fallback. */
+function env(string $key, mixed $default = null): mixed
+{
+    $val = $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key);
+    if ($val === false || $val === null || $val === '') {
+        return $default;
+    }
+    return match (strtolower((string) $val)) {
+        'true', '(true)' => true,
+        'false', '(false)' => false,
+        'null', '(null)' => null,
+        'empty', '(empty)' => '',
+        default => $val,
+    };
+}
+
 /** Escape output HTML. Wajib dipakai untuk semua data dinamis. */
 function e(?string $value): string
 {

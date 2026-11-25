@@ -15,7 +15,7 @@ $(function () {
   /* ------------------------------------------------------------------ */
   /* Konfigurasi & state                                                  */
   /* ------------------------------------------------------------------ */
-  const cfg      = window.HistoryConfig || { isAdmin: false, receiptBase: '/foodease/public/cashier/receipt.php?code=' };
+  const cfg      = window.HistoryConfig || { isAdmin: false, receiptBase: '/Kopi Nusa/public/cashier/receipt.php?code=' };
   const API_LIST = 'api/payments/list.php';
   const API_VOID = 'api/payments/void.php';
 
