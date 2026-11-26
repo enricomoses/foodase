@@ -26,10 +26,9 @@ foodease/
 │   ├── views/           # Template HTML/PHP (admin, auth, cashier, customer)
 │   └── bootstrap.php    # Inisialisasi awal, autoloader, dan pemuatan .env
 ├── database/
-│   ├── migrations/      # Skrip migrasi skema SQL terurut
-│   ├── schema.sql       # Struktur tabel awal database
-│   ├── seed.sql         # Data awal kategori dan menu
-│   └── seed-users.php   # Pembuat akun pengguna default (admin, kasir)
+│   ├── seeders/         # Seeder native PHP (User, Category, Menu)
+│   ├── migrate.php      # CLI runner migrasi & seeder native PHP
+│   └── schema.sql       # Struktur tabel awal terkonsolidasi dari 0
 ├── docs/                # Dokumentasi internal proyek
 ├── public/              # Root direktori yang dapat diakses publik oleh web server
 │   ├── api/             # Endpoint JSON API (AJAX)
@@ -86,18 +85,15 @@ SESSION_LIFETIME=7200
 > **Catatan Keamanan:** Berkas `.env` bersifat privat dan tidak boleh di-commit atau dipublikasikan ke repositori git.
 
 ### 4. Penyiapan Database
-1. Buat database baru bernama `foodease` di phpMyAdmin / MySQL CLI:
-   ```sql
-   CREATE DATABASE foodease CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-   ```
-2. Impor berkas skema dan data awal:
-   - `database/schema.sql`
-   - `database/seed.sql`
-   - Migrasi tambahan pada folder `database/migrations/`
-3. Buat akun default sistem menggunakan PHP CLI:
+1. Pastikan variabel `DB_NAME` dan kredensial database pada berkas `.env` sudah sesuai (mis. `DB_NAME=foodase`).
+2. Jalankan perintah migrasi & seeder dari nol melalui PHP CLI (membuat database otomatis, memasang `database/schema.sql`, dan mengisi data awal):
    ```bash
-   php database/seed-users.php
+   php database/migrate.php --fresh --seed
    ```
+   Perintah lain yang tersedia:
+   - `php database/migrate.php` — pasang skema bila database/tabel belum ada
+   - `php database/migrate.php --seed` — jalankan seeder secara idempotent
+   - `php database/migrate.php --status` — cek status tabel dan riwayat migrasi
    Akun bawaan yang tersedia:
    - **Admin:** Username: `admin` | Password: `admin12345`
    - **Kasir:** Username: `kasir1` | Password: `kasir12345`
