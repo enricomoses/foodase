@@ -62,17 +62,17 @@ if ($flashError) {
           type="button"
           class="staff-role-btn h-9 rounded-lg text-xs font-semibold transition-all bg-azure text-white shadow-sm cursor-pointer"
           data-role="cashier"
-          data-i18n="register_cashier"
+          data-i18n="staff_cashier"
         >
-          <?= e(__('register_cashier')) ?>
+          <?= e(__('staff_cashier')) ?>
         </button>
         <button
           type="button"
           class="staff-role-btn h-9 rounded-lg text-xs font-semibold text-subtle hover:text-ink transition-all cursor-pointer"
           data-role="admin"
-          data-i18n="register_admin"
+          data-i18n="staff_admin"
         >
-          <?= e(__('register_admin')) ?>
+          <?= e(__('staff_admin')) ?>
         </button>
       </div>
     </div>

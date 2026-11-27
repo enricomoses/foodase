@@ -6,7 +6,14 @@ declare(strict_types=1);
  * Layout: admin.php. Data dimuat via AJAX oleh admin-reports.js.
  */
 ?>
-<div class="space-y-6">
+<div
+  id="admin-reports-root"
+  class="space-y-6"
+  data-api-summary="<?= e(url('api/reports/summary.php')) ?>"
+  data-api-best-sellers="<?= e(url('api/reports/best-sellers.php')) ?>"
+  data-api-daily="<?= e(url('api/reports/daily.php')) ?>"
+  data-export-url="<?= e(url('api/reports/export.php')) ?>"
+>
 
   <!-- Filter Bar & Aksi Cepat -->
   <div class="rounded-xl border border-line bg-white p-5 space-y-4">
@@ -240,12 +247,3 @@ declare(strict_types=1);
   </div>
 
 </div>
-
-<script>
-  window.ReportConfig = {
-    apiSummary:     '<?= e(url('api/reports/summary.php')) ?>',
-    apiBestSellers: '<?= e(url('api/reports/best-sellers.php')) ?>',
-    apiDaily:       '<?= e(url('api/reports/daily.php')) ?>',
-    exportUrl:      '<?= e(url('api/reports/export.php')) ?>'
-  };
-</script>

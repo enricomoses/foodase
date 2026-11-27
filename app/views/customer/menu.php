@@ -4,30 +4,25 @@ declare(strict_types=1);
 use App\Core\Config;
 
 /**
- * View Katalog & Landing Page Pelanggan — Nola.
+ * View Katalog & Landing Page Pelanggan — FoodEase.
  */
 
-$appName = (string) Config::get('app.name', 'Nola');
-$panoBase = asset('img/hero/pano/');
-$interiorImage = asset('assets/images/tour/tour-4.webp');
-$panoFile = PUBLIC_PATH . '/assets/images/panorama/cafe-panorama-seamless.jpg';
-$panoVersion = is_file($panoFile) ? (string) filemtime($panoFile) : '2';
+$appName   = (string) Config::get('app.name', 'FoodEase');
+$heroPanel = PUBLIC_PATH . '/assets/img/hero/panel-1.jpg';
+$heroVer   = is_file($heroPanel) ? (string) filemtime($heroPanel) : '1';
+$placeholderImg = asset('img/placeholder-menu.svg');
 ?>
 
 <!-- ============================================================
-     0. CAFÉ AMBIENT STAGE (Ken Burns — Zero Seam, GPU 60fps)
-     Two interior layers crossfade with slow zoom-pan; no tiling,
-     no wrap point, no visible join ever.
+     0. CAFÉ AMBIENT STAGE
      ============================================================ -->
 <div id="cafe-stage" aria-hidden="true" role="presentation">
-  <!-- Layer A: Barista counter — always underneath -->
   <div class="cafe-kb-layer cafe-kb-a">
-    <img class="cafe-kb-img" src="<?= e(asset('images/panorama/panel-1.jpg')) ?>?v=<?= e($panoVersion) ?>"
+    <img class="cafe-kb-img" src="<?= e(asset('img/hero/panel-1.jpg')) ?>?v=<?= e($heroVer) ?>"
          alt="" loading="eager" decoding="async">
   </div>
-  <!-- Layer B: Coffee bar front face — crossfades over A -->
   <div class="cafe-kb-layer cafe-kb-b">
-    <img class="cafe-kb-img" src="<?= e(asset('img/hero/pano/f.jpg')) ?>"
+    <img class="cafe-kb-img" src="<?= e(asset('img/hero/f.jpg')) ?>"
          alt="" loading="eager" decoding="async">
   </div>
 
@@ -38,13 +33,12 @@ $panoVersion = is_file($panoFile) ? (string) filemtime($panoFile) : '2';
 <div class="shade"></div>
 
 <!-- ============================================================
-     1. NAVIGATION BAR (Floating Pill — Kopi Calf Inspired)
+     1. NAVIGATION BAR
      ============================================================ -->
 <nav class="lp-nav" id="lp-nav" aria-label="Navigasi utama">
   <div class="lp-nav-in">
-    <!-- Script Wordmark -->
     <a href="<?= e(url()) ?>" class="lp-logo focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-full" aria-label="<?= e($appName) ?>">
-      <span class="lp-logo-text">Nola</span>
+      <span class="lp-logo-text"><?= e($appName) ?></span>
     </a>
 
     <!-- Nav Links -->
@@ -102,8 +96,8 @@ $panoVersion = is_file($panoFile) ? (string) filemtime($panoFile) : '2';
     </h1>
 
     <div class="lp-hero-row">
-      <p class="lp-lead" data-rv>
-        Halo Teman Nola, kamu bisa menikmati seluruh menu racikan kopi, minuman segar, dan hidangan lezat langsung dipesan dari layar kamu.
+      <p class="lp-lead" data-rv data-i18n="lp_desc">
+        <?= e(__('lp_desc')) ?>
       </p>
 
       <div class="lp-ctas" data-rv>
@@ -143,112 +137,33 @@ $panoVersion = is_file($panoFile) ? (string) filemtime($panoFile) : '2';
       </div>
     </div>
 
-    <!-- Pinned Horizontal Scroll Card Track (Persis img 3) -->
     <div class="lp-track-container" id="lp-track-container">
       <div class="lp-track" id="lp-track">
-        <!-- 1. Es Kopi Nola Premium (Blue bg) -->
-        <div class="lp-card group" onclick="$('#mobile-search-input, #global-search-input').val('Es Kopi Susu Premium').trigger('input'); document.getElementById('menu-catalog-section').scrollIntoView({behavior:'smooth'});">
+        <?php
+        $signatureItems = [
+            ['rank' => '#1', 'query' => 'Es Kopi Susu Premium', 'cat' => 'ORIGINAL KOPI SUSU', 'name' => 'Es Kopi Susu Premium', 'price' => 24000, 'red' => false],
+            ['rank' => '#2', 'query' => 'Es Kopi Susu Regular', 'cat' => 'ORIGINAL KOPI SUSU', 'name' => 'Es Kopi Susu Regular', 'price' => 22000, 'red' => true],
+            ['rank' => '#3', 'query' => 'New Matcha Latte',     'cat' => 'MILK SERIES',        'name' => 'New Matcha Latte',     'price' => 25000, 'red' => false],
+            ['rank' => '#4', 'query' => 'Iced Chocolate',       'cat' => 'MILK SERIES',        'name' => 'Iced Chocolate',       'price' => 25000, 'red' => false],
+            ['rank' => '#5', 'query' => 'Magic Cheese Cream',   'cat' => 'MAGIC CREAM',        'name' => 'Magic Cheese Cream',   'price' => 27000, 'red' => true],
+            ['rank' => '#6', 'query' => 'Smooth Pistachio',     'cat' => 'SMOOTH SERIES',      'name' => 'Smooth Pistachio',     'price' => 29000, 'red' => false],
+            ['rank' => '#7', 'query' => 'Dimsum Mentai',        'cat' => 'DIMSUM',             'name' => 'Dimsum Mentai',        'price' => 25000, 'red' => true],
+            ['rank' => '#8', 'query' => 'Brownies Fudgy',       'cat' => 'BAKERY',             'name' => 'Brownies Fudgy',       'price' => 10000, 'red' => false],
+        ];
+        foreach ($signatureItems as $sig):
+        ?>
+        <button type="button" class="lp-card <?= $sig['red'] ? 'card-red ' : '' ?>group text-left" data-quick-search="<?= e($sig['query']) ?>">
           <div class="lp-card-ph">
-            <span class="lp-rank">#1</span>
-            <img src="<?= e(url('uploads/menus/premium.webp')) ?>" alt="Es Kopi Nola Premium" loading="lazy">
+            <span class="lp-rank"><?= e($sig['rank']) ?></span>
+            <img src="<?= e($placeholderImg) ?>" alt="<?= e($sig['name']) ?>" loading="lazy">
           </div>
           <div class="lp-card-body">
-            <small>ORIGINAL KOPI SUSU</small>
-            <b>Es Kopi Nola Premium</b>
-            <span>Rp 20.000</span>
+            <small><?= e($sig['cat']) ?></small>
+            <b><?= e($sig['name']) ?></b>
+            <span><?= e(rupiah($sig['price'])) ?></span>
           </div>
-        </div>
-
-        <!-- 2. Es Kopi Nola Regular (Red bg) -->
-        <div class="lp-card card-red group" onclick="$('#mobile-search-input, #global-search-input').val('Es Kopi Susu Regular').trigger('input'); document.getElementById('menu-catalog-section').scrollIntoView({behavior:'smooth'});">
-          <div class="lp-card-ph">
-            <span class="lp-rank">#2</span>
-            <img src="<?= e(url('uploads/menus/reguler.webp')) ?>" alt="Es Kopi Nola Regular" loading="lazy">
-          </div>
-          <div class="lp-card-body">
-            <small>ORIGINAL KOPI SUSU</small>
-            <b>Es Kopi Nola Regular</b>
-            <span>Rp 18.000</span>
-          </div>
-        </div>
-
-        <!-- 3. New Matcha Latte (Blue bg) -->
-        <div class="lp-card group" onclick="$('#mobile-search-input, #global-search-input').val('New Matcha Latte').trigger('input'); document.getElementById('menu-catalog-section').scrollIntoView({behavior:'smooth'});">
-          <div class="lp-card-ph">
-            <span class="lp-rank">#3</span>
-            <img src="<?= e(url('uploads/menus/matcha.webp')) ?>" alt="New Matcha Latte" loading="lazy">
-          </div>
-          <div class="lp-card-body">
-            <small>MILK SERIES</small>
-            <b>New Matcha Latte</b>
-            <span>Rp 25.000</span>
-          </div>
-        </div>
-
-        <!-- 4. Iced Chocolate (Blue bg) -->
-        <div class="lp-card group" onclick="$('#mobile-search-input, #global-search-input').val('Iced Chocolate').trigger('input'); document.getElementById('menu-catalog-section').scrollIntoView({behavior:'smooth'});">
-          <div class="lp-card-ph">
-            <span class="lp-rank">#4</span>
-            <img src="<?= e(url('uploads/menus/iced-chocolate.webp')) ?>" alt="Iced Chocolate" loading="lazy">
-          </div>
-          <div class="lp-card-body">
-            <small>MILK SERIES</small>
-            <b>Iced Chocolate</b>
-            <span>Rp 25.000</span>
-          </div>
-        </div>
-
-        <!-- 5. Magic Cheese Cream (Red bg) -->
-        <div class="lp-card card-red group" onclick="$('#mobile-search-input, #global-search-input').val('Magic Cheese Cream').trigger('input'); document.getElementById('menu-catalog-section').scrollIntoView({behavior:'smooth'});">
-          <div class="lp-card-ph">
-            <span class="lp-rank">#5</span>
-            <img src="<?= e(url('uploads/menus/magic-cheese-butter-cream.webp')) ?>" alt="Magic Cheese Cream" loading="lazy">
-          </div>
-          <div class="lp-card-body">
-            <small>MAGIC CREAM</small>
-            <b>Magic Cheese Cream</b>
-            <span>Rp 27.000</span>
-          </div>
-        </div>
-
-        <!-- 6. Smooth Pistachio (Blue bg) -->
-        <div class="lp-card group" onclick="$('#mobile-search-input, #global-search-input').val('Smooth Pistachio').trigger('input'); document.getElementById('menu-catalog-section').scrollIntoView({behavior:'smooth'});">
-          <div class="lp-card-ph">
-            <span class="lp-rank">#6</span>
-            <img src="<?= e(url('uploads/menus/smooth-cup.webp')) ?>" alt="Smooth Pistachio" loading="lazy">
-          </div>
-          <div class="lp-card-body">
-            <small>SMOOTH SERIES</small>
-            <b>Smooth Pistachio</b>
-            <span>Rp 29.000</span>
-          </div>
-        </div>
-
-        <!-- 7. Dimsum Mentai (Red bg) -->
-        <div class="lp-card card-red group" onclick="$('#mobile-search-input, #global-search-input').val('Dimsum Mentai').trigger('input'); document.getElementById('menu-catalog-section').scrollIntoView({behavior:'smooth'});">
-          <div class="lp-card-ph">
-            <span class="lp-rank">#7</span>
-            <img src="<?= e(url('uploads/menus/dimsum-mentai.webp')) ?>" alt="Dimsum Mentai" loading="lazy">
-          </div>
-          <div class="lp-card-body">
-            <small>DIMSUM</small>
-            <b>Dimsum Mentai</b>
-            <span>Rp 25.000</span>
-          </div>
-        </div>
-
-        <!-- 8. Fudgy Brownies (Blue bg) -->
-        <div class="lp-card group" onclick="$('#mobile-search-input, #global-search-input').val('Brownies Fudgy').trigger('input'); document.getElementById('menu-catalog-section').scrollIntoView({behavior:'smooth'});">
-          <div class="lp-card-ph">
-            <span class="lp-rank">#8</span>
-            <img src="<?= e(url('uploads/menus/fudgy-brownies.webp')) ?>" alt="Brownies Fudgy" loading="lazy">
-          </div>
-          <div class="lp-card-body">
-            <small>BAKERY</small>
-            <b>Fudgy Brownies</b>
-            <span>Rp 10.000</span>
-          </div>
-        </div>
+        </button>
+        <?php endforeach; ?>
       </div>
     </div>
   </div>
@@ -286,7 +201,7 @@ $panoVersion = is_file($panoFile) ? (string) filemtime($panoFile) : '2';
           <span class="n">1</span>
           <div class="lp-step-content">
             <small>DATANG</small>
-            <b>Disambut &ldquo;Halo Teman Nola!&rdquo;</b>
+            <b>Disambut &ldquo;Halo Teman <?= e($appName) ?>!&rdquo;</b>
             <p>Begitu pintu terbuka, barista menyapa dan siap membantu kamu memilih.</p>
           </div>
         </li>

@@ -1,10 +1,8 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Layout halaman cetak struk (Kosong / Minimal untuk cetak struk thermal 80 mm).
- * Variabel yang didukung: $title, $content.
- */
+$cssFile = PUBLIC_PATH . '/assets/css/receipt.css';
+$cssVer  = is_file($cssFile) ? (string) filemtime($cssFile) : '1';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -12,9 +10,10 @@ declare(strict_types=1);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= e($title ?? 'Cetak Struk') ?></title>
-  <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
+  <link rel="stylesheet" href="<?= e(asset('css/receipt.css')) ?>?v=<?= e($cssVer) ?>">
 </head>
-<body class="bg-white text-black p-0 m-0 font-mono text-xs">
+<body>
   <?= $content ?? '' ?>
+  <script src="<?= e(asset('js/pages/receipt.js')) ?>"></script>
 </body>
 </html>

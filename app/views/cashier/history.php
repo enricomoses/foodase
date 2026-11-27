@@ -8,7 +8,12 @@ declare(strict_types=1);
  */
 $isAdmin = ($role ?? '') === 'admin';
 ?>
-<div class="space-y-6">
+<div
+  id="cashier-history-root"
+  class="space-y-6"
+  data-is-admin="<?= $isAdmin ? '1' : '0' ?>"
+  data-receipt-base="<?= e(url('cashier/receipt.php?code=')) ?>"
+>
 
   <!-- Filter Bar -->
   <div class="flex flex-wrap gap-3 items-end">
@@ -269,11 +274,3 @@ $isAdmin = ($role ?? '') === 'admin';
   </div>
 </div>
 <?php endif; ?>
-
-<script>
-  /* Data awal yang dibutuhkan cashier-history.js */
-  window.HistoryConfig = {
-    isAdmin: <?= $isAdmin ? 'true' : 'false' ?>,
-    receiptBase: '<?= e(url('cashier/receipt.php?code=')) ?>'
-  };
-</script>

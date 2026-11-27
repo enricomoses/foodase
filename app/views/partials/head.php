@@ -2,29 +2,36 @@
 declare(strict_types=1);
 
 use App\Core\Config;
+use App\Core\I18n;
 
-$appName = (string) Config::get('app.name', 'Nola');
+$appName   = (string) Config::get('app.name', 'FoodEase');
 $pageTitle = isset($title) && $title !== ''
     ? e($title) . ' — ' . e($appName)
     : e($appName);
+$cssFile = PUBLIC_PATH . '/assets/css/app.css';
+$cssVer  = is_file($cssFile) ? (string) filemtime($cssFile) : '1';
+$i18nPayload = json_encode([
+    'lang'         => current_lang(),
+    'translations' => I18n::all(),
+], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 ?>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="csrf-token" content="<?= e(csrf_token()) ?>">
+<meta name="app-base-url" content="<?= e(rtrim(url(), '/')) ?>">
 <base href="<?= e(rtrim(url(), '/')) ?>/">
 <title><?= $pageTitle ?></title>
 
-<!-- Brand Typography: Plus Jakarta Sans / Inter Tight (headline/UI), DM Sans (body), JetBrains Mono (angka/ID/harga), Playball (script wordmark) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playball&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
 
-<!-- LANGKAH 1: Tema Default Terang / Putih Bersih (Khas Kopi Calf Menu) -->
+<script id="app-i18n" type="application/json"><?= $i18nPayload ?></script>
+
 <script>
   (function () {
     try {
-      // Default tema adalah Light (Putih) agar katalog menu selalu bersih dan kontras
-      const stored = localStorage.getItem('nola_theme') || localStorage.getItem('kopinusa_theme');
+      var stored = localStorage.getItem('foodease_theme');
       if (stored === 'dark') {
         document.documentElement.classList.add('dark');
       } else {
@@ -36,7 +43,6 @@ $pageTitle = isset($title) && $title !== ''
   })();
 </script>
 
-<!-- LANGKAH 2: Config Tailwind HARUS diset SEBELUM CDN script -->
 <script>
   tailwind = { config: {
     darkMode: 'class',
@@ -78,8 +84,8 @@ $pageTitle = isset($title) && $title !== ''
           surface: '#F5F5F3',
           line: '#EAEAE6',
           subtle: '#6E6E68',
-          accent: { DEFAULT: '#000EE9', dark: '#0009B8', light: '#ECEEFE' },
-          danger:  { DEFAULT: '#FF0000', light: '#FFECEC' },
+          accent: { DEFAULT: '#06C167', dark: '#048848', light: '#E6F8EF' },
+          danger: { DEFAULT: '#E11900', light: '#FDECEA' },
         },
         fontFamily: {
           sans: ['"DM Sans"', 'system-ui', '-apple-system', 'sans-serif'],
@@ -91,8 +97,5 @@ $pageTitle = isset($title) && $title !== ''
   }};
 </script>
 
-<!-- LANGKAH 3: Load Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
-
-<!-- LANGKAH 4: CSS Kustom Aplikasi (SETELAH Tailwind) -->
-<link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>?v=<?= file_exists(PUBLIC_PATH . '/assets/css/app.css') ? filemtime(PUBLIC_PATH . '/assets/css/app.css') : time() ?>">
+<link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>?v=<?= e($cssVer) ?>">

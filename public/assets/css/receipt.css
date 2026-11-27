@@ -1,0 +1,147 @@
+@page {
+  size: 80mm auto;
+  margin: 4mm;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+  color: #000;
+  background: #fff;
+  max-width: 72mm;
+  margin: 0 auto;
+  padding: 4mm 0;
+  line-height: 1.5;
+}
+
+.receipt-center {
+  text-align: center;
+}
+
+.receipt-title {
+  font-size: 15px;
+  margin: 0;
+}
+
+.receipt-subtitle {
+  font-size: 10px;
+  margin: 2px 0 0;
+}
+
+.receipt-divider {
+  border: none;
+  border-top: 1px dashed #000;
+  margin: 6px 0;
+}
+
+.receipt-bold {
+  font-weight: bold;
+}
+
+table.items {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table.items td {
+  vertical-align: top;
+  padding: 1px 0;
+}
+
+table.items td.item-price {
+  text-align: right;
+  white-space: nowrap;
+  padding-left: 4px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.summary-gap {
+  margin-top: 4px;
+}
+
+.summary-row.total {
+  font-weight: bold;
+  font-size: 13px;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid #000;
+}
+
+.receipt-footer {
+  margin-top: 8px;
+}
+
+.receipt-brand-foot {
+  font-size: 10px;
+  color: #666;
+}
+
+.receipt-error {
+  padding: 20px 8px;
+  color: #b91c1c;
+}
+
+.receipt-actions {
+  margin-top: 16px;
+}
+
+.receipt-icon {
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+  margin-right: 4px;
+}
+
+.btn-print {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px auto 4px;
+  width: 100%;
+  max-width: 200px;
+  padding: 8px 0;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 0.03em;
+}
+
+.btn-close-tab {
+  display: block;
+  margin: 6px auto;
+  width: 100%;
+  max-width: 200px;
+  padding: 8px 0;
+  background: transparent;
+  color: #555;
+  border: 1px solid #ccc;
+  border-radius: 9999px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: center;
+  text-decoration: none;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    padding: 0;
+    margin: 0;
+  }
+}
