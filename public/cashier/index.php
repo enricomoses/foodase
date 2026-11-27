@@ -14,4 +14,4 @@ echo View::render('cashier/orders', [
     'title'      => 'Pesanan Masuk',
     'activeMenu' => $activeMenu,
     'scripts'    => ['js/pages/payment.js?v=12', 'js/pages/cashier-orders.js?v=12'],
-], 'cashier');
+], 'app');

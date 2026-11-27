@@ -12,4 +12,4 @@ echo View::render('admin/categories', [
     'title'      => 'Kelola Kategori',
     'activeMenu' => 'categories',
     'scripts'    => ['js/pages/admin-categories.js'],
-], 'admin');
+], 'app');

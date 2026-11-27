@@ -4,277 +4,125 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Auth;
+use App\Core\BaseController;
+use App\Core\Exceptions\ValidationException;
 use App\Core\Request;
 use App\Core\Response;
-use App\Models\Order;
-use App\Models\OrderDetail;
 use App\Models\Payment;
 use App\Services\PaymentService;
 
 /**
- * PaymentController — Endpoint pembayaran dan riwayat transaksi.
+ * PaymentController — Endpoint pembayaran, riwayat transaksi, dan void.
  */
-final class PaymentController
+final class PaymentController extends BaseController
 {
-    /**
-     * POST api/payments/pay.php
-     * Proses pembayaran pesanan oleh kasir/admin (FR-PAY-04, BR-07..09).
-     *
-     * Payload JSON:
-     * {
-     *   "order_id": 1,
-     *   "method": "cash" | "qris",
-     *   "amount_paid": 50000
-     * }
-     *
-     * Response sukses 200:
-     * {
-     *   "success": true,
-     *   "message": "...",
-     *   "data": { "payment_code": "PAY-261022-001", "total": 45000, "amount_paid": 50000, "change_amount": 5000, "method": "cash" }
-     * }
-     */
     public function pay(): void
     {
-        Auth::requireRole(['cashier', 'admin']);
+        $this->handleApi(function (): void {
+            $input      = Request::body();
+            $orderId    = (int) ($input['order_id'] ?? 0);
+            $method     = trim((string) ($input['method'] ?? ''));
+            $amountPaid = (int) ($input['amount_paid'] ?? 0);
 
-        $user  = Auth::user();
-        $input = Request::json();
+            $errors = [];
+            if ($orderId <= 0) {
+                $errors['order_id'] = 'ID pesanan tidak valid.';
+            }
+            if (!in_array($method, ['cash', 'qris'], true)) {
+                $errors['method'] = 'Metode pembayaran tidak valid.';
+            }
+            if ($method === 'cash' && $amountPaid <= 0) {
+                $errors['amount_paid'] = 'Nominal bayar harus lebih dari 0.';
+            }
+            if (!empty($errors)) {
+                throw new ValidationException('Data tidak valid.', $errors);
+            }
 
-        $orderId    = isset($input['order_id']) ? (int) $input['order_id'] : 0;
-        $method     = trim((string) ($input['method'] ?? ''));
-        $amountPaid = isset($input['amount_paid']) ? (int) $input['amount_paid'] : 0;
-
-        // Validasi dasar input
-        $errors = [];
-        if ($orderId <= 0) {
-            $errors['order_id'] = 'ID pesanan tidak valid.';
-        }
-        if (!in_array($method, ['cash', 'qris'], true)) {
-            $errors['method'] = 'Metode pembayaran tidak valid.';
-        }
-        if ($method === 'cash' && $amountPaid <= 0) {
-            $errors['amount_paid'] = 'Nominal bayar harus lebih dari 0.';
-        }
-
-        if (!empty($errors)) {
-            Response::error('Data tidak valid.', 422, $errors);
-        }
-
-        try {
             $result = PaymentService::pay(
-                orderId:    $orderId,
-                method:     $method,
+                orderId: $orderId,
+                method: $method,
                 amountPaid: $amountPaid,
-                cashierId:  (int) ($user['id'] ?? 0),
+                cashierId: (int) (Auth::id() ?? 0)
             );
-        } catch (\InvalidArgumentException $e) {
-            $decoded = json_decode($e->getMessage(), true);
-            if (is_array($decoded)) {
-                Response::error($decoded['message'] ?? 'Data tidak valid.', 422, $decoded['errors'] ?? []);
-            }
-            Response::error($e->getMessage(), 422);
-        } catch (\RuntimeException $e) {
-            $decoded = json_decode($e->getMessage(), true);
-            if (is_array($decoded)) {
-                $status = isset($decoded['status']) ? (int) $decoded['status'] : 409;
-                Response::error($decoded['message'] ?? 'Konflik status.', $status);
-            }
-            log_error($e);
-            Response::error('Terjadi kesalahan saat memproses pembayaran.', 500);
-        } catch (\Throwable $e) {
-            log_error($e);
-            Response::error('Terjadi kesalahan saat memproses pembayaran.', 500);
-        }
 
-        Response::json([
-            'payment_code'  => $result['payment_code'],
-            'total'         => $result['total'],
-            'amount_paid'   => $result['amount_paid'],
-            'change_amount' => $result['change_amount'],
-            'method'        => $result['method'],
-        ], 'Pembayaran berhasil diproses.');
+            Response::json([
+                'payment_code'  => $result['payment_code'],
+                'total'         => $result['total'],
+                'amount_paid'   => $result['amount_paid'],
+                'change_amount' => $result['change_amount'],
+                'method'        => $result['method'],
+            ], 'Pembayaran berhasil diproses.');
+        }, method: 'POST', roles: ['cashier', 'admin'], csrf: true);
     }
 
     /**
-     * GET api/payments/list.php
-     * Daftar riwayat pembayaran (FR-HIS-01..02).
-     * Kasir hanya melihat miliknya; admin melihat semua.
-     */
-    public function list(): void
-    {
-        Auth::requireRole(['cashier', 'admin']);
-
-        $user = Auth::user();
-        $role = (string) ($user['role'] ?? 'cashier');
-
-        $method   = Request::get('method');
-        $q        = trim((string) Request::get('q', ''));
-        $dateFrom = Request::get('date_from');
-        $dateTo   = Request::get('date_to');
-        $page     = max(1, (int) Request::get('page', 1));
-        $perPage  = max(1, min(100, (int) Request::get('per_page', 20)));
-
-        $filters = [
-            'q'        => $q,
-            'page'     => $page,
-            'per_page' => $perPage,
-        ];
-
-        // Kasir hanya melihat pembayaran yang dilakukan olehnya
-        if ($role === 'cashier') {
-            $filters['cashier_id'] = (int) ($user['id'] ?? 0);
-        }
-
-        if ($method !== null && $method !== '') {
-            $filters['method'] = $method;
-        }
-
-        if ($dateFrom !== null && $dateFrom !== '') {
-            $filters['date_from'] = $dateFrom;
-        }
-
-        if ($dateTo !== null && $dateTo !== '') {
-            $filters['date_to'] = $dateTo;
-        }
-
-        $result = Payment::list($filters);
-
-        // Format nilai agar konsisten
-        foreach ($result['data'] as &$row) {
-            $row['total']         = (int) $row['total'];
-            $row['amount_paid']   = (int) $row['amount_paid'];
-            $row['change_amount'] = (int) $row['change_amount'];
-        }
-        unset($row);
-
-        Response::json([
-            'payments'   => $result['data'],
-            'pagination' => [
-                'total'    => $result['total'],
-                'page'     => $result['page'],
-                'per_page' => $result['per_page'],
-                'pages'    => $result['pages'],
-            ],
-        ], 'Riwayat pembayaran berhasil diambil.');
-    }
-
-    /**
-     * GET api/payments/list.php
-     * Riwayat transaksi dengan semua status (paid + void).
-     * Kasir hanya miliknya; admin semua — scope dipaksa di server (BR-12, FR-HIS-01..02).
+     * Daftar riwayat transaksi (semua status atau filter paid/void).
+     * Scope kasir dipaksa di server (kasir hanya miliknya, admin semua).
      */
     public function history(): void
     {
-        Auth::requireRole(['cashier', 'admin']);
+        $this->handleApi(function (): void {
+            $user   = Auth::user();
+            $role   = (string) ($user['role'] ?? 'cashier');
+            $status = (string) Request::get('status', '');
 
-        $user = Auth::user();
-        $role = (string) ($user['role'] ?? 'cashier');
+            $filters = [
+                'q'         => trim((string) Request::get('q', '')),
+                'status'    => in_array($status, ['paid', 'void'], true) ? $status : '',
+                'method'    => Request::get('method'),
+                'date_from' => Request::get('date_from'),
+                'date_to'   => Request::get('date_to'),
+                'page'      => (int) Request::get('page', 1),
+                'per_page'  => (int) Request::get('per_page', 20),
+            ];
 
-        $status   = Request::get('status', '');   // '' = semua, 'paid', 'void'
-        $method   = Request::get('method');
-        $q        = trim((string) Request::get('q', ''));
-        $dateFrom = Request::get('date_from');
-        $dateTo   = Request::get('date_to');
-        $page     = max(1, (int) Request::get('page', 1));
-        $perPage  = max(1, min(100, (int) Request::get('per_page', 20)));
+            if ($role === 'cashier') {
+                $filters['cashier_id'] = (int) ($user['id'] ?? 0);
+            }
 
-        $filters = [
-            'q'        => $q,
-            'status'   => in_array($status, ['paid', 'void'], true) ? $status : '',
-            'page'     => $page,
-            'per_page' => $perPage,
-        ];
+            $result = Payment::list($filters);
 
-        // Paksa scope kasir di server (BR-12)
-        if ($role === 'cashier') {
-            $filters['cashier_id'] = (int) ($user['id'] ?? 0);
-        }
+            foreach ($result['data'] as &$row) {
+                $row['total']         = (int) $row['total'];
+                $row['amount_paid']   = (int) $row['amount_paid'];
+                $row['change_amount'] = (int) $row['change_amount'];
+            }
+            unset($row);
 
-        if ($method !== null && $method !== '') {
-            $filters['method'] = $method;
-        }
-
-        if ($dateFrom !== null && $dateFrom !== '') {
-            $filters['date_from'] = $dateFrom;
-        }
-
-        if ($dateTo !== null && $dateTo !== '') {
-            $filters['date_to'] = $dateTo;
-        }
-
-        $result = \App\Models\Payment::search($filters);
-
-        foreach ($result['data'] as &$row) {
-            $row['total']         = (int) $row['total'];
-            $row['amount_paid']   = (int) $row['amount_paid'];
-            $row['change_amount'] = (int) $row['change_amount'];
-        }
-        unset($row);
-
-        Response::json([
-            'payments'   => $result['data'],
-            'paid_total' => $result['paid_total'],
-            'pagination' => [
-                'total'    => $result['total'],
-                'page'     => $result['page'],
-                'per_page' => $result['per_page'],
-                'pages'    => $result['pages'],
-            ],
-            'is_admin'   => $role === 'admin',
-        ], 'Riwayat transaksi berhasil diambil.');
+            Response::json([
+                'payments'   => $result['data'],
+                'paid_total' => $result['paid_total'],
+                'pagination' => [
+                    'total'    => $result['total'],
+                    'page'     => $result['page'],
+                    'per_page' => $result['per_page'],
+                    'pages'    => $result['pages'],
+                ],
+                'is_admin'   => $role === 'admin',
+            ], 'Riwayat transaksi berhasil diambil.');
+        }, method: 'GET', roles: ['cashier', 'admin']);
     }
 
-    /**
-     * POST api/payments/void.php
-     * Void pembayaran (FR-STS-03, BR-10). Hanya boleh dilakukan oleh admin.
-     * Body JSON: { "order_id": int, "reason": string }
-     */
     public function void(): void
     {
-        Auth::requireRole(['admin']);
+        $this->handleApi(function (): void {
+            $input   = Request::body();
+            $orderId = (int) ($input['order_id'] ?? $input['id'] ?? 0);
+            $reason  = trim((string) ($input['reason'] ?? ''));
 
-        $user = Auth::user();
-        $userId = (int) ($user['id'] ?? 0);
+            $errors = [];
+            if ($orderId <= 0) {
+                $errors['order_id'] = 'ID pesanan tidak valid.';
+            }
+            if (mb_strlen($reason) < 5) {
+                $errors['reason'] = 'Alasan void wajib diisi minimal 5 karakter.';
+            }
+            if (!empty($errors)) {
+                throw new ValidationException('Data tidak valid.', $errors);
+            }
 
-        $input = Request::json();
-        $orderId = isset($input['order_id']) ? (int) $input['order_id'] : 0;
-        if ($orderId <= 0 && isset($input['id'])) {
-            $orderId = (int) $input['id'];
-        }
-        $reason = trim((string) ($input['reason'] ?? ''));
-
-        $errors = [];
-        if ($orderId <= 0) {
-            $errors['order_id'] = 'ID pesanan tidak valid.';
-        }
-        if (mb_strlen($reason) < 5) {
-            $errors['reason'] = 'Alasan void wajib diisi minimal 5 karakter.';
-        }
-
-        if (!empty($errors)) {
-            Response::error('Data tidak valid.', 422, $errors);
-        }
-
-        try {
-            $result = PaymentService::void($orderId, $userId, $reason);
+            $result = PaymentService::void($orderId, (int) (Auth::id() ?? 0), $reason);
             Response::json($result, 'Pembayaran berhasil di-void.');
-        } catch (\InvalidArgumentException $e) {
-            $decoded = json_decode($e->getMessage(), true);
-            if (is_array($decoded)) {
-                Response::error($decoded['message'] ?? 'Data tidak valid.', 422, $decoded['errors'] ?? []);
-            }
-            Response::error($e->getMessage(), 422);
-        } catch (\RuntimeException $e) {
-            $decoded = json_decode($e->getMessage(), true);
-            if (is_array($decoded)) {
-                $status = isset($decoded['status']) ? (int) $decoded['status'] : 409;
-                Response::error($decoded['message'] ?? 'Gagal melakukan void.', $status);
-            }
-            Response::error($e->getMessage(), 409);
-        } catch (\Throwable $e) {
-            log_error($e);
-            Response::error('Terjadi kesalahan saat memproses void pembayaran.', 500);
-        }
+        }, method: 'POST', roles: ['admin'], csrf: true);
     }
 }

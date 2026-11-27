@@ -4,323 +4,149 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Auth;
-use App\Core\Csrf;
+use App\Core\BaseController;
+use App\Core\Exceptions\ValidationException;
 use App\Core\Request;
 use App\Core\Response;
-use App\Core\Validator;
-use App\Models\Category;
-use App\Models\Menu;
-use App\Services\UploadService;
-use Throwable;
+use App\Services\MenuService;
 
 /**
  * Controller untuk manajemen menu (FR-MENU-01..06, BR-02, BR-13).
  */
-final class MenuController
+final class MenuController extends BaseController
 {
-    /**
-     * GET — Daftar menu dengan filter dan paginasi.
-     * Publik hanya melihat menu aktif (is_available = 1, deleted_at IS NULL).
-     * Admin boleh include_unavailable=1 untuk melihat menu tidak tersedia.
-     */
-    public static function index(): void
+    public function index(): void
     {
-        $isAdmin = Auth::check() && Auth::role() === 'admin';
+        $this->handleApi(function (): void {
+            $isAdmin = Auth::check() && Auth::role() === 'admin';
+            // Publik tetap dapat meminta include_unavailable=1 untuk menampilkan badge "Habis" (FR-CMENU-03)
+            $includeUnavailParam = Request::get('include_unavailable', $isAdmin ? '1' : '1');
 
-        $filters = [
-            'q'                  => Request::get('q', ''),
-            'category_id'        => Request::get('category_id', ''),
-            'include_unavailable'=> Request::get('include_unavailable', '1') === '1',
-            'page'               => (int) Request::get('page', 1),
-            'per_page'           => (int) Request::get('per_page', 100),
-        ];
+            $filters = [
+                'q'                   => (string) Request::get('q', ''),
+                'category_id'         => (string) Request::get('category_id', ''),
+                'include_unavailable' => $includeUnavailParam === '1',
+                'page'                => (int) Request::get('page', 1),
+                'per_page'            => (int) Request::get('per_page', 100),
+            ];
 
-        // Mendukung filter ids[] untuk sinkronisasi keranjang
-        $rawIds = Request::get('ids');
-        if (is_array($rawIds)) {
-            $filters['ids'] = array_map('intval', $rawIds);
-        }
-
-        $result = Menu::list($filters);
-
-        // Tambahkan image_url dan terjemahan untuk setiap item
-        foreach ($result['data'] as &$row) {
-            $row['image_url']   = UploadService::imageUrl($row['image'] ?? null);
-            $row['is_available'] = (bool) $row['is_available'];
-            $row['name_original'] = $row['name'];
-            $row['name'] = \App\Core\I18n::translateMenuName($row['name']);
-            $row['description_original'] = $row['description'] ?? '';
-            $row['description'] = \App\Core\I18n::translateMenuDesc($row['description'] ?? null, $row['name_original']);
-            if (isset($row['category_name'])) {
-                $row['category_name_original'] = $row['category_name'];
-                $row['category_name'] = \App\Core\I18n::translateCategory($row['category_name']);
+            $rawIds = Request::get('ids');
+            if (is_array($rawIds)) {
+                $filters['ids'] = array_map('intval', $rawIds);
             }
-        }
-        unset($row);
 
-        Response::json($result, 'Daftar menu berhasil diambil.');
+            Response::json(MenuService::list($filters, true), 'Daftar menu berhasil diambil.');
+        }, method: 'GET');
     }
 
-    /**
-     * GET — Detail satu menu berdasarkan id.
-     */
-    public static function show(): void
+    public function show(): void
     {
-        $id = (int) Request::get('id', 0);
-        if ($id <= 0) {
-            Response::error('ID menu tidak valid.', 422);
-        }
+        $this->handleApi(function (): void {
+            $id = (int) Request::get('id', 0);
+            if ($id <= 0) {
+                throw new ValidationException('ID menu tidak valid.');
+            }
 
-        $menu = Menu::find($id);
-        if (!$menu) {
-            Response::error('Menu tidak ditemukan.', 404);
-        }
-
-        // Publik: menu harus is_available (BR-02)
-        $isAdmin = Auth::check() && Auth::role() === 'admin';
-        if (!$isAdmin && !$menu['is_available']) {
-            Response::error('Menu tidak tersedia.', 404);
-        }
-
-        $menu['image_url']   = UploadService::imageUrl($menu['image'] ?? null);
-        $menu['is_available'] = (bool) $menu['is_available'];
-
-        Response::json($menu, 'Detail menu berhasil diambil.');
+            $isAdmin = Auth::check() && Auth::role() === 'admin';
+            Response::json(MenuService::detail($id, $isAdmin), 'Detail menu berhasil diambil.');
+        }, method: 'GET');
     }
 
-    /**
-     * POST — Tambah menu baru (admin + CSRF, multipart/form-data).
-     */
-    public static function store(): void
+    public function store(): void
     {
-        Auth::requireRole(['admin']);
-        Csrf::guard();
+        $this->handleApi(function (): void {
+            $input = $this->readMenuPayload();
+            $this->validateMenuPayload($input);
 
-        $input = [
-            'category_id'  => Request::post('category_id', ''),
-            'name'         => Request::post('name', ''),
-            'description'  => Request::post('description', ''),
-            'price'        => Request::post('price', ''),
-            'is_available' => Request::post('is_available', '1'),
-        ];
-
-        $errors = self::validateMenuInput($input);
-        if (!empty($errors)) {
-            Response::error('Validasi gagal.', 422, $errors);
-        }
-
-        // Proses upload foto (opsional)
-        $imageName = null;
-        if (!empty($_FILES['image']['name'])) {
-            try {
-                $imageName = UploadService::storeMenuImage($_FILES['image']);
-            } catch (Throwable $e) {
-                Response::error($e->getMessage(), 422, ['image' => $e->getMessage()]);
-            }
-        }
-
-        try {
-            $id   = Menu::create([
-                'category_id'  => (int)   $input['category_id'],
-                'name'         => trim((string) $input['name']),
-                'description'  => $input['description'] !== '' ? trim((string) $input['description']) : null,
-                'price'        => (int)   $input['price'],
-                'image'        => $imageName,
-                'is_available' => $input['is_available'] !== '' ? (int) $input['is_available'] : 1,
-            ]);
-
-            $created = Menu::find($id);
-            if ($created) {
-                $created['image_url']   = UploadService::imageUrl($created['image'] ?? null);
-                $created['is_available'] = (bool) $created['is_available'];
-            }
+            $file    = !empty($_FILES['image']['name']) ? $_FILES['image'] : null;
+            $created = MenuService::create($input, $file);
 
             Response::json($created, 'Menu berhasil ditambahkan.', 201);
-        } catch (Throwable $e) {
-            log_error($e);
-            // Hapus gambar yang sudah terupload bila gagal simpan DB
-            if ($imageName) {
-                UploadService::deleteMenuImage($imageName);
+        }, method: 'POST', roles: ['admin'], csrf: true);
+    }
+
+    public function update(): void
+    {
+        $this->handleApi(function (): void {
+            $id = (int) Request::post('id', 0);
+            if ($id <= 0) {
+                throw new ValidationException('ID menu tidak valid.', ['id' => 'ID menu tidak valid.']);
             }
-            Response::error('Gagal menyimpan menu.', 500);
-        }
+
+            $input = $this->readMenuPayload();
+            $this->validateMenuPayload($input);
+
+            $file    = !empty($_FILES['image']['name']) ? $_FILES['image'] : null;
+            $updated = MenuService::update($id, $input, $file);
+
+            Response::json($updated, 'Menu berhasil diperbarui.');
+        }, method: 'POST', roles: ['admin'], csrf: true);
+    }
+
+    public function destroy(): void
+    {
+        $this->handleApi(function (): void {
+            $input = Request::body();
+            $this->validate($input, ['id' => 'required|int|min:1'], [
+                'id.required' => 'ID menu tidak valid.',
+                'id.int'      => 'ID menu tidak valid.',
+            ]);
+
+            MenuService::delete((int) $input['id']);
+            Response::json(null, 'Menu berhasil dihapus.');
+        }, method: 'POST', roles: ['admin'], csrf: true);
+    }
+
+    public function toggle(): void
+    {
+        $this->handleApi(function (): void {
+            $input = Request::body();
+            $this->validate($input, ['id' => 'required|int|min:1'], [
+                'id.required' => 'ID menu tidak valid.',
+                'id.int'      => 'ID menu tidak valid.',
+            ]);
+
+            $newState = MenuService::toggle((int) $input['id']);
+            $label    = $newState ? 'Tersedia' : 'Tidak tersedia';
+            Response::json(['is_available' => $newState], "Menu berhasil diubah menjadi {$label}.");
+        }, method: 'POST', roles: ['admin'], csrf: true);
     }
 
     /**
-     * POST — Perbarui menu (admin + CSRF, multipart/form-data).
+     * @return array<string, mixed>
      */
-    public static function update(): void
+    private function readMenuPayload(): array
     {
-        Auth::requireRole(['admin']);
-        Csrf::guard();
-
-        $id = (int) Request::post('id', 0);
-        if ($id <= 0) {
-            Response::error('ID menu tidak valid.', 422);
-        }
-
-        $existing = Menu::find($id);
-        if (!$existing) {
-            Response::error('Menu tidak ditemukan.', 404);
-        }
-
-        $input = [
+        return [
             'category_id'  => Request::post('category_id', ''),
-            'name'         => Request::post('name', ''),
-            'description'  => Request::post('description', ''),
+            'name'         => trim((string) Request::post('name', '')),
+            'description'  => trim((string) Request::post('description', '')),
             'price'        => Request::post('price', ''),
             'is_available' => Request::post('is_available', '1'),
         ];
-
-        $errors = self::validateMenuInput($input);
-        if (!empty($errors)) {
-            Response::error('Validasi gagal.', 422, $errors);
-        }
-
-        // Proses upload foto baru (opsional)
-        $newImageName = null;
-        if (!empty($_FILES['image']['name'])) {
-            try {
-                $newImageName = UploadService::storeMenuImage($_FILES['image']);
-            } catch (Throwable $e) {
-                Response::error($e->getMessage(), 422, ['image' => $e->getMessage()]);
-            }
-        }
-
-        $updateData = [
-            'category_id'  => (int)   $input['category_id'],
-            'name'         => trim((string) $input['name']),
-            'description'  => $input['description'] !== '' ? trim((string) $input['description']) : null,
-            'price'        => (int)   $input['price'],
-            'is_available' => $input['is_available'] !== '' ? (int) $input['is_available'] : 1,
-        ];
-
-        if ($newImageName !== null) {
-            $updateData['image'] = $newImageName;
-        }
-
-        try {
-            Menu::update($id, $updateData);
-
-            // Hapus foto lama bila diganti
-            if ($newImageName !== null && $existing['image']) {
-                UploadService::deleteMenuImage((string) $existing['image']);
-            }
-
-            $updated = Menu::find($id);
-            if ($updated) {
-                $updated['image_url']   = UploadService::imageUrl($updated['image'] ?? null);
-                $updated['is_available'] = (bool) $updated['is_available'];
-            }
-
-            Response::json($updated, 'Menu berhasil diperbarui.');
-        } catch (Throwable $e) {
-            log_error($e);
-            // Hapus gambar baru yang sudah terupload bila update DB gagal
-            if ($newImageName) {
-                UploadService::deleteMenuImage($newImageName);
-            }
-            Response::error('Gagal memperbarui menu.', 500);
-        }
     }
 
     /**
-     * POST — Soft-delete menu (admin + CSRF, BR-13).
+     * @param array<string, mixed> $input
      */
-    public static function destroy(): void
+    private function validateMenuPayload(array $input): void
     {
-        Auth::requireRole(['admin']);
-        Csrf::guard();
-
-        $input = Request::input();
-        $id    = (int) ($input['id'] ?? 0);
-        if ($id <= 0) {
-            Response::error('ID menu tidak valid.', 422);
-        }
-
-        $menu = Menu::find($id);
-        if (!$menu) {
-            Response::error('Menu tidak ditemukan.', 404);
-        }
-
-        try {
-            Menu::softDelete($id);
-            Response::json(null, 'Menu berhasil dihapus.');
-        } catch (Throwable $e) {
-            log_error($e);
-            Response::error('Gagal menghapus menu.', 500);
-        }
-    }
-
-    /**
-     * POST — Toggle is_available (admin + CSRF, FR-MENU-05).
-     */
-    public static function toggle(): void
-    {
-        Auth::requireRole(['admin']);
-        Csrf::guard();
-
-        $input = Request::input();
-        $id    = (int) ($input['id'] ?? 0);
-        if ($id <= 0) {
-            Response::error('ID menu tidak valid.', 422);
-        }
-
-        $newState = Menu::toggleAvailability($id);
-        if ($newState === null) {
-            Response::error('Menu tidak ditemukan.', 404);
-        }
-
-        $label = $newState ? 'Tersedia' : 'Tidak tersedia';
-        Response::json(['is_available' => $newState], "Menu berhasil diubah menjadi {$label}.");
-    }
-
-    /**
-     * Validasi input menu (nama, kategori, harga, deskripsi).
-     *
-     * @return array<string, string> Pesan error per field, kosong bila valid
-     */
-    private static function validateMenuInput(array $input): array
-    {
-        $errors = [];
-
-        // Nama
-        $name = trim((string) ($input['name'] ?? ''));
-        if ($name === '') {
-            $errors['name'] = 'Nama menu wajib diisi.';
-        } elseif (mb_strlen($name) < 2) {
-            $errors['name'] = 'Nama menu minimal 2 karakter.';
-        } elseif (mb_strlen($name) > 100) {
-            $errors['name'] = 'Nama menu maksimal 100 karakter.';
-        }
-
-        // Kategori
-        $categoryId = (int) ($input['category_id'] ?? 0);
-        if ($categoryId <= 0) {
-            $errors['category_id'] = 'Kategori wajib dipilih.';
-        } else {
-            $cat = Category::find($categoryId);
-            if (!$cat) {
-                $errors['category_id'] = 'Kategori tidak ditemukan.';
-            }
-        }
-
-        // Harga
-        $price = $input['price'] ?? '';
-        if ($price === '') {
-            $errors['price'] = 'Harga menu wajib diisi.';
-        } elseif (filter_var($price, FILTER_VALIDATE_INT) === false || (int) $price < 1) {
-            $errors['price'] = 'Harga harus berupa bilangan bulat minimal 1.';
-        } elseif ((int) $price > 10_000_000) {
-            $errors['price'] = 'Harga maksimal Rp 10.000.000.';
-        }
-
-        // Deskripsi (opsional)
-        $desc = trim((string) ($input['description'] ?? ''));
-        if ($desc !== '' && mb_strlen($desc) > 500) {
-            $errors['description'] = 'Deskripsi maksimal 500 karakter.';
-        }
-
-        return $errors;
+        $this->validate($input, [
+            'name'        => 'required|min:2|max:100',
+            'category_id' => 'required|int|min:1',
+            'price'       => 'required|int|between:1,10000000',
+            'description' => 'max:500',
+        ], [
+            'name.required'        => 'Nama menu wajib diisi.',
+            'name.min'             => 'Nama menu minimal 2 karakter.',
+            'name.max'             => 'Nama menu maksimal 100 karakter.',
+            'category_id.required' => 'Kategori wajib dipilih.',
+            'category_id.int'      => 'Kategori tidak valid.',
+            'category_id.min'      => 'Kategori wajib dipilih.',
+            'price.required'       => 'Harga menu wajib diisi.',
+            'price.int'            => 'Harga harus berupa bilangan bulat minimal 1.',
+            'price.between'        => 'Harga harus antara Rp 1 dan Rp 10.000.000.',
+            'description.max'      => 'Deskripsi maksimal 500 karakter.',
+        ]);
     }
 }

@@ -12,4 +12,4 @@ echo View::render('cashier/orders', [
     'title'      => 'Kelola Pesanan',
     'activeMenu' => 'orders',
     'scripts'    => ['js/pages/payment.js?v=12', 'js/pages/cashier-orders.js?v=12'],
-], 'admin');
+], 'app');

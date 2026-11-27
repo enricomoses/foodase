@@ -12,4 +12,4 @@ echo View::render('admin/users', [
     'title'      => 'Kelola Akun Kasir',
     'activeMenu' => 'users',
     'scripts'    => ['js/pages/admin-users.js'],
-], 'admin');
+], 'app');

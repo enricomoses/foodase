@@ -5,4 +5,4 @@ require __DIR__ . '/../../../app/bootstrap.php';
 
 use App\Controllers\UserController;
 
-UserController::update();
+(new UserController())->update();

@@ -18,4 +18,4 @@ echo View::render('cashier/history', [
     'activeMenu' => 'history',
     'role'       => $role,
     'scripts'    => ['js/pages/cashier-history.js?v=1'],
-], 'cashier');
+], 'app');

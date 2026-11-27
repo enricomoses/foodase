@@ -15,4 +15,4 @@ echo View::render('admin/reports', [
     'title'      => 'Laporan Penjualan',
     'activeMenu' => 'reports',
     'scripts'    => ['js/pages/admin-reports.js?v=1'],
-], 'admin');
+], 'app');

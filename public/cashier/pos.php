@@ -15,4 +15,4 @@ echo View::render('cashier/pos', [
     'title'      => 'POS Kasir',
     'activeMenu' => 'pos',
     'scripts'    => ['js/pages/payment.js?v=1', 'js/pages/pos.js?v=1'],
-], 'cashier');
+], 'app');

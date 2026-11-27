@@ -30,4 +30,4 @@ echo View::render('admin/dashboard', [
     'activeMenu' => 'dashboard',
     'name'       => $name,
     'scripts'    => ['js/pages/admin-dashboard.js?v=2'],
-], 'admin');
+], 'app');

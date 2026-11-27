@@ -5,4 +5,4 @@ require __DIR__ . '/../../../app/bootstrap.php';
 
 use App\Controllers\CategoryController;
 
-CategoryController::index();
+(new CategoryController())->index();
