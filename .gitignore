@@ -9,6 +9,8 @@ app/config/config.local.php
 # Storage & Runtime Logs
 storage/logs/*
 !storage/logs/.gitkeep
+storage/cache/throttle/*
+!storage/cache/throttle/.gitkeep
 public/uploads/menus/*
 !public/uploads/menus/.gitkeep
 

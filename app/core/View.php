@@ -7,15 +7,19 @@ use InvalidArgumentException;
 use Throwable;
 
 /**
- * Renderer template tampilan (View) dengan dukungan layout.
+ * Renderer template tampilan (View) dengan dukungan layout dan partial terisolasi.
  */
 final class View
 {
+    private static bool $iconsLoaded = false;
+
     /**
      * Render view template dengan data, dan opsional disisipkan ke layout sebagai $content.
      */
     public static function render(string $view, array $data = [], ?string $layout = null): string
     {
+        self::ensureIconsLoaded();
+
         $viewFile = self::resolvePath($view);
         if (!is_file($viewFile)) {
             throw new InvalidArgumentException("File view tidak ditemukan: {$view}");
@@ -37,26 +41,49 @@ final class View
     }
 
     /**
-     * Cari path file view di dalam app/views/.
+     * Render partial dari app/views/partials/ dalam scope terisolasi.
      */
-    private static function resolvePath(string $view): string
+    public static function partial(string $name, array $data = []): string
     {
-        $normalized = str_replace('.', '/', ltrim($view, '/'));
-        if (!str_ends_with($normalized, '.php')) {
-            $normalized .= '.php';
+        self::ensureIconsLoaded();
+
+        $normalized = self::normalizeName($name);
+        $file = APP_PATH . '/views/partials/' . $normalized . '.php';
+        if (!is_file($file)) {
+            throw new InvalidArgumentException("File partial tidak ditemukan: {$name}");
         }
-        return APP_PATH . '/views/' . $normalized;
+
+        return self::evaluateFile($file, $data);
     }
 
-    /**
-     * Cari path layout di app/views/layouts/ atau app/views/.
-     */
+    private static function ensureIconsLoaded(): void
+    {
+        if (!self::$iconsLoaded) {
+            self::$iconsLoaded = true;
+            $iconsFile = APP_PATH . '/views/partials/icons.php';
+            if (is_file($iconsFile)) {
+                require_once $iconsFile;
+            }
+        }
+    }
+
+    private static function normalizeName(string $name): string
+    {
+        $clean = ltrim($name, '/');
+        if (str_ends_with($clean, '.php')) {
+            $clean = substr($clean, 0, -4);
+        }
+        return str_replace('.', '/', $clean);
+    }
+
+    private static function resolvePath(string $view): string
+    {
+        return APP_PATH . '/views/' . self::normalizeName($view) . '.php';
+    }
+
     private static function resolveLayoutPath(string $layout): string
     {
-        $normalized = str_replace('.', '/', ltrim($layout, '/'));
-        if (!str_ends_with($normalized, '.php')) {
-            $normalized .= '.php';
-        }
+        $normalized = self::normalizeName($layout) . '.php';
 
         $directPath = APP_PATH . '/views/' . $normalized;
         if (is_file($directPath)) {
@@ -66,9 +93,6 @@ final class View
         return APP_PATH . '/views/layouts/' . $normalized;
     }
 
-    /**
-     * Eksekusi file view di dalam scope terisolasi dan tangkap outputnya.
-     */
     private static function evaluateFile(string $filePath, array $data): string
     {
         extract($data, EXTR_SKIP);

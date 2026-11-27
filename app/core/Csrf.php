@@ -8,9 +8,6 @@ namespace App\Core;
  */
 final class Csrf
 {
-    /**
-     * Dapatkan CSRF token dari sesi saat ini, atau buat baru jika belum ada.
-     */
     public static function token(): string
     {
         $token = Session::get('_csrf_token');
@@ -21,9 +18,6 @@ final class Csrf
         return $token;
     }
 
-    /**
-     * Verifikasi token yang diberikan dengan token di sesi.
-     */
     public static function verify(?string $token): bool
     {
         if ($token === null || $token === '') {
@@ -39,21 +33,19 @@ final class Csrf
     }
 
     /**
-     * Periksa token CSRF pada request POST. Balas 403 JSON jika token tidak valid.
+     * Wajibkan request POST dengan token CSRF valid (header X-CSRF-Token atau body _token).
+     * Menolak request non-POST dengan 405 agar tidak bisa di-bypass via GET.
      */
     public static function guard(): void
     {
         if (!Request::isPost()) {
-            return;
+            Request::requireMethod('POST');
         }
 
-        // Ambil token dari header HTTP X-CSRF-Token atau field _token di body/input
         $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
         if (!is_string($token) || $token === '') {
-            $token = Request::input('_token');
-            if (!is_string($token)) {
-                $token = null;
-            }
+            $bodyToken = Request::body('_token');
+            $token = is_string($bodyToken) ? $bodyToken : null;
         }
 
         if (!self::verify($token)) {

@@ -8,85 +8,67 @@ namespace App\Core;
  */
 final class Session
 {
+    private static bool $idleChecked = false;
+
     /**
-     * Memulai sesi jika belum aktif dan menerapkan idle timeout.
+     * Memulai sesi jika belum aktif dan menerapkan idle timeout (sekali per request).
      */
     public static function start(): void
     {
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            self::checkIdleTimeout();
-            return;
-        }
-
-        $name = (string) Config::get('session.name', 'kopinusa_session');
-
-        if (!headers_sent()) {
-            session_name($name);
-            session_set_cookie_params([
-                'lifetime' => 0,
-                'path'     => '/',
-                'domain'   => '',
-                'secure'   => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
-                'httponly' => true,
-                'samesite' => 'Lax',
-            ]);
-        }
-
         if (session_status() !== PHP_SESSION_ACTIVE) {
+            $name = (string) Config::get('session.name', 'foodease_session');
+
+            if (!headers_sent()) {
+                session_name($name);
+                session_set_cookie_params([
+                    'lifetime' => 0,
+                    'path'     => '/',
+                    'domain'   => '',
+                    'secure'   => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+                    'httponly' => true,
+                    'samesite' => 'Lax',
+                ]);
+            }
+
             @session_start();
         }
 
-        self::checkIdleTimeout();
+        if (!self::$idleChecked) {
+            self::$idleChecked = true;
+            self::checkIdleTimeout();
+        }
     }
 
-    /**
-     * Ambil data dari sesi berdasarkan key.
-     */
     public static function get(string $key, mixed $default = null): mixed
     {
         self::start();
         return $_SESSION[$key] ?? $default;
     }
 
-    /**
-     * Simpan data ke sesi.
-     */
     public static function set(string $key, mixed $value): void
     {
         self::start();
         $_SESSION[$key] = $value;
     }
 
-    /**
-     * Cek apakah key tertentu ada di dalam sesi.
-     */
     public static function has(string $key): bool
     {
         self::start();
         return isset($_SESSION[$key]);
     }
 
-    /**
-     * Hapus key tertentu dari sesi.
-     */
     public static function forget(string $key): void
     {
         self::start();
         unset($_SESSION[$key]);
     }
 
-    /**
-     * Simpan data flash (sementara) ke sesi.
-     */
     public static function flash(string $key, mixed $value): void
     {
         self::start();
         $_SESSION['_flash'][$key] = $value;
     }
 
-    /**
-     * Ambil dan langsung hapus data flash dari sesi.
-     */
     public static function pullFlash(string $key, mixed $default = null): mixed
     {
         self::start();
@@ -98,9 +80,6 @@ final class Session
         return $default;
     }
 
-    /**
-     * Regenerasi ID sesi untuk mencegah session fixation.
-     */
     public static function regenerate(bool $deleteOldSession = true): bool
     {
         self::start();
@@ -126,21 +105,25 @@ final class Session
             setcookie(
                 session_name(),
                 '',
-                time() - 42000,
-                $params['path'],
-                $params['domain'],
-                $params['secure'],
-                $params['httponly']
+                [
+                    'expires'  => time() - 42000,
+                    'path'     => $params['path'],
+                    'domain'   => $params['domain'],
+                    'secure'   => (bool) $params['secure'],
+                    'httponly' => (bool) $params['httponly'],
+                    'samesite' => $params['samesite'] ?: 'Lax',
+                ]
             );
         }
 
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_destroy();
         }
+        self::$idleChecked = false;
     }
 
     /**
-     * Cek batas waktu tidak aktif (idle timeout). Hancurkan sesi jika kedaluwarsa.
+     * Cek idle timeout. Reset data sesi & regenerasi ID tanpa mengirim Set-Cookie bentrok.
      */
     private static function checkIdleTimeout(): void
     {
@@ -152,9 +135,10 @@ final class Session
         $now = time();
 
         if (isset($_SESSION['_last_activity']) && ($now - (int) $_SESSION['_last_activity'] > $lifetime)) {
-            self::destroy();
-            self::start();
-            self::regenerate(true);
+            $_SESSION = [];
+            if (!headers_sent()) {
+                session_regenerate_id(true);
+            }
         }
 
         $_SESSION['_last_activity'] = $now;

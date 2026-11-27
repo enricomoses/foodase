@@ -11,11 +11,11 @@ function env(string $key, mixed $default = null): mixed
         return $default;
     }
     return match (strtolower((string) $val)) {
-        'true', '(true)' => true,
+        'true', '(true)'   => true,
         'false', '(false)' => false,
-        'null', '(null)' => null,
+        'null', '(null)'   => null,
         'empty', '(empty)' => '',
-        default => $val,
+        default            => $val,
     };
 }
 
@@ -55,7 +55,7 @@ function csrf_field(): string
     return '<input type="hidden" name="_token" value="' . e(csrf_token()) . '">';
 }
 
-/** Ambil nilai input lama dari sesi (berguna untuk form setelah validasi gagal). */
+/** Ambil nilai input lama dari sesi. */
 function old(string $key, mixed $default = null): mixed
 {
     $old = \App\Core\Session::get('_old_input');
@@ -111,8 +111,4 @@ function translate_menu_desc(?string $desc, string $name, ?string $lang = null):
 function translate_category(string $name, ?string $lang = null): string
 {
     return \App\Core\I18n::translateCategory($name, $lang);
-}
-
-if (defined('APP_PATH') && is_file(APP_PATH . '/views/partials/icons.php')) {
-    require_once APP_PATH . '/views/partials/icons.php';
 }

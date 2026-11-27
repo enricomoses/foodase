@@ -4,10 +4,8 @@ declare(strict_types=1);
 namespace App\Core;
 
 /**
- * Validasi input data dengan aturan standar.
- * Contoh pemakaian:
- * $v = Validator::make($data, ['name' => 'required|min:2|max:50', 'email' => 'email']);
- * if ($v->fails()) { ... $v->errors(); }
+ * Validasi input data terpusat dengan aturan standar.
+ * Mendukung: required, int, min, max, between, in, regex, email, array, date, boolean, password_strong.
  */
 final class Validator
 {
@@ -19,14 +17,11 @@ final class Validator
 
     public function __construct(array $data, array $rules, array $customMessages = [])
     {
-        $this->data = $data;
-        $this->rules = $rules;
+        $this->data           = $data;
+        $this->rules          = $rules;
         $this->customMessages = $customMessages;
     }
 
-    /**
-     * Buat instance Validator dan jalankan validasi.
-     */
     public static function make(array $data, array $rules, array $customMessages = []): self
     {
         $instance = new self($data, $rules, $customMessages);
@@ -34,9 +29,6 @@ final class Validator
         return $instance;
     }
 
-    /**
-     * Jalankan proses validasi untuk setiap field dan aturan.
-     */
     public function validate(): bool
     {
         if ($this->hasValidated) {
@@ -44,66 +36,49 @@ final class Validator
         }
 
         $this->hasValidated = true;
-        $this->errors = [];
+        $this->errors       = [];
 
         foreach ($this->rules as $field => $rules) {
-            $ruleList = is_array($rules) ? $rules : explode('|', (string) $rules);
-            $value = $this->data[$field] ?? null;
-
+            $ruleList    = is_array($rules) ? $rules : explode('|', (string) $rules);
+            $value       = $this->data[$field] ?? null;
             $hasRequired = in_array('required', $ruleList, true);
-            $isEmpty = ($value === null || $value === '' || (is_array($value) && empty($value)));
+            $isEmpty     = ($value === null || $value === '' || (is_array($value) && empty($value)));
 
             if ($isEmpty) {
                 if ($hasRequired) {
                     $this->addError($field, 'required', "{$field} wajib diisi.");
                 }
-                // Jika kosong dan tidak required, lewati aturan lainnya
                 continue;
             }
 
             foreach ($ruleList as $rule) {
-                if ($rule === 'required') {
+                if ($rule === 'required' || $rule === '') {
                     continue;
                 }
-
-                $this->applyRule($field, $value, $rule, $ruleList);
+                $this->applyRule($field, $value, (string) $rule, $ruleList);
             }
         }
 
         return empty($this->errors);
     }
 
-    /**
-     * Cek apakah validasi gagal.
-     */
     public function fails(): bool
     {
         $this->validate();
         return !empty($this->errors);
     }
 
-    /**
-     * Cek apakah validasi berhasil.
-     */
     public function passes(): bool
     {
         return !$this->fails();
     }
 
-    /**
-     * Ambil seluruh pesan error yang dikelompokkan per field.
-     * Format: ['field' => ['Pesan error 1', ...]]
-     */
     public function errors(): array
     {
         $this->validate();
         return $this->errors;
     }
 
-    /**
-     * Ambil pesan error pertama untuk setiap field.
-     * Format: ['field' => 'Pesan error pertama']
-     */
     public function firstErrors(): array
     {
         $this->validate();
@@ -114,16 +89,12 @@ final class Validator
         return $result;
     }
 
-    /**
-     * Ambil pesan error pertama untuk field tertentu atau error pertama secara global.
-     */
     public function first(?string $field = null): ?string
     {
         $this->validate();
         if ($field !== null) {
             return $this->errors[$field][0] ?? null;
         }
-
         foreach ($this->errors as $messages) {
             if (!empty($messages)) {
                 return $messages[0];
@@ -132,9 +103,6 @@ final class Validator
         return null;
     }
 
-    /**
-     * Ambil data yang berhasil divalidasi sesuai key pada rules.
-     */
     public function validated(): array
     {
         $result = [];
@@ -147,8 +115,28 @@ final class Validator
     }
 
     /**
-     * Terapkan aturan tertentu pada field.
+     * Validasi kriteria password kuat secara terpusat (dipakai oleh Validator & UserService).
+     *
+     * @return string[]
      */
+    public static function checkStrongPassword(string $password): array
+    {
+        $errors = [];
+        if (strlen($password) < 8) {
+            $errors[] = 'Password minimal 8 karakter.';
+        }
+        if (!preg_match('/[A-Z]/', $password)) {
+            $errors[] = 'Password harus mengandung minimal 1 huruf besar.';
+        }
+        if (!preg_match('/[0-9]/', $password)) {
+            $errors[] = 'Password harus mengandung minimal 1 angka.';
+        }
+        if (!preg_match('/[^a-zA-Z0-9]/', $password)) {
+            $errors[] = 'Password harus mengandung minimal 1 karakter khusus.';
+        }
+        return $errors;
+    }
+
     private function applyRule(string $field, mixed $value, string $rule, array $allRules): void
     {
         $params = '';
@@ -167,15 +155,44 @@ final class Validator
                 }
                 break;
 
+            case 'array':
+                if (!is_array($value)) {
+                    $this->addError($field, 'array', "{$field} harus berupa daftar data.");
+                }
+                break;
+
+            case 'boolean':
+                if (filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) === null) {
+                    $this->addError($field, 'boolean', "{$field} harus berupa nilai benar/salah.");
+                }
+                break;
+
+            case 'date':
+                $str = (string) $value;
+                if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $str, $m) || !checkdate((int) $m[2], (int) $m[3], (int) $m[1])) {
+                    $this->addError($field, 'date', "Format tanggal {$field} tidak valid (YYYY-MM-DD).");
+                }
+                break;
+
+            case 'password_strong':
+                $pwErrors = self::checkStrongPassword((string) $value);
+                if (!empty($pwErrors)) {
+                    $this->addError($field, 'password_strong', implode(' ', $pwErrors));
+                }
+                break;
+
             case 'min':
                 $min = (int) $params;
                 if ($isNumericContext && is_numeric($value)) {
                     if ((float) $value < $min) {
                         $this->addError($field, 'min', "{$field} minimal bernilai {$min}.");
                     }
+                } elseif (is_array($value)) {
+                    if (count($value) < $min) {
+                        $this->addError($field, 'min', "{$field} minimal berisi {$min} item.");
+                    }
                 } else {
-                    $len = mb_strlen((string) $value);
-                    if ($len < $min) {
+                    if (mb_strlen((string) $value) < $min) {
                         $this->addError($field, 'min', "{$field} minimal {$min} karakter.");
                     }
                 }
@@ -187,9 +204,12 @@ final class Validator
                     if ((float) $value > $max) {
                         $this->addError($field, 'max', "{$field} maksimal bernilai {$max}.");
                     }
+                } elseif (is_array($value)) {
+                    if (count($value) > $max) {
+                        $this->addError($field, 'max', "{$field} maksimal berisi {$max} item.");
+                    }
                 } else {
-                    $len = mb_strlen((string) $value);
-                    if ($len > $max) {
+                    if (mb_strlen((string) $value) > $max) {
                         $this->addError($field, 'max', "{$field} maksimal {$max} karakter.");
                     }
                 }
@@ -197,9 +217,8 @@ final class Validator
 
             case 'between':
                 $parts = explode(',', $params);
-                $min = isset($parts[0]) ? (float) $parts[0] : 0;
-                $max = isset($parts[1]) ? (float) $parts[1] : 0;
-
+                $min   = isset($parts[0]) ? (float) $parts[0] : 0;
+                $max   = isset($parts[1]) ? (float) $parts[1] : 0;
                 if ($isNumericContext && is_numeric($value)) {
                     $valNum = (float) $value;
                     if ($valNum < $min || $valNum > $max) {
@@ -238,13 +257,10 @@ final class Validator
         }
     }
 
-    /**
-     * Tambahkan pesan error ke koleksi error.
-     */
     private function addError(string $field, string $rule, string $defaultMessage): void
     {
         $customKey = "{$field}.{$rule}";
-        $message = $this->customMessages[$customKey]
+        $message   = $this->customMessages[$customKey]
             ?? $this->customMessages[$field]
             ?? $defaultMessage;
 

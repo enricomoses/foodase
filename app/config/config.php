@@ -6,22 +6,22 @@ $local = is_file(__DIR__ . '/config.local.php') ? require __DIR__ . '/config.loc
 
 return array_replace_recursive([
     'app' => [
-        'name'     => (string) env('APP_NAME', 'Nola'),
+        'name'     => (string) env('APP_NAME', 'FoodEase'),
         'env'      => (string) env('APP_ENV', 'development'),      // development | production
         'debug'    => (bool) env('APP_DEBUG', true),               // false saat demo/produksi
-        'base_url' => (string) env('APP_BASE_URL', '/foodease'),    // URL folder project di htdocs (tanpa slash akhir)
+        'base_url' => (string) env('APP_BASE_URL', '/foodase'),    // URL folder project di htdocs (tanpa slash akhir)
         'timezone' => (string) env('APP_TIMEZONE', 'Asia/Jakarta'),
     ],
     'db' => [
         'host'    => (string) env('DB_HOST', '127.0.0.1'),
         'port'    => (int) env('DB_PORT', 3306),
-        'name'    => (string) env('DB_NAME', 'foodease'),
+        'name'    => (string) env('DB_NAME', 'foodase'),
         'user'    => (string) env('DB_USER', 'root'),
         'pass'    => (string) env('DB_PASS', ''),                  // default XAMPP: kosong
         'charset' => (string) env('DB_CHARSET', 'utf8mb4'),
     ],
     'session' => [
-        'name'     => (string) env('SESSION_NAME', 'nola_session'),
+        'name'     => (string) env('SESSION_NAME', 'foodease_session'),
         'lifetime' => (int) env('SESSION_LIFETIME', 7200),         // idle timeout (detik)
     ],
     'upload' => [
@@ -33,6 +33,6 @@ return array_replace_recursive([
         'max_table'     => 30,
         'max_item_kind' => 30,
         'max_qty'       => 99,
-        'code_prefix'   => 'NL',
+        'code_prefix'   => 'FE',
     ],
 ], $local);
