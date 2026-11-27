@@ -3,34 +3,29 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Core\Database;
-use PDO;
+use App\Core\BaseModel;
 
 /**
  * Model untuk tabel categories.
  */
-final class Category
+final class Category extends BaseModel
 {
+    private const BASE_SELECT = "SELECT c.id, c.name, c.sort_order, c.created_at, c.updated_at,
+               COALESCE(c.subtitle, 'UNGGULAN') AS subtitle,
+               COUNT(m.id) AS menu_count
+        FROM categories c
+        LEFT JOIN menus m ON m.category_id = c.id AND m.deleted_at IS NULL";
+
     /**
-     * Ambil semua kategori diurutkan berdasarkan sort_order ASC, name ASC,
-     * beserta jumlah menu yang terkait.
+     * Ambil semua kategori beserta jumlah menu aktif (tidak terhapus).
      *
      * @return array<int, array<string, mixed>>
      */
     public static function all(): array
     {
-        $pdo = Database::connection();
-        $sql = 'SELECT c.id, c.name, c.sort_order, c.created_at, c.updated_at,
-                       COALESCE(c.subtitle, \'UNGGULAN\') AS subtitle,
-                       COUNT(m.id) AS menu_count
-                FROM categories c
-                LEFT JOIN menus m ON m.category_id = c.id
-                GROUP BY c.id
-                ORDER BY c.sort_order ASC, c.name ASC';
-
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return self::fetchAll(
+            self::BASE_SELECT . ' GROUP BY c.id ORDER BY c.sort_order ASC, c.name ASC'
+        );
     }
 
     /**
@@ -38,21 +33,10 @@ final class Category
      */
     public static function find(int $id): ?array
     {
-        $pdo = Database::connection();
-        $sql = 'SELECT c.id, c.name, c.sort_order, c.created_at, c.updated_at,
-                       COALESCE(c.subtitle, \'UNGGULAN\') AS subtitle,
-                       COUNT(m.id) AS menu_count
-                FROM categories c
-                LEFT JOIN menus m ON m.category_id = c.id
-                WHERE c.id = :id
-                GROUP BY c.id
-                LIMIT 1';
-
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        return $result ?: null;
+        return self::fetchOne(
+            self::BASE_SELECT . ' WHERE c.id = :id GROUP BY c.id LIMIT 1',
+            [':id' => $id]
+        );
     }
 
     /**
@@ -60,8 +44,7 @@ final class Category
      */
     public static function findByName(string $name, ?int $excludeId = null): ?array
     {
-        $pdo = Database::connection();
-        $sql = 'SELECT * FROM categories WHERE LOWER(name) = LOWER(:name)';
+        $sql    = 'SELECT * FROM categories WHERE LOWER(name) = LOWER(:name)';
         $params = [':name' => trim($name)];
 
         if ($excludeId !== null) {
@@ -69,38 +52,26 @@ final class Category
             $params[':exclude_id'] = $excludeId;
         }
 
-        $sql .= ' LIMIT 1';
-
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute($params);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        return $result ?: null;
+        return self::fetchOne($sql . ' LIMIT 1', $params);
     }
 
     /**
-     * Hitung total menu yang mengaitkan kategori ini (aktif maupun terhapus).
+     * Hitung total seluruh menu yang mengaitkan kategori ini (termasuk soft-deleted, untuk BR-14).
      */
     public static function countMenus(int $id): int
     {
-        $pdo = Database::connection();
-        $stmt = $pdo->prepare('SELECT COUNT(*) FROM menus WHERE category_id = :id');
-        $stmt->execute([':id' => $id]);
-
-        return (int) $stmt->fetchColumn();
+        return (int) self::fetchValue(
+            'SELECT COUNT(*) FROM menus WHERE category_id = :id',
+            [':id' => $id]
+        );
     }
 
-    /**
-     * Buat kategori baru dan kembalikan ID yang dibuat.
-     */
     public static function create(array $data): int
     {
-        $pdo = Database::connection();
+        $pdo  = self::db();
         $stmt = $pdo->prepare(
-            'INSERT INTO categories (name, sort_order)
-             VALUES (:name, :sort_order)'
+            'INSERT INTO categories (name, sort_order) VALUES (:name, :sort_order)'
         );
-
         $stmt->execute([
             ':name'       => trim((string) $data['name']),
             ':sort_order' => (int) ($data['sort_order'] ?? 0),
@@ -109,16 +80,10 @@ final class Category
         return (int) $pdo->lastInsertId();
     }
 
-    /**
-     * Perbarui data kategori.
-     */
     public static function update(int $id, array $data): bool
     {
-        $pdo = Database::connection();
-        $stmt = $pdo->prepare(
-            'UPDATE categories
-             SET name = :name, sort_order = :sort_order
-             WHERE id = :id'
+        $stmt = self::db()->prepare(
+            'UPDATE categories SET name = :name, sort_order = :sort_order WHERE id = :id'
         );
 
         return $stmt->execute([
@@ -128,13 +93,9 @@ final class Category
         ]);
     }
 
-    /**
-     * Hapus kategori berdasarkan ID.
-     */
     public static function delete(int $id): bool
     {
-        $pdo = Database::connection();
-        $stmt = $pdo->prepare('DELETE FROM categories WHERE id = :id');
+        $stmt = self::db()->prepare('DELETE FROM categories WHERE id = :id');
         return $stmt->execute([':id' => $id]);
     }
 }

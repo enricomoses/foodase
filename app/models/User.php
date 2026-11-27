@@ -3,81 +3,50 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Core\Database;
-use PDO;
+use App\Core\BaseModel;
 
 /**
  * Model untuk tabel users.
  */
-final class User
+final class User extends BaseModel
 {
-    /**
-     * Cari user berdasarkan username. Mengembalikan null jika tidak ditemukan.
-     */
+    public static function find(int $id): ?array
+    {
+        return self::fetchOne('SELECT * FROM users WHERE id = :id LIMIT 1', [':id' => $id]);
+    }
+
     public static function findByUsername(string $username): ?array
     {
-        $pdo = Database::connection();
-        $stmt = $pdo->prepare('SELECT * FROM users WHERE username = :username LIMIT 1');
-        $stmt->execute([':username' => $username]);
-        $user = $stmt->fetch();
-
-        return $user ?: null;
+        return self::fetchOne('SELECT * FROM users WHERE username = :username LIMIT 1', [':username' => $username]);
     }
 
     /**
-     * Cari user berdasarkan ID. Mengembalikan null jika tidak ditemukan.
-     */
-    public static function findById(int $id): ?array
-    {
-        $pdo = Database::connection();
-        $stmt = $pdo->prepare('SELECT * FROM users WHERE id = :id LIMIT 1');
-        $stmt->execute([':id' => $id]);
-        $user = $stmt->fetch();
-
-        return $user ?: null;
-    }
-
-    /**
-     * Dapatkan daftar user, opsional difilter berdasarkan role.
+     * Daftar user, opsional difilter berdasarkan role.
+     *
+     * @return array<int, array<string, mixed>>
      */
     public static function list(?string $role = null): array
     {
-        $pdo = Database::connection();
+        $sql    = 'SELECT id, name, username, role, is_active, last_login_at, created_at, updated_at FROM users';
+        $params = [];
 
         if ($role !== null && $role !== '') {
-            $stmt = $pdo->prepare(
-                'SELECT id, name, username, role, is_active, last_login_at, created_at, updated_at
-                 FROM users
-                 WHERE role = :role
-                 ORDER BY name ASC'
-            );
-            $stmt->execute([':role' => $role]);
-            return $stmt->fetchAll();
+            $sql .= ' WHERE role = :role';
+            $params[':role'] = $role;
         }
 
-        $stmt = $pdo->prepare(
-            'SELECT id, name, username, role, is_active, last_login_at, created_at, updated_at
-             FROM users
-             ORDER BY name ASC'
-        );
-        $stmt->execute();
-        return $stmt->fetchAll();
+        return self::fetchAll($sql . ' ORDER BY name ASC', $params);
     }
 
-    /**
-     * Tambah user baru ke database dan kembalikan ID yang baru dibuat.
-     */
     public static function create(array $data): int
     {
-        $pdo = Database::connection();
-
+        $pdo  = self::db();
         $hash = $data['password_hash'] ?? password_hash((string) ($data['password'] ?? ''), PASSWORD_DEFAULT);
 
         $stmt = $pdo->prepare(
             'INSERT INTO users (name, username, password_hash, role, is_active)
              VALUES (:name, :username, :password_hash, :role, :is_active)'
         );
-
         $stmt->execute([
             ':name'          => (string) $data['name'],
             ':username'      => (string) $data['username'],
@@ -89,32 +58,20 @@ final class User
         return (int) $pdo->lastInsertId();
     }
 
-    /**
-     * Perbarui data user (name, username, role, is_active).
-     */
     public static function update(int $id, array $data): bool
     {
-        $pdo = Database::connection();
         $fields = [];
         $params = [':id' => $id];
 
-        if (array_key_exists('name', $data)) {
-            $fields[] = 'name = :name';
-            $params[':name'] = (string) $data['name'];
-        }
-
-        if (array_key_exists('username', $data)) {
-            $fields[] = 'username = :username';
-            $params[':username'] = (string) $data['username'];
-        }
-
-        if (array_key_exists('role', $data)) {
-            $fields[] = 'role = :role';
-            $params[':role'] = (string) $data['role'];
+        foreach (['name', 'username', 'role'] as $col) {
+            if (array_key_exists($col, $data)) {
+                $fields[]        = "{$col} = :{$col}";
+                $params[":{$col}"] = (string) $data[$col];
+            }
         }
 
         if (array_key_exists('is_active', $data)) {
-            $fields[] = 'is_active = :is_active';
+            $fields[]             = 'is_active = :is_active';
             $params[':is_active'] = (bool) $data['is_active'] ? 1 : 0;
         }
 
@@ -122,59 +79,40 @@ final class User
             return false;
         }
 
-        $sql = 'UPDATE users SET ' . implode(', ', $fields) . ' WHERE id = :id';
-        $stmt = $pdo->prepare($sql);
-
+        $stmt = self::db()->prepare('UPDATE users SET ' . implode(', ', $fields) . ' WHERE id = :id');
         return $stmt->execute($params);
     }
 
-    /**
-     * Aktifkan atau nonaktifkan akun user.
-     */
     public static function setActive(int $id, bool $isActive): bool
     {
-        $pdo = Database::connection();
-        $stmt = $pdo->prepare('UPDATE users SET is_active = :is_active WHERE id = :id');
+        $stmt = self::db()->prepare('UPDATE users SET is_active = :is_active WHERE id = :id');
         return $stmt->execute([
             ':id'        => $id,
             ':is_active' => $isActive ? 1 : 0,
         ]);
     }
 
-    /**
-     * Perbarui password user dengan hash baru.
-     */
     public static function updatePassword(int $id, string $newPassword): bool
     {
-        $pdo = Database::connection();
-        $stmt = $pdo->prepare('UPDATE users SET password_hash = :hash WHERE id = :id');
+        $stmt = self::db()->prepare('UPDATE users SET password_hash = :hash WHERE id = :id');
         return $stmt->execute([
             ':id'   => $id,
             ':hash' => password_hash($newPassword, PASSWORD_DEFAULT),
         ]);
     }
 
-    /**
-     * Perbarui waktu login terakhir pengguna.
-     */
     public static function touchLastLogin(int $id): bool
     {
-        $pdo = Database::connection();
-        $stmt = $pdo->prepare('UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = :id');
+        $stmt = self::db()->prepare('UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = :id');
         return $stmt->execute([':id' => $id]);
     }
 
-    /**
-     * Perbarui session_id aktif user (Single Active Session).
-     */
     public static function updateSessionId(int $id, ?string $sessionId): bool
     {
-        $pdo = Database::connection();
-        $stmt = $pdo->prepare('UPDATE users SET session_id = :sid WHERE id = :id');
+        $stmt = self::db()->prepare('UPDATE users SET session_id = :sid WHERE id = :id');
         return $stmt->execute([
             ':id'  => $id,
             ':sid' => $sessionId,
         ]);
     }
 }
-

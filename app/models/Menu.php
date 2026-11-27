@@ -3,32 +3,36 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Core\Database;
-use PDO;
+use App\Core\BaseModel;
 
 /**
- * Model untuk tabel menus.
- * Soft delete: baris dengan deleted_at != NULL tidak ditampilkan.
+ * Model untuk tabel menus (mendukung soft-delete via deleted_at).
  */
-final class Menu
+final class Menu extends BaseModel
 {
+    private const BASE_SELECT = "SELECT m.id, m.category_id, m.name, m.description, m.price,
+               m.image, m.is_available, m.deleted_at, m.created_at, m.updated_at,
+               COALESCE(m.badge, '') AS badge,
+               COALESCE(m.serving_tag, 'Iced') AS serving_tag,
+               c.name AS category_name,
+               COALESCE(c.subtitle, 'UNGGULAN') AS category_subtitle
+        FROM menus m
+        LEFT JOIN categories c ON c.id = m.category_id";
+
     /**
      * Ambil daftar menu dengan filter + paginasi.
      *
-     * @param array $filters
-     * @return array{data: array, total: int, page: int, per_page: int, pages: int}
+     * @return array{data: array<int, array<string, mixed>>, total: int, page: int, per_page: int, pages: int}
      */
     public static function list(array $filters = []): array
     {
-        $pdo = Database::connection();
-
         $q              = trim((string) ($filters['q'] ?? ''));
         $categoryId     = isset($filters['category_id']) && $filters['category_id'] !== ''
-                            ? (int) $filters['category_id'] : null;
+            ? (int) $filters['category_id'] : null;
         $includeUnavail = (bool) ($filters['include_unavailable'] ?? false);
         $ids            = isset($filters['ids']) && is_array($filters['ids']) ? $filters['ids'] : [];
-        $page           = max(1, (int) ($filters['page'] ?? 1));
-        $perPage        = max(1, min(100, (int) ($filters['per_page'] ?? 20)));
+        $page           = (int) ($filters['page'] ?? 1);
+        $perPage        = (int) ($filters['per_page'] ?? 20);
 
         $where  = ['m.deleted_at IS NULL'];
         $params = [];
@@ -50,7 +54,7 @@ final class Menu
 
         if (!empty($ids)) {
             $placeholders = [];
-            foreach ($ids as $i => $id) {
+            foreach (array_values($ids) as $i => $id) {
                 $key            = ':id_' . $i;
                 $placeholders[] = $key;
                 $params[$key]   = (int) $id;
@@ -60,80 +64,57 @@ final class Menu
 
         $whereClause = 'WHERE ' . implode(' AND ', $where);
 
-        // Hitung total
-        $countStmt = $pdo->prepare("SELECT COUNT(*) FROM menus m {$whereClause}");
-        $countStmt->execute($params);
-        $total = (int) $countStmt->fetchColumn();
-
-        // Ambil data
-        $offset  = ($page - 1) * $perPage;
-        $dataSql = "SELECT m.id, m.category_id, m.name, m.description, m.price,
-                           m.image, m.is_available, m.deleted_at, m.created_at, m.updated_at,
-                           COALESCE(m.badge, '')         AS badge,
-                           COALESCE(m.serving_tag, 'Iced') AS serving_tag,
-                           COALESCE(m.svg_illustration, '') AS svg_illustration,
-                           c.name AS category_name,
-                           COALESCE(c.subtitle, 'UNGGULAN') AS category_subtitle
-                    FROM menus m
-                    LEFT JOIN categories c ON c.id = m.category_id
-                    {$whereClause}
-                    ORDER BY c.sort_order ASC, c.name ASC, m.name ASC
-                    LIMIT :limit OFFSET :offset";
-
-        $dataStmt = $pdo->prepare($dataSql);
-        foreach ($params as $k => $v) {
-            $dataStmt->bindValue($k, $v);
-        }
-        $dataStmt->bindValue(':limit',  $perPage, PDO::PARAM_INT);
-        $dataStmt->bindValue(':offset', $offset,  PDO::PARAM_INT);
-        $dataStmt->execute();
-        $rows = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return [
-            'data'     => $rows,
-            'total'    => $total,
-            'page'     => $page,
-            'per_page' => $perPage,
-            'pages'    => $total > 0 ? (int) ceil($total / $perPage) : 1,
-        ];
+        return self::paginate(
+            self::BASE_SELECT . " {$whereClause} ORDER BY c.sort_order ASC, c.name ASC, m.name ASC",
+            "SELECT COUNT(*) FROM menus m {$whereClause}",
+            $params,
+            $page,
+            $perPage
+        );
     }
 
     /**
-     * Cari menu berdasarkan ID.
+     * Cari satu menu berdasarkan ID.
      */
     public static function find(int $id, bool $includeSoftDeleted = false): ?array
     {
-        $pdo = Database::connection();
-        $sql = 'SELECT m.id, m.category_id, m.name, m.description, m.price,
-                       m.image, m.is_available, m.deleted_at, m.created_at, m.updated_at,
-                       COALESCE(m.badge, \'\')           AS badge,
-                       COALESCE(m.serving_tag, \'Iced\') AS serving_tag,
-                       COALESCE(m.svg_illustration, \'\') AS svg_illustration,
-                       c.name AS category_name,
-                       COALESCE(c.subtitle, \'UNGGULAN\') AS category_subtitle
-                FROM menus m
-                LEFT JOIN categories c ON c.id = m.category_id
-                WHERE m.id = :id';
-
+        $sql = self::BASE_SELECT . ' WHERE m.id = :id';
         if (!$includeSoftDeleted) {
             $sql .= ' AND m.deleted_at IS NULL';
         }
 
-        $sql .= ' LIMIT 1';
-
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        return $result ?: null;
+        return self::fetchOne($sql . ' LIMIT 1', [':id' => $id]);
     }
 
     /**
-     * Buat menu baru dan kembalikan ID yang dibuat.
+     * Ambil banyak menu aktif sekaligus berdasarkan daftar ID (menghindari N+1 query).
+     *
+     * @param int[] $ids
+     * @return array<int, array<string, mixed>> Diindeks berdasarkan menu.id
      */
+    public static function findByIds(array $ids): array
+    {
+        $cleanIds = array_values(array_unique(array_filter(array_map('intval', $ids), static fn(int $id): bool => $id > 0)));
+        if (empty($cleanIds)) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($cleanIds), '?'));
+        $rows = self::fetchAll(
+            self::BASE_SELECT . " WHERE m.deleted_at IS NULL AND m.id IN ({$placeholders})",
+            $cleanIds
+        );
+
+        $indexed = [];
+        foreach ($rows as $row) {
+            $indexed[(int) $row['id']] = $row;
+        }
+        return $indexed;
+    }
+
     public static function create(array $data): int
     {
-        $pdo  = Database::connection();
+        $pdo  = self::db();
         $stmt = $pdo->prepare(
             'INSERT INTO menus (category_id, name, description, price, image, is_available)
              VALUES (:category_id, :name, :description, :price, :image, :is_available)'
@@ -143,7 +124,7 @@ final class Menu
             ':category_id'  => (int) $data['category_id'],
             ':name'         => trim((string) $data['name']),
             ':description'  => isset($data['description']) && $data['description'] !== ''
-                                    ? trim((string) $data['description']) : null,
+                ? trim((string) $data['description']) : null,
             ':price'        => (int) $data['price'],
             ':image'        => $data['image'] ?? null,
             ':is_available' => isset($data['is_available']) ? (int) $data['is_available'] : 1,
@@ -152,13 +133,9 @@ final class Menu
         return (int) $pdo->lastInsertId();
     }
 
-    /**
-     * Perbarui data menu.
-     */
     public static function update(int $id, array $data): bool
     {
-        $pdo    = Database::connection();
-        $sets   = [
+        $sets = [
             'category_id = :category_id',
             'name = :name',
             'description = :description',
@@ -170,7 +147,7 @@ final class Menu
             ':category_id'  => (int) $data['category_id'],
             ':name'         => trim((string) $data['name']),
             ':description'  => isset($data['description']) && $data['description'] !== ''
-                                    ? trim((string) $data['description']) : null,
+                ? trim((string) $data['description']) : null,
             ':price'        => (int) $data['price'],
             ':is_available' => isset($data['is_available']) ? (int) $data['is_available'] : 1,
         ];
@@ -180,33 +157,26 @@ final class Menu
             $params[':image'] = $data['image'];
         }
 
-        $stmt = $pdo->prepare(
+        $stmt = self::db()->prepare(
             'UPDATE menus SET ' . implode(', ', $sets) . ' WHERE id = :id AND deleted_at IS NULL'
         );
 
         return $stmt->execute($params);
     }
 
-    /**
-     * Soft-delete menu (BR-13): set deleted_at = NOW().
-     */
     public static function softDelete(int $id): bool
     {
-        $pdo  = Database::connection();
-        $stmt = $pdo->prepare(
+        $stmt = self::db()->prepare(
             'UPDATE menus SET deleted_at = NOW() WHERE id = :id AND deleted_at IS NULL'
         );
         $stmt->execute([':id' => $id]);
+
         return $stmt->rowCount() > 0;
     }
 
-    /**
-     * Toggle is_available untuk menu tertentu.
-     * Mengembalikan nilai is_available baru, atau null jika tidak ditemukan.
-     */
     public static function toggleAvailability(int $id): ?bool
     {
-        $pdo  = Database::connection();
+        $pdo  = self::db();
         $stmt = $pdo->prepare(
             'UPDATE menus SET is_available = 1 - is_available WHERE id = :id AND deleted_at IS NULL'
         );
@@ -216,21 +186,15 @@ final class Menu
             return null;
         }
 
-        $check = $pdo->prepare('SELECT is_available FROM menus WHERE id = :id');
-        $check->execute([':id' => $id]);
-        $row = $check->fetch(PDO::FETCH_ASSOC);
-
-        return $row !== false ? (bool) $row['is_available'] : null;
+        $val = self::fetchValue('SELECT is_available FROM menus WHERE id = :id', [':id' => $id], $pdo);
+        return $val !== false ? (bool) $val : null;
     }
 
-    /**
-     * Cek apakah menu pernah dipesan (ada di order_details) — untuk BR-13.
-     */
     public static function hasOrders(int $id): bool
     {
-        $pdo  = Database::connection();
-        $stmt = $pdo->prepare('SELECT COUNT(*) FROM order_details WHERE menu_id = :id LIMIT 1');
-        $stmt->execute([':id' => $id]);
-        return (int) $stmt->fetchColumn() > 0;
+        return (int) self::fetchValue(
+            'SELECT COUNT(*) FROM order_details WHERE menu_id = :id LIMIT 1',
+            [':id' => $id]
+        ) > 0;
     }
 }
