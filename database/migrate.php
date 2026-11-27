@@ -53,6 +53,9 @@ function main(array $argv): int
 
     $dbName  = validatedDbName((string) Config::get('db.name', ''));
     $charset = (string) Config::get('db.charset', 'utf8mb4');
+    if (!preg_match('/^[a-zA-Z0-9_]+$/', $charset)) {
+        throw new RuntimeException("Charset database tidak valid: '{$charset}'.");
+    }
     $collate = $charset === 'utf8mb4' ? 'utf8mb4_unicode_ci' : "{$charset}_general_ci";
 
     if ($flags['status']) {
@@ -301,7 +304,8 @@ function splitSqlStatements(string $sql): array
         }
 
         if (!$inSingleQuote && !$inDoubleQuote && !$inBacktick) {
-            if ($char === '-' && $next === '-') {
+            $afterDash = $sql[$i + 2] ?? ' ';
+            if ($char === '-' && $next === '-' && ctype_space($afterDash)) {
                 $inLineComment = true;
                 $i++;
                 continue;
@@ -318,13 +322,19 @@ function splitSqlStatements(string $sql): array
         }
 
         if ($char === "'" && !$inDoubleQuote && !$inBacktick) {
-            $escaped = ($i > 0 && $sql[$i - 1] === '\\');
-            if (!$escaped) {
+            $backslashes = 0;
+            for ($j = $i - 1; $j >= 0 && $sql[$j] === '\\'; $j--) {
+                $backslashes++;
+            }
+            if ($backslashes % 2 === 0) {
                 $inSingleQuote = !$inSingleQuote;
             }
         } elseif ($char === '"' && !$inSingleQuote && !$inBacktick) {
-            $escaped = ($i > 0 && $sql[$i - 1] === '\\');
-            if (!$escaped) {
+            $backslashes = 0;
+            for ($j = $i - 1; $j >= 0 && $sql[$j] === '\\'; $j--) {
+                $backslashes++;
+            }
+            if ($backslashes % 2 === 0) {
                 $inDoubleQuote = !$inDoubleQuote;
             }
         } elseif ($char === '`' && !$inSingleQuote && !$inDoubleQuote) {

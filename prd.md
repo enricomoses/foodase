@@ -267,7 +267,7 @@ Prioritas: **P0** wajib selesai, **P1** nilai tambah demo, **P2** opsional.
 
 ## 7. Model Data
 
-Engine InnoDB, charset `utf8mb4`, collation `utf8mb4_unicode_ci`. SQL lengkap ada di `execution-guide.md` (Langkah 5) dan disimpan sebagai `database/schema.sql`.
+Engine InnoDB, charset `utf8mb4`, collation `utf8mb4_unicode_ci`. SQL lengkap disimpan sebagai `database/schema.sql` dan dijalankan melalui CLI runner `database/migrate.php` beserta seeder di `database/seeders/`.
 
 ```
 users 1 ───< orders (created_by, cancelled_by)
@@ -288,6 +288,7 @@ orders 1 ─── 0..1 payments
 | role | ENUM('admin','cashier') | |
 | is_active | TINYINT(1) | default 1 |
 | last_login_at | DATETIME NULL | |
+| session_id | VARCHAR(128) NULL | Single Active Session per akun |
 | created_at, updated_at | DATETIME | |
 
 ### `categories`
@@ -297,6 +298,7 @@ orders 1 ─── 0..1 payments
 | id | INT UNSIGNED PK AI | |
 | name | VARCHAR(60) | UNIQUE |
 | sort_order | SMALLINT UNSIGNED | default 0 |
+| subtitle | VARCHAR(50) NULL | label subjudul katalog |
 | created_at, updated_at | DATETIME | |
 
 ### `menus`
@@ -309,6 +311,9 @@ orders 1 ─── 0..1 payments
 | description | TEXT NULL | |
 | price | INT UNSIGNED | Rupiah |
 | image | VARCHAR(255) NULL | nama file di `public/uploads/menus/` |
+| badge | VARCHAR(50) NULL | label opsional (Best Seller, Signature, dll.) |
+| serving_tag | VARCHAR(30) | default `'Iced'` |
+| svg_illustration | TEXT NULL | opsional |
 | is_available | TINYINT(1) | default 1 |
 | deleted_at | DATETIME NULL | soft delete |
 | created_at, updated_at | DATETIME | |
@@ -390,62 +395,82 @@ Index: `status`, `payment_status`, `created_at`.
 ### 8.3 Struktur folder
 
 ```
-foodease/                          ← C:\xampp\htdocs\foodease
+foodase/                           ← C:\xampp\htdocs\foodase
+├── .editorconfig
+├── .env.example                   # template variabel lingkungan (salin ke .env)
 ├── .htaccess                      # arahkan semua request ke public/
 ├── .gitignore
 ├── AGENTS.md                      # aturan kerja untuk agent
 ├── README.md
 ├── prd.md
-├── execution-guide.md
 │
 ├── app/                           # TIDAK bisa diakses langsung dari browser
-│   ├── bootstrap.php              # konstanta, autoload, config, timezone, error mode
+│   ├── bootstrap.php              # konstanta, autoload, .env, config, timezone, error handler
 │   ├── config/
-│   │   ├── config.php             # konfigurasi default
-│   │   └── config.local.example.php   # salin ke config.local.php (di-gitignore)
-│   ├── core/                      # infrastruktur umum, tidak tahu bisnis kafe
+│   │   ├── config.php             # konfigurasi default (.env driven)
+│   │   └── config.local.example.php
+│   ├── lang/                      # Single Source of Truth kamus multi-bahasa (id, en, zh)
+│   │   ├── id.php
+│   │   ├── en.php
+│   │   ├── zh.php
+│   │   └── catalog.php
+│   ├── core/                      # infrastruktur umum MVC native (domain-agnostic)
+│   │   ├── Auth.php               # login state, Single Active Session, guard role (memoized)
+│   │   ├── BaseController.php     # guard terpusat (method, role, CSRF) & exception-to-JSON
+│   │   ├── BaseModel.php          # helper PDO: fetchOne, fetchAll, paginate, generateDailyCode
 │   │   ├── Config.php
-│   │   ├── Database.php           # singleton PDO
-│   │   ├── Request.php            # input bersih (get/post/json/method)
-│   │   ├── Response.php           # json(), redirect(), error()
-│   │   ├── Session.php
-│   │   ├── Auth.php               # login state + guard role
 │   │   ├── Csrf.php
+│   │   ├── Database.php           # singleton PDO + transaction()
+│   │   ├── I18n.php               # loader ringan untuk app/lang/
+│   │   ├── Request.php            # get/post/json/body/input/requireMethod/ip
+│   │   ├── Response.php           # json(), error(), csv(), redirect()
+│   │   ├── Session.php
 │   │   ├── Validator.php
-│   │   ├── View.php               # render view + layout
-│   │   └── helpers.php            # e(), url(), asset(), rupiah(), dll.
-│   ├── models/
+│   │   ├── View.php               # render view, layout, dan partial()
+│   │   ├── helpers.php            # e(), url(), asset(), rupiah(), __(), log_error()
+│   │   └── exceptions/            # AppException, ValidationException, NotFoundException,
+│   │                              # ConflictException, ForbiddenException
+│   ├── models/                    # semua extends BaseModel
 │   │   ├── User.php
 │   │   ├── Category.php
 │   │   ├── Menu.php
 │   │   ├── Order.php
 │   │   ├── OrderDetail.php
-│   │   └── Payment.php
-│   ├── services/
-│   │   ├── OrderService.php       # buat pesanan, hitung total, ubah status, batal
-│   │   ├── PaymentService.php     # bayar, void
+│   │   ├── Payment.php
+│   │   └── Report.php
+│   ├── services/                  # logika bisnis & transaksi DB (tanpa raw SQL/HTML)
+│   │   ├── AuthService.php        # login throttling berbasis file
+│   │   ├── CategoryService.php
+│   │   ├── MenuService.php
+│   │   ├── OrderService.php
+│   │   ├── PaymentService.php
+│   │   ├── ReceiptService.php
 │   │   ├── ReportService.php
-│   │   └── UploadService.php      # validasi + simpan gambar
-│   ├── controllers/
+│   │   ├── UploadService.php
+│   │   └── UserService.php
+│   ├── controllers/               # semua extends BaseController (instance methods)
 │   │   ├── AuthController.php
 │   │   ├── CategoryController.php
+│   │   ├── LangController.php
 │   │   ├── MenuController.php
-│   │   ├── UserController.php
 │   │   ├── OrderController.php
 │   │   ├── PaymentController.php
-│   │   └── ReportController.php
+│   │   ├── ReceiptController.php
+│   │   ├── ReportController.php
+│   │   └── UserController.php
 │   └── views/
-│       ├── layouts/               # public.php, cashier.php, admin.php, auth.php, print.php
-│       ├── partials/              # head.php, navbar.php, sidebar.php, modal.php, toast.php, icons.php, pagination.php
-│       ├── auth/                  # login.php
+│       ├── layouts/               # app.php (admin & kasir), auth.php, print.php, public.php
+│       ├── partials/              # head.php, navbar.php, sidebar.php, modal.php, toast.php,
+│       │                          # icons.php, lang-switcher.php, theme-toggle.php,
+│       │                          # scripts-core.php, password-checklist.php
 │       ├── customer/              # menu.php, cart.php, checkout.php, track.php, history.php
 │       ├── cashier/               # orders.php, pos.php, history.php
-│       ├── admin/                 # dashboard.php, categories.php, menus.php, users.php, reports.php
-│       └── receipt/               # receipt.php
+│       ├── admin/                 # dashboard.php, login.php, categories.php, menus.php, users.php, reports.php
+│       └── receipt/               # receipt.php, error.php
 │
 ├── public/                        # satu-satunya document root efektif
 │   ├── .htaccess
-│   ├── index.php                  # menu pelanggan
+│   ├── index.php                  # katalog & landing menu pelanggan
 │   ├── cart.php
 │   ├── checkout.php
 │   ├── track.php                  # status satu pesanan
@@ -459,11 +484,14 @@ foodease/                          ← C:\xampp\htdocs\foodease
 │   │   └── receipt.php
 │   ├── admin/
 │   │   ├── index.php              # dashboard
+│   │   ├── login.php              # portal login staf
+│   │   ├── orders.php             # kelola pesanan
 │   │   ├── categories.php
 │   │   ├── menus.php
 │   │   ├── users.php
 │   │   └── reports.php
-│   ├── api/                       # endpoint AJAX (JSON), satu file per aksi
+│   ├── api/                       # endpoint AJAX (JSON), tipis ~8 baris per aksi
+│   │   ├── lang.php
 │   │   ├── auth/        login.php, logout.php
 │   │   ├── categories/  list.php, create.php, update.php, delete.php
 │   │   ├── menus/       list.php, detail.php, create.php, update.php, delete.php, toggle.php
@@ -471,24 +499,28 @@ foodease/                          ← C:\xampp\htdocs\foodease
 │   │   ├── orders/      create.php, track.php, mine.php, list.php, detail.php,
 │   │   │                create-pos.php, update-status.php, cancel.php
 │   │   ├── payments/    pay.php, void.php, list.php
-│   │   └── reports/     summary.php, best-sellers.php, daily.php
+│   │   └── reports/     summary.php, best-sellers.php, daily.php, by-method.php, export.php
 │   ├── assets/
-│   │   ├── css/         app.css            # komponen kecil di luar Tailwind
+│   │   ├── css/         app.css, receipt.css
 │   │   ├── js/
-│   │   │   ├── core/    app.js, api.js, ui.js, format.js, icons.js, cart-store.js
-│   │   │   └── pages/   login.js, menu.js, cart.js, checkout.js, track.js, history.js,
-│   │   │                cashier-orders.js, pos.js, payment.js, cashier-history.js,
-│   │   │                admin-categories.js, admin-menus.js, admin-users.js, admin-reports.js
+│   │   │   ├── core/    api.js, app.js, cart-store.js, format.js, i18n.js, icons.js, ui.js
+│   │   │   └── pages/   admin-categories.js, admin-dashboard.js, admin-login.js, admin-menus.js,
+│   │   │                admin-reports.js, admin-users.js, cart.js, cashier-history.js,
+│   │   │                cashier-orders.js, checkout.js, history.js, menu.js, payment.js,
+│   │   │                pos.js, receipt.js, track.js
 │   │   ├── vendor/jquery/   jquery-3.7.1.min.js
-│   │   └── img/         placeholder-menu.svg, logo.svg
-│   └── uploads/menus/             # foto menu (isi di-gitignore)
+│   │   └── img/         placeholder-menu.svg, hero/
+│   └── uploads/
+│       ├── .htaccess              # Apache 2.4 Require all denied untuk skrip
+│       └── menus/                 # foto menu (isi di-gitignore)
 │
 ├── database/
+│   ├── migrate.php                # CLI runner skema & seeder (--fresh, --seed, --status)
 │   ├── schema.sql
-│   ├── seed.sql
-│   └── seed-users.php             # CLI: buat akun admin + kasir dengan password ter-hash
+│   └── seeders/                   # DatabaseSeeder, UserSeeder, CategorySeeder, MenuSeeder
 │
 ├── storage/
+│   ├── cache/throttle/            # rate-limit login berbasis file (di-gitignore)
 │   └── logs/                      # error log aplikasi (di-gitignore)
 └── docs/                          # opsional: ERD, screenshot, catatan demo
 ```
@@ -529,6 +561,7 @@ Kode HTTP: `200` sukses, `201` dibuat, `401` belum login, `403` tidak berhak / C
 
 | Endpoint | Method | Akses | Fungsi |
 | --- | :---: | --- | --- |
+| `api/lang.php` | POST | publik | Ganti bahasa antarmuka (`id`, `en`, `zh`) + kembalikan kamus |
 | `api/auth/login.php` | POST | publik | Login |
 | `api/auth/logout.php` | POST | login | Logout |
 | `api/categories/list.php` | GET | publik | Daftar kategori |
@@ -558,7 +591,9 @@ Kode HTTP: `200` sukses, `201` dibuat, `401` belum login, `403` tidak berhak / C
 | `api/payments/list.php` | GET | kasir/admin | Riwayat transaksi |
 | `api/reports/summary.php` | GET | admin | Ringkasan pendapatan (`from`, `to`) |
 | `api/reports/best-sellers.php` | GET | admin | Menu terlaris |
-| `api/reports/daily.php` | GET | admin | Pendapatan harian + per metode |
+| `api/reports/daily.php` | GET | admin | Pendapatan harian |
+| `api/reports/by-method.php` | GET | admin | Pendapatan per metode pembayaran |
+| `api/reports/export.php` | GET | admin | Ekspor CSV laporan transaksi lunas (dengan sanitasi CSV formula injection) |
 
 Contoh payload checkout (`api/orders/create.php`):
 
@@ -583,8 +618,8 @@ Field `price` / `total` sengaja **tidak** diterima.
 | SQL Injection | PDO prepared statements di semua query, `ATTR_EMULATE_PREPARES = false` |
 | XSS | `e()` untuk semua output; di JS pakai `.text()` atau fungsi escape, bukan `.html()` untuk data pengguna |
 | CSRF | Token per session, dikirim lewat header `X-CSRF-Token`, diverifikasi di semua `POST` |
-| Session hijacking/fixation | Cookie `HttpOnly`, `SameSite=Lax`, `session_regenerate_id(true)` saat login, timeout idle |
-| Brute force login | Batasi percobaan gagal (mis. 5× per 10 menit per username+IP, disimpan di session/tabel ringan) — P1 |
+| Session hijacking/fixation | Cookie `HttpOnly`, `SameSite=Lax`, `session_regenerate_id(true)` saat login, timeout idle, dan Single Active Session (`users.session_id`) |
+| Brute force login | Throttling 5× per 10 menit per username + `REMOTE_ADDR`, disimpan di `storage/cache/throttle/` (`LOCK_EX`) |
 | Manipulasi harga | Harga hanya dari DB (BR-01) |
 | Double payment | Transaksi + `FOR UPDATE` + unique `order_id` di `payments` (BR-09) |
 | Upload berbahaya | Cek MIME dengan `finfo`, ekstensi whitelist, nama random, batas 2 MB, folder upload tidak mengeksekusi PHP (`php_flag engine off` / `.htaccess`) |
@@ -675,13 +710,15 @@ Aturan: tombol utama **selalu hitam**, bukan hijau. Hijau tidak dipakai sebagai 
 | `/checkout.php` | publik | `customer/checkout` |
 | `/track.php?code=` | publik | `customer/track` |
 | `/orders.php` | publik | `customer/history` |
-| `/login.php` | tamu | `auth/login` |
+| `/login.php` | tamu | `admin/login` |
+| `/admin/login.php` | tamu | `admin/login` |
 | `/logout.php` | login | redirect |
 | `/cashier/` | kasir, admin | `cashier/orders` |
 | `/cashier/pos.php` | kasir, admin | `cashier/pos` |
 | `/cashier/history.php` | kasir, admin | `cashier/history` |
 | `/cashier/receipt.php?code=` | kasir, admin | `receipt/receipt` |
 | `/admin/` | admin | `admin/dashboard` |
+| `/admin/orders.php` | admin | `cashier/orders` |
 | `/admin/categories.php` | admin | `admin/categories` |
 | `/admin/menus.php` | admin | `admin/menus` |
 | `/admin/users.php` | admin | `admin/users` |

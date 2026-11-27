@@ -22,14 +22,10 @@ final class UserSeeder
             ['Kasir Satu',    'kasir1', 'kasir12345', 'cashier', 1],
         ];
 
+        // INSERT IGNORE agar menjalankan ulang --seed tidak menimpa password custom yang sudah diubah
         $stmt = $pdo->prepare(
-            'INSERT INTO users (name, username, password_hash, role, is_active)
-             VALUES (:name, :username, :password_hash, :role, :is_active)
-             ON DUPLICATE KEY UPDATE
-               name          = VALUES(name),
-               password_hash = VALUES(password_hash),
-               role          = VALUES(role),
-               is_active     = VALUES(is_active)'
+            'INSERT IGNORE INTO users (name, username, password_hash, role, is_active)
+             VALUES (:name, :username, :password_hash, :role, :is_active)'
         );
 
         $count = 0;
