@@ -5,11 +5,12 @@
 $(function () {
   'use strict';
 
-  const cfg = window.ReportConfig || {
-    apiSummary:     '/Kopi Nusa/public/api/reports/summary.php',
-    apiBestSellers: '/Kopi Nusa/public/api/reports/best-sellers.php',
-    apiDaily:       '/Kopi Nusa/public/api/reports/daily.php',
-    exportUrl:      '/Kopi Nusa/public/api/reports/export.php'
+  const $root = $('#admin-reports-root');
+  const cfg = {
+    apiSummary:     $root.data('api-summary') || window.Api.resolveUrl('api/reports/summary.php'),
+    apiBestSellers: $root.data('api-best-sellers') || window.Api.resolveUrl('api/reports/best-sellers.php'),
+    apiDaily:       $root.data('api-daily') || window.Api.resolveUrl('api/reports/daily.php'),
+    exportUrl:      $root.data('export-url') || window.Api.resolveUrl('api/reports/export.php')
   };
 
   /**
@@ -51,7 +52,7 @@ $(function () {
    * Escape HTML string
    */
   function escHtml(str) {
-    return $('<div>').text(String(str || '')).html();
+    return window.UI.escape(str);
   }
 
   /**

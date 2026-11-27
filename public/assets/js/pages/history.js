@@ -11,8 +11,7 @@ $(function () {
   'use strict';
 
   function getBaseUrl() {
-    const baseEl = document.querySelector('base');
-    return baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/Kopi Nusa/';
+    return window.Api.baseUrl();
   }
 
   let cachedOrders = [];
@@ -24,10 +23,8 @@ $(function () {
       loadMyOrders();
     });
 
-    $(document).on('nola:lang-changed kopinusa:lang-changed', function () {
-      if (cachedOrders && cachedOrders.length) {
-        renderOrdersList(cachedOrders);
-      }
+    $(document).on('app:lang-changed', function () {
+      loadMyOrders();
     });
   }
 
@@ -37,30 +34,25 @@ $(function () {
     $('#history-empty').addClass('hidden');
     $('#history-list').addClass('hidden').empty();
 
-    $.ajax({
-      url: getBaseUrl() + 'api/orders/mine.php',
-      type: 'GET',
-      dataType: 'json'
-    })
-    .done(function (res) {
-      showLoading(false);
-      const orders = (res && res.data && Array.isArray(res.data)) ? res.data : [];
-      cachedOrders = orders;
+    window.Api.get('api/orders/mine.php')
+      .then(function (res) {
+        showLoading(false);
+        const orders = (res && res.data && Array.isArray(res.data)) ? res.data : [];
+        cachedOrders = orders;
 
-      if (!orders.length) {
-        $('#history-empty').removeClass('hidden');
-        return;
-      }
+        if (!orders.length) {
+          $('#history-empty').removeClass('hidden');
+          return;
+        }
 
-      renderOrdersList(orders);
-    })
-    .fail(function (jqXHR) {
-      showLoading(false);
-      const res = jqXHR.responseJSON;
-      const msg = (res && res.message) ? res.message : 'Gagal memuat riwayat pesanan.';
-      $('#history-error-text').text(msg);
-      $('#history-error').removeClass('hidden');
-    });
+        renderOrdersList(orders);
+      })
+      .catch(function (err) {
+        showLoading(false);
+        const msg = (err && err.message) ? err.message : 'Gagal memuat riwayat pesanan.';
+        $('#history-error-text').text(msg);
+        $('#history-error').removeClass('hidden');
+      });
   }
 
   function t(key, fallback) {
@@ -71,8 +63,8 @@ $(function () {
     const $container = $('#history-list').empty();
 
     orders.forEach(function (order) {
-      const code = $('<div>').text(order.order_code).html();
-      const name = $('<div>').text(order.customer_name).html();
+      const code = window.UI.escape(order.order_code);
+      const name = window.UI.escape(order.customer_name);
       const dateStr = window.Fmt.datetime(order.created_at);
       const totalStr = window.Fmt.rupiah(order.total);
 
@@ -86,7 +78,7 @@ $(function () {
       if (order.items && order.items.length) {
         const itemNames = order.items.map(function (it) {
           const menuTitle = window.I18n ? window.I18n.translateMenuName(it.menu_name) : it.menu_name;
-          return $('<div>').text(menuTitle).html() + ' × ' + it.qty;
+          return window.UI.escape(menuTitle) + ' × ' + it.qty;
         });
         itemsSummary = itemNames.join(', ');
       } else {

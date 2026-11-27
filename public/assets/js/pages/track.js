@@ -18,8 +18,7 @@ $(function () {
   const PLACEHOLDER = 'assets/img/placeholder-menu.svg';
 
   function getBaseUrl() {
-    const baseEl = document.querySelector('base');
-    return baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/Kopi Nusa/';
+    return window.Api.baseUrl();
   }
 
   let currentCode    = '';
@@ -55,9 +54,9 @@ $(function () {
      EVENT LISTENERS
      ============================================================ */
   function bindEvents() {
-    $(document).on('nola:lang-changed kopinusa:lang-changed', function () {
-      if (cachedOrderData) {
-        renderOrderData(cachedOrderData);
+    $(document).on('app:lang-changed', function () {
+      if (currentCode) {
+        fetchOrderStatus(currentCode, currentName, true);
       }
     });
 
@@ -122,26 +121,19 @@ $(function () {
       params.name = name;
     }
 
-    $.ajax({
-      url: getBaseUrl() + 'api/orders/track.php',
-      type: 'GET',
-      data: params,
-      dataType: 'json'
-    })
-    .done(function (res) {
-      showLoading(false);
-      if (res && res.success && res.data) {
-        renderOrderData(res.data);
-      } else {
-        showError(res.message || 'Pesanan tidak ditemukan.');
-      }
-    })
-    .fail(function (jqXHR) {
-      showLoading(false);
-      const res = jqXHR.responseJSON;
-      const msg = (res && res.message) ? res.message : 'Pesanan tidak ditemukan.';
-      showError(msg);
-    });
+    window.Api.get('api/orders/track.php', params)
+      .then(function (res) {
+        showLoading(false);
+        if (res && res.success && res.data) {
+          renderOrderData(res.data);
+        } else {
+          showError((res && res.message) || 'Pesanan tidak ditemukan.');
+        }
+      })
+      .catch(function (err) {
+        showLoading(false);
+        showError((err && err.message) ? err.message : 'Pesanan tidak ditemukan.');
+      });
   }
 
   /* ============================================================
@@ -309,13 +301,13 @@ $(function () {
       const $row = $(`
         <div class="flex items-center gap-3 py-2.5">
           <img
-            src="${$('<div>').text(imgSrc).html()}"
-            alt="${$('<div>').text(itemTitle).html()}"
+            src="${window.UI.escape(imgSrc)}"
+            alt="${window.UI.escape(itemTitle)}"
             class="w-10 h-10 rounded-lg object-cover bg-surface border border-line shrink-0"
             onerror="this.src='${PLACEHOLDER}'"
           >
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-ink line-clamp-1">${$('<div>').text(itemTitle).html()}</p>
+            <p class="text-sm font-medium text-ink line-clamp-1">${window.UI.escape(itemTitle)}</p>
             <p class="text-xs text-subtle tabular-nums">${window.Fmt.rupiah(item.price)} × ${item.qty}</p>
           </div>
           <p class="text-sm font-bold text-ink tabular-nums shrink-0">${window.Fmt.rupiah(item.subtotal)}</p>

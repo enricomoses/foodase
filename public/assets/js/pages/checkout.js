@@ -62,12 +62,9 @@ $(function () {
 
     const ids    = cartItems.map(function (it) { return it.id; });
     const params = ids.map(function (id) { return 'ids[]=' + encodeURIComponent(id); }).join('&');
-    const baseEl = document.querySelector('base');
-    const base   = baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/Kopi Nusa/';
-    const url    = base + 'api/menus/list.php?' + params + '&include_unavailable=1&per_page=100';
 
-    $.ajax({ url: url, type: 'GET', dataType: 'json' })
-      .done(function (res) {
+    window.Api.get('api/menus/list.php?' + params + '&include_unavailable=1&per_page=100')
+      .then(function (res) {
         if (res && res.data && res.data.data) {
           const serverMap = {};
           res.data.data.forEach(function (m) {
@@ -77,9 +74,9 @@ $(function () {
           cartItems.forEach(function (item) {
             const sm = serverMap[parseInt(item.id, 10)];
             if (sm) {
-              item.name       = sm.name;
-              item.price      = parseInt(sm.price, 10) || item.price;
-              item.image_url  = sm.image_url || item.image_url || null;
+              item.name        = sm.name;
+              item.price       = parseInt(sm.price, 10) || item.price;
+              item.image_url   = sm.image_url || item.image_url || null;
               item.unavailable = !sm.is_available;
             } else {
               item.unavailable = true;
@@ -88,8 +85,7 @@ $(function () {
         }
         renderCartSummary();
       })
-      .fail(function () {
-        // Tampilkan dengan data lokal — server akan re-validasi
+      .catch(function () {
         renderCartSummary();
       });
   }
@@ -123,13 +119,13 @@ $(function () {
       const $row = $(`
         <div class="flex items-center gap-3 py-2">
           <img
-            src="${$('<div>').text(imgSrc).html()}"
-            alt="${$('<div>').text(item.name).html()}"
+            src="${window.UI.escape(imgSrc)}"
+            alt="${window.UI.escape(item.name)}"
             class="w-10 h-10 rounded-lg object-cover bg-surface border border-line shrink-0"
             onerror="this.src='${PLACEHOLDER}'"
           >
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-ink line-clamp-1">${$('<div>').text(item.name).html()}</p>
+            <p class="text-sm font-medium text-ink line-clamp-1">${window.UI.escape(item.name)}</p>
             <p class="text-xs text-subtle tabular-nums">${formatRupiah(item.price)} × ${item.qty}</p>
           </div>
           <p class="text-sm font-bold text-ink tabular-nums shrink-0">${formatRupiah(lineTotal)}</p>
@@ -268,50 +264,38 @@ $(function () {
       payload.table_number = parseInt($('#input-table-number').val(), 10);
     }
 
-    const baseEl = document.querySelector('base');
-    const base   = baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/Kopi Nusa/';
-
-    $.ajax({
-      url:         base + 'api/orders/create.php',
-      type:        'POST',
-      contentType: 'application/json; charset=utf-8',
-      dataType:    'json',
-      data:        JSON.stringify(payload),
-      headers:     { 'X-CSRF-Token': getCsrfToken() }
-    })
-    .done(function (res) {
-      if (res && res.success && res.data) {
-        onOrderSuccess(res.data.order_code, res.data.total);
-      } else {
-        showServerError(res.message || 'Terjadi kesalahan. Coba lagi.');
+    window.Api.post('api/orders/create.php', payload)
+      .then(function (res) {
+        if (res && res.success && res.data) {
+          onOrderSuccess(res.data.order_code, res.data.total);
+        } else {
+          showServerError((res && res.message) || 'Terjadi kesalahan. Coba lagi.');
+          setSubmitting(false);
+          isSubmitting = false;
+        }
+      })
+      .catch(function (err) {
+        if (err) {
+          showServerError(err.message || 'Terjadi kesalahan.');
+          if (err.errors && typeof err.errors === 'object') {
+            const fieldMap = {
+              customer_name: 'customer-name',
+              order_type:    'order-type',
+              table_number:  'table-number',
+              notes:         'notes',
+              items:         'customer-name'
+            };
+            $.each(err.errors, function (field, msg) {
+              const htmlField = fieldMap[field] || field;
+              showFieldError(htmlField, msg);
+            });
+          }
+        } else {
+          showServerError('Gagal terhubung ke server. Periksa koneksi Anda.');
+        }
         setSubmitting(false);
         isSubmitting = false;
-      }
-    })
-    .fail(function (jqXHR) {
-      const res = jqXHR.responseJSON;
-      if (res) {
-        showServerError(res.message || 'Terjadi kesalahan.');
-        // Tampilkan error per-field dari server
-        if (res.errors && typeof res.errors === 'object') {
-          const fieldMap = {
-            customer_name: 'customer-name',
-            order_type:    'order-type',
-            table_number:  'table-number',
-            notes:         'notes',
-            items:         'customer-name' // tampilkan di posisi umum
-          };
-          $.each(res.errors, function (field, msg) {
-            const htmlField = fieldMap[field] || field;
-            showFieldError(htmlField, msg);
-          });
-        }
-      } else {
-        showServerError('Gagal terhubung ke server. Periksa koneksi Anda.');
-      }
-      setSubmitting(false);
-      isSubmitting = false;
-    });
+      });
   });
 
   function setSubmitting(state) {
@@ -333,8 +317,7 @@ $(function () {
     // Kosongkan keranjang
     CartStore.clear();
     try {
-      localStorage.setItem('nola_last_order', orderCode);
-      localStorage.setItem('kopinusa_last_order', orderCode);
+      localStorage.setItem('foodease_last_order', orderCode);
     } catch (e) {}
 
     // Tampilkan kode pesanan dan total
@@ -342,9 +325,7 @@ $(function () {
     $('#success-total').text(formatRupiah(total));
 
     // Tombol lacak pesanan
-    const baseEl = document.querySelector('base');
-    const base   = baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/Kopi Nusa/';
-    $('#btn-track-order').attr('href', base + 'track.php?code=' + encodeURIComponent(orderCode));
+    $('#btn-track-order').attr('href', window.Api.baseUrl() + 'track.php?code=' + encodeURIComponent(orderCode));
 
     // Ganti tampilan
     $('#checkout-form-section').addClass('hidden');

@@ -6,10 +6,11 @@
 $(function () {
   'use strict';
 
-  const cfg = window.DashboardConfig || {
-    apiSummary:     '/Kopi Nusa/public/api/reports/summary.php',
-    apiBestSellers: '/Kopi Nusa/public/api/reports/best-sellers.php',
-    apiDaily:       '/Kopi Nusa/public/api/reports/daily.php'
+  const $root = $('#admin-dashboard-root');
+  const cfg = {
+    apiSummary:     $root.data('api-summary') || window.Api.resolveUrl('api/reports/summary.php'),
+    apiBestSellers: $root.data('api-best-sellers') || window.Api.resolveUrl('api/reports/best-sellers.php'),
+    apiDaily:       $root.data('api-daily') || window.Api.resolveUrl('api/reports/daily.php')
   };
 
   /* ── Helpers ─────────────────────────────────────────────────────────── */

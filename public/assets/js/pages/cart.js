@@ -62,47 +62,34 @@ $(function () {
   function syncWithServer() {
     const ids = cartItems.map(function (it) { return it.id; });
 
-    // Bangun query string manual karena $.ajax data param tidak support array parameter berganda
     const params = ids.map(function (id) { return 'ids[]=' + encodeURIComponent(id); }).join('&');
-    const url = (function () {
-      const baseEl = document.querySelector('base');
-      const base = baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/Kopi Nusa/';
-      return base + 'api/menus/list.php?' + params + '&include_unavailable=1&per_page=100';
-    })();
 
-    $.ajax({
-      url: url,
-      type: 'GET',
-      dataType: 'json'
-    })
-    .done(function (res) {
-      if (res && res.data && res.data.data) {
-        const serverMenus = res.data.data;
-        const serverMap = {};
-        serverMenus.forEach(function (m) {
-          serverMap[parseInt(m.id, 10)] = m;
-        });
+    window.Api.get('api/menus/list.php?' + params + '&include_unavailable=1&per_page=100')
+      .then(function (res) {
+        if (res && res.data && res.data.data) {
+          const serverMenus = res.data.data;
+          const serverMap = {};
+          serverMenus.forEach(function (m) {
+            serverMap[parseInt(m.id, 10)] = m;
+          });
 
-        cartItems.forEach(function (item) {
-          const sm = serverMap[parseInt(item.id, 10)];
-          if (sm) {
-            // Perbarui harga, nama, image_url dari server
-            item.name      = sm.name;
-            item.price     = parseInt(sm.price, 10) || item.price;
-            item.image_url = sm.image_url || item.image_url || null;
-            item.unavailable = !sm.is_available;
-          } else {
-            // Tidak ditemukan di server — tandai tidak tersedia
-            item.unavailable = true;
-          }
-        });
-      }
-      renderCart();
-    })
-    .fail(function () {
-      // Jika gagal sinkron → render dengan data lokal, tanpa memblokir
-      renderCart();
-    });
+          cartItems.forEach(function (item) {
+            const sm = serverMap[parseInt(item.id, 10)];
+            if (sm) {
+              item.name        = sm.name;
+              item.price       = parseInt(sm.price, 10) || item.price;
+              item.image_url   = sm.image_url || item.image_url || null;
+              item.unavailable = !sm.is_available;
+            } else {
+              item.unavailable = true;
+            }
+          });
+        }
+        renderCart();
+      })
+      .catch(function () {
+        renderCart();
+      });
   }
 
   /* ============================================================
@@ -137,8 +124,8 @@ $(function () {
           <!-- Foto Kecil -->
           <div class="relative shrink-0">
             <img
-              src="${$('<div>').text(imgSrc).html()}"
-              alt="${$('<div>').text(displayName).html()}"
+              src="${window.UI.escape(imgSrc)}"
+              alt="${window.UI.escape(displayName)}"
               class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover bg-surface border border-line ${isUnavail ? 'opacity-50' : ''}"
               onerror="this.src='${PLACEHOLDER}'"
             >
@@ -148,7 +135,7 @@ $(function () {
           <!-- Nama & Harga -->
           <div class="flex-1 min-w-0">
             <p class="font-semibold text-sm sm:text-base text-ink leading-snug line-clamp-2">
-              ${$('<div>').text(displayName).html()}
+              ${window.UI.escape(displayName)}
             </p>
             <p class="mt-0.5 text-xs text-subtle tabular-nums">${priceFormatted} / item</p>
             <p class="mt-1 text-sm font-bold text-ink tabular-nums">${lineTotal}</p>
@@ -372,16 +359,15 @@ $(function () {
      ============================================================ */
   $(window).on('storage', function (e) {
     const orig = e.originalEvent || e;
-    if (orig && (orig.key === 'nola_cart' || orig.key === 'kopinusa_cart')) {
-      // Re-init saat localStorage berubah dari tab lain
+    if (orig && (orig.key === 'foodease_cart' || orig.key === 'nola_cart' || orig.key === 'kopinusa_cart')) {
       init();
     }
   });
 
   // Re-render keranjang jika bahasa berubah
-  $(document).on('nola:lang-changed kopinusa:lang-changed', function () {
+  $(document).on('app:lang-changed', function () {
     if (cartItems && cartItems.length) {
-      renderCart();
+      syncWithServer();
     }
   });
 

@@ -20,13 +20,11 @@ $(function () {
   const PLACEHOLDER = 'assets/img/placeholder-menu.svg';
 
   function getBaseUrl() {
-    const baseEl = document.querySelector('base');
-    return baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/Kopi Nusa/';
+    return window.Api.baseUrl();
   }
 
   function getCsrfToken() {
-    const meta = document.querySelector('meta[name="csrf-token"]');
-    return meta ? meta.getAttribute('content') : '';
+    return window.Api.csrfToken();
   }
 
   function timeAgo(dateStr) {
@@ -310,30 +308,24 @@ $(function () {
       per_page: 20
     };
 
-    $.ajax({
-      url:      getBaseUrl() + 'api/orders/list.php',
-      type:     'GET',
-      data:     params,
-      dataType: 'json'
-    })
-    .done(function (res) {
-      isRequestPending = false;
-      showLoading(false);
+    window.Api.get('api/orders/list.php', params)
+      .then(function (res) {
+        isRequestPending = false;
+        showLoading(false);
 
-      if (res && res.success && res.data) {
-        handleOrdersSuccess(res.data, isBackground);
-      } else {
-        showError(res.message || 'Gagal memuat pesanan.');
-      }
-    })
-    .fail(function (jqXHR) {
-      isRequestPending = false;
-      showLoading(false);
-      if (!isBackground) {
-        const res = jqXHR.responseJSON;
-        showError((res && res.message) ? res.message : 'Terjadi kesalahan saat memuat data.');
-      }
-    });
+        if (res && res.success && res.data) {
+          handleOrdersSuccess(res.data, isBackground);
+        } else {
+          showError((res && res.message) || 'Gagal memuat pesanan.');
+        }
+      })
+      .catch(function (err) {
+        isRequestPending = false;
+        showLoading(false);
+        if (!isBackground) {
+          showError((err && err.message) ? err.message : 'Terjadi kesalahan saat memuat data.');
+        }
+      });
   }
 
   /* ============================================================
@@ -417,9 +409,9 @@ $(function () {
     $('#table-empty').addClass('hidden');
 
     orders.forEach(function (order) {
-      const code    = $('<div>').text(order.order_code).html();
-      const name    = $('<div>').text(order.customer_name).html();
-      const summary = $('<div>').text(order.items_summary || '').html();
+      const code    = window.UI.escape(order.order_code);
+      const name    = window.UI.escape(order.customer_name);
+      const summary = window.UI.escape(order.items_summary || '');
       const total   = window.Fmt.rupiah(order.total);
       const time    = timeAgo(order.created_at);
 
@@ -559,27 +551,19 @@ $(function () {
     $('#terminal-total-amount').text('Rp 0');
 
     // Ambil detail lengkap pesanan via API
-    $.ajax({
-      url:      getBaseUrl() + 'api/orders/detail.php',
-      type:     'GET',
-      data:     { code: code },
-      dataType: 'json'
-    })
-    .done(function (res) {
-      if (res && res.success && res.data) {
-        populateTerminalPanel(res.data, focusPaymentInput);
-      } else {
-        if (window.UI && typeof window.UI.toast === 'function') {
-          window.UI.toast('error', res.message || 'Gagal memuat detail pesanan.');
+    window.Api.get('api/orders/detail.php', { code: code })
+      .then(function (res) {
+        if (res && res.success && res.data) {
+          populateTerminalPanel(res.data, focusPaymentInput);
+        } else if (window.UI && typeof window.UI.toast === 'function') {
+          window.UI.toast('error', (res && res.message) || 'Gagal memuat detail pesanan.');
         }
-      }
-    })
-    .fail(function (jqXHR) {
-      const res = jqXHR.responseJSON;
-      if (window.UI && typeof window.UI.toast === 'function') {
-        window.UI.toast('error', (res && res.message) ? res.message : 'Terjadi kesalahan saat memuat rincian.');
-      }
-    });
+      })
+      .catch(function (err) {
+        if (window.UI && typeof window.UI.toast === 'function') {
+          window.UI.toast('error', (err && err.message) ? err.message : 'Terjadi kesalahan saat memuat rincian.');
+        }
+      });
   }
 
   function populateTerminalPanel(data, focusPaymentInput) {
@@ -621,13 +605,13 @@ $(function () {
         const $itemRow = $(`
           <div class="flex items-center gap-2.5 py-2">
             <img
-              src="${$('<div>').text(imgSrc).html()}"
-              alt="${$('<div>').text(it.menu_name).html()}"
+              src="${window.UI.escape(imgSrc)}"
+              alt="${window.UI.escape(it.menu_name)}"
               class="w-9 h-9 rounded-lg object-cover bg-surface border border-line shrink-0"
               onerror="this.src='${PLACEHOLDER}'"
             >
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-bold text-ink truncate">${$('<div>').text(it.menu_name).html()}</p>
+              <p class="text-xs font-bold text-ink truncate">${window.UI.escape(it.menu_name)}</p>
               <p class="text-[11px] text-subtle tabular-nums">${window.Fmt.rupiah(it.price)} × ${it.qty}</p>
             </div>
             <p class="text-xs font-bold text-ink tabular-nums shrink-0">${window.Fmt.rupiah(it.subtotal)}</p>
@@ -873,55 +857,40 @@ $(function () {
       $btn.prop('disabled', true);
     }
 
-    $.ajax({
-      url:         getBaseUrl() + 'api/payments/pay.php',
-      type:        'POST',
-      contentType: 'application/json',
-      data:        JSON.stringify({
-        order_id:    order.id,
-        method:      method,
-        amount_paid: amountPaid
-      }),
-      dataType:    'json',
-      headers:     { 'X-CSRF-Token': getCsrfToken() }
+    window.Api.post('api/payments/pay.php', {
+      order_id:    order.id,
+      method:      method,
+      amount_paid: amountPaid
     })
-    .done(function (res) {
-      if (window.UI && typeof window.UI.setLoading === 'function') {
-        window.UI.setLoading($btn, false);
-      } else {
-        $btn.prop('disabled', false);
-      }
-
-      if (res && res.success && res.data) {
-        if (window.UI && typeof window.UI.toast === 'function') {
-          window.UI.toast('success', 'Pembayaran berhasil! Kode: ' + res.data.payment_code);
+      .then(function (res) {
+        if (window.UI && typeof window.UI.setLoading === 'function') {
+          window.UI.setLoading($btn, false);
+        } else {
+          $btn.prop('disabled', false);
         }
 
-        // Tawarkan struk instan
-        offerPrintReceipt(order.order_code, res.data);
+        if (res && res.success && res.data) {
+          if (window.UI && typeof window.UI.toast === 'function') {
+            window.UI.toast('success', 'Pembayaran berhasil! Kode: ' + res.data.payment_code);
+          }
 
-        // Segarkan data pesanan
-        fetchOrders(false);
-
-        // Muat ulang rincian pesanan yang baru dibayar
-        selectOrder(order.order_code, false);
-      } else {
-        if (window.UI && typeof window.UI.toast === 'function') {
-          window.UI.toast('error', res.message || 'Gagal memproses pembayaran.');
+          offerPrintReceipt(order.order_code, res.data);
+          fetchOrders(false);
+          selectOrder(order.order_code, false);
+        } else if (window.UI && typeof window.UI.toast === 'function') {
+          window.UI.toast('error', (res && res.message) || 'Gagal memproses pembayaran.');
         }
-      }
-    })
-    .fail(function (jqXHR) {
-      if (window.UI && typeof window.UI.setLoading === 'function') {
-        window.UI.setLoading($btn, false);
-      } else {
-        $btn.prop('disabled', false);
-      }
-      const res = jqXHR.responseJSON;
-      if (window.UI && typeof window.UI.toast === 'function') {
-        window.UI.toast('error', (res && res.message) ? res.message : 'Terjadi kesalahan saat memproses pembayaran.');
-      }
-    });
+      })
+      .catch(function (err) {
+        if (window.UI && typeof window.UI.setLoading === 'function') {
+          window.UI.setLoading($btn, false);
+        } else {
+          $btn.prop('disabled', false);
+        }
+        if (window.UI && typeof window.UI.toast === 'function') {
+          window.UI.toast('error', (err && err.message) ? err.message : 'Terjadi kesalahan saat memproses pembayaran.');
+        }
+      });
   }
 
   /* ============================================================

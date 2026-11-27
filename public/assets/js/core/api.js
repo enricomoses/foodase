@@ -1,8 +1,26 @@
 /**
  * Wrapper pemanggilan API HTTP terstandarisasi berbasis Promise & jQuery AJAX.
+ * Menangani base URL dan header X-CSRF-Token secara terpusat.
  */
 window.Api = (function ($) {
   'use strict';
+
+  function getBaseUrl() {
+    var meta = document.querySelector('meta[name="app-base-url"]');
+    if (meta && meta.content) {
+      return meta.content.replace(/\/+$/, '') + '/';
+    }
+    var baseEl = document.querySelector('base');
+    if (baseEl && baseEl.href) {
+      return baseEl.href.replace(/\/+$/, '') + '/';
+    }
+    return '/';
+  }
+
+  function getCsrfToken() {
+    var meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? (meta.content || '') : '';
+  }
 
   function normalizeResponse(res) {
     return {
@@ -14,8 +32,8 @@ window.Api = (function ($) {
   }
 
   function normalizeError(jqXHR) {
-    let message = 'Gagal terhubung ke server.';
-    let errors = [];
+    var message = 'Gagal terhubung ke server.';
+    var errors = [];
 
     if (jqXHR.responseJSON) {
       if (jqXHR.responseJSON.message) {
@@ -42,18 +60,14 @@ window.Api = (function ($) {
     if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/')) {
       return url;
     }
-    const baseEl = document.querySelector('base');
-    const base = baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/foodease/';
-    return base + url.replace(/^\/+/, '');
+    return getBaseUrl() + url.replace(/^\/+/, '');
   }
 
   return {
-    /**
-     * HTTP GET request.
-     * @param {string} url
-     * @param {object} [params={}]
-     * @returns {Promise<{success: boolean, message: string, data: any, errors: any}>}
-     */
+    baseUrl: getBaseUrl,
+    csrfToken: getCsrfToken,
+    resolveUrl: resolveUrl,
+
     get: function (url, params) {
       return new Promise(function (resolve, reject) {
         $.ajax({
@@ -62,21 +76,11 @@ window.Api = (function ($) {
           data: params || {},
           dataType: 'json'
         })
-        .done(function (res) {
-          resolve(normalizeResponse(res));
-        })
-        .fail(function (jqXHR) {
-          reject(normalizeError(jqXHR));
-        });
+          .done(function (res) { resolve(normalizeResponse(res)); })
+          .fail(function (jqXHR) { reject(normalizeError(jqXHR)); });
       });
     },
 
-    /**
-     * HTTP POST request dengan payload JSON.
-     * @param {string} url
-     * @param {object} [data={}]
-     * @returns {Promise<{success: boolean, message: string, data: any, errors: any}>}
-     */
     post: function (url, data) {
       return new Promise(function (resolve, reject) {
         $.ajax({
@@ -84,23 +88,14 @@ window.Api = (function ($) {
           type: 'POST',
           data: JSON.stringify(data || {}),
           contentType: 'application/json; charset=utf-8',
+          headers: { 'X-CSRF-Token': getCsrfToken() },
           dataType: 'json'
         })
-        .done(function (res) {
-          resolve(normalizeResponse(res));
-        })
-        .fail(function (jqXHR) {
-          reject(normalizeError(jqXHR));
-        });
+          .done(function (res) { resolve(normalizeResponse(res)); })
+          .fail(function (jqXHR) { reject(normalizeError(jqXHR)); });
       });
     },
 
-    /**
-     * HTTP POST request dengan FormData (mis. upload file atau form multipart).
-     * @param {string} url
-     * @param {FormData} formData
-     * @returns {Promise<{success: boolean, message: string, data: any, errors: any}>}
-     */
     postForm: function (url, formData) {
       return new Promise(function (resolve, reject) {
         $.ajax({
@@ -109,14 +104,11 @@ window.Api = (function ($) {
           data: formData,
           processData: false,
           contentType: false,
+          headers: { 'X-CSRF-Token': getCsrfToken() },
           dataType: 'json'
         })
-        .done(function (res) {
-          resolve(normalizeResponse(res));
-        })
-        .fail(function (jqXHR) {
-          reject(normalizeError(jqXHR));
-        });
+          .done(function (res) { resolve(normalizeResponse(res)); })
+          .fail(function (jqXHR) { reject(normalizeError(jqXHR)); });
       });
     }
   };

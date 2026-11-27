@@ -15,7 +15,11 @@ $(function () {
   /* ------------------------------------------------------------------ */
   /* Konfigurasi & state                                                  */
   /* ------------------------------------------------------------------ */
-  const cfg      = window.HistoryConfig || { isAdmin: false, receiptBase: '/Kopi Nusa/public/cashier/receipt.php?code=' };
+  const $root    = $('#cashier-history-root');
+  const cfg      = {
+    isAdmin:     String($root.data('is-admin')) === '1',
+    receiptBase: $root.data('receipt-base') || window.Api.resolveUrl('cashier/receipt.php?code=')
+  };
   const API_LIST = 'api/payments/list.php';
   const API_VOID = 'api/payments/void.php';
 
@@ -391,7 +395,7 @@ $(function () {
   /* Util: escape HTML (tanpa .html() mentah untuk data pengguna)        */
   /* ------------------------------------------------------------------ */
   function escHtml(str) {
-    return $('<div>').text(String(str || '')).html();
+    return window.UI.escape(str);
   }
 
   /* ------------------------------------------------------------------ */

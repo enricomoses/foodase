@@ -16,8 +16,7 @@ window.PaymentModal = (function ($) {
 
   /* ── Helpers ──────────────────────────────────────────────── */
   function getBaseUrl() {
-    const baseEl = document.querySelector('base');
-    return baseEl ? baseEl.href.replace(/\/+$/, '') + '/' : '/Kopi Nusa/';
+    return window.Api.baseUrl();
   }
 
   function getCsrfToken() {
@@ -209,45 +208,37 @@ window.PaymentModal = (function ($) {
       $btn.prop('disabled', true).text('Memproses...');
     }
 
-    $.ajax({
-      url:         getBaseUrl() + 'api/payments/pay.php',
-      type:        'POST',
-      contentType: 'application/json',
-      data:        JSON.stringify({
-        order_id:    currentOrder.id,
-        method:      method,
-        amount_paid: amountPaid
-      }),
-      dataType:    'json',
-      headers:     { 'X-CSRF-Token': getCsrfToken() }
+    window.Api.post('api/payments/pay.php', {
+      order_id:    currentOrder.id,
+      method:      method,
+      amount_paid: amountPaid
     })
-    .done(function (res) {
-      if (window.UI && typeof window.UI.setLoading === 'function') {
-        window.UI.setLoading($btn, false);
-      } else {
-        $btn.prop('disabled', false);
-      }
-
-      if (res && res.success && res.data) {
-        close();
-        showToast('Pembayaran berhasil! Kode: ' + res.data.payment_code, 'success');
-        if (typeof onSuccessCallback === 'function') {
-          onSuccessCallback(res.data);
+      .then(function (res) {
+        if (window.UI && typeof window.UI.setLoading === 'function') {
+          window.UI.setLoading($btn, false);
+        } else {
+          $btn.prop('disabled', false);
         }
-      } else {
-        showToast(res.message || 'Gagal memproses pembayaran.', 'error');
-      }
-    })
-    .fail(function (jqXHR) {
-      if (window.UI && typeof window.UI.setLoading === 'function') {
-        window.UI.setLoading($btn, false);
-      } else {
-        $btn.prop('disabled', false);
-      }
 
-      const res = jqXHR.responseJSON;
-      showToast((res && res.message) ? res.message : 'Terjadi kesalahan saat memproses pembayaran.', 'error');
-    });
+        if (res && res.success && res.data) {
+          close();
+          showToast('Pembayaran berhasil! Kode: ' + res.data.payment_code, 'success');
+          if (typeof onSuccessCallback === 'function') {
+            onSuccessCallback(res.data);
+          }
+        } else {
+          showToast((res && res.message) || 'Gagal memproses pembayaran.', 'error');
+        }
+      })
+      .catch(function (err) {
+        if (window.UI && typeof window.UI.setLoading === 'function') {
+          window.UI.setLoading($btn, false);
+        } else {
+          $btn.prop('disabled', false);
+        }
+
+        showToast((err && err.message) ? err.message : 'Terjadi kesalahan saat memproses pembayaran.', 'error');
+      });
   }
 
   /* ── Toast Notification ──────────────────────────────────── */

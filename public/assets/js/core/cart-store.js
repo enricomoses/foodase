@@ -1,16 +1,20 @@
 /**
- * CartStore — Pengelola penyimpanan keranjang belanja berbasis localStorage.
- * Standar: FR-CART-01..04.
+ * CartStore — Pengelola keranjang belanja berbasis localStorage (FR-CART-01..04, BR-03).
  */
 window.CartStore = (function ($) {
   'use strict';
 
-  const STORAGE_KEY = 'nola_cart';
+  var STORAGE_KEY = 'foodease_cart';
+  var MAX_QTY = 99;
+  var MAX_ITEM_KIND = 30;
 
   function readCart() {
     try {
-      const data = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('kopinusa_cart');
-      return data ? JSON.parse(data) : [];
+      var data = localStorage.getItem(STORAGE_KEY)
+        || localStorage.getItem('nola_cart')
+        || localStorage.getItem('kopinusa_cart');
+      var parsed = data ? JSON.parse(data) : [];
+      return Array.isArray(parsed) ? parsed : [];
     } catch (e) {
       return [];
     }
@@ -24,57 +28,51 @@ window.CartStore = (function ($) {
   }
 
   function updateBadge() {
-    const items = readCart();
-    const totalCount = items.reduce(function (sum, item) {
+    var items = readCart();
+    var totalCount = items.reduce(function (sum, item) {
       return sum + (parseInt(item.qty, 10) || 1);
     }, 0);
     $('#cart-count, .cart-badge-count').text(totalCount);
   }
 
-  // Update badge saat halaman selesai dimuat
   $(function () {
     updateBadge();
   });
 
   return {
-    /**
-     * Dapatkan semua item di keranjang.
-     * @returns {Array}
-     */
+    MAX_QTY: MAX_QTY,
+    MAX_ITEM_KIND: MAX_ITEM_KIND,
+
     getItems: function () {
       return readCart();
     },
 
-    /**
-     * Dapatkan total jumlah item (sum of quantities).
-     * @returns {number}
-     */
     count: function () {
-      const items = readCart();
-      return items.reduce(function (sum, item) {
+      return readCart().reduce(function (sum, item) {
         return sum + (parseInt(item.qty, 10) || 1);
       }, 0);
     },
 
-    /**
-     * Tambahkan menu ke keranjang dengan jumlah tertentu.
-     * @param {object} menu {id, name, price, image, image_url, category_name}
-     * @param {number} [qty=1]
-     * @returns {Array}
-     */
     add: function (menu, qty) {
       qty = parseInt(qty, 10) || 1;
       if (qty <= 0) return readCart();
 
-      const items = readCart();
-      const menuId = parseInt(menu.id, 10);
-      const existing = items.find(function (it) {
+      var items = readCart();
+      var menuId = parseInt(menu.id, 10);
+      var existing = items.find(function (it) {
         return parseInt(it.id, 10) === menuId;
       });
 
       if (existing) {
-        existing.qty = (parseInt(existing.qty, 10) || 0) + qty;
+        var nextQty = Math.min(MAX_QTY, (parseInt(existing.qty, 10) || 0) + qty);
+        existing.qty = nextQty;
       } else {
+        if (items.length >= MAX_ITEM_KIND) {
+          if (window.UI && typeof window.UI.toast === 'function') {
+            window.UI.toast('warning', 'Maksimal ' + MAX_ITEM_KIND + ' jenis menu per pesanan.');
+          }
+          return items;
+        }
         items.push({
           id: menuId,
           name: menu.name,
@@ -82,7 +80,7 @@ window.CartStore = (function ($) {
           image: menu.image || null,
           image_url: menu.image_url || null,
           category_name: menu.category_name || '',
-          qty: qty
+          qty: Math.min(MAX_QTY, qty)
         });
       }
 
@@ -90,27 +88,15 @@ window.CartStore = (function ($) {
       return items;
     },
 
-    /**
-     * Hapus satu item dari keranjang.
-     * @param {number} menuId
-     * @returns {Array}
-     */
     remove: function (menuId) {
       menuId = parseInt(menuId, 10);
-      let items = readCart();
-      items = items.filter(function (it) {
+      var items = readCart().filter(function (it) {
         return parseInt(it.id, 10) !== menuId;
       });
       writeCart(items);
       return items;
     },
 
-    /**
-     * Ubah jumlah item tertentu.
-     * @param {number} menuId
-     * @param {number} qty
-     * @returns {Array}
-     */
     updateQty: function (menuId, qty) {
       menuId = parseInt(menuId, 10);
       qty = parseInt(qty, 10);
@@ -118,28 +104,22 @@ window.CartStore = (function ($) {
         return this.remove(menuId);
       }
 
-      const items = readCart();
-      const item = items.find(function (it) {
+      var items = readCart();
+      var item = items.find(function (it) {
         return parseInt(it.id, 10) === menuId;
       });
 
       if (item) {
-        item.qty = qty;
+        item.qty = Math.min(MAX_QTY, qty);
         writeCart(items);
       }
       return items;
     },
 
-    /**
-     * Kosongkan keranjang.
-     */
     clear: function () {
       writeCart([]);
     },
 
-    /**
-     * Sinkronkan badge keranjang pada navbar.
-     */
     syncBadge: function () {
       updateBadge();
     }

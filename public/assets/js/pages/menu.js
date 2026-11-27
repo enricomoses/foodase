@@ -5,10 +5,9 @@
 $(function () {
   'use strict';
 
-  // Pastikan halaman menu pelanggan SELALU bertema putih bersih (Clean Light Mode)
+  // Pastikan halaman menu pelanggan bertema putih bersih (Clean Light Mode)
   document.documentElement.classList.remove('dark');
   try {
-    localStorage.setItem('nola_theme', 'light');
     localStorage.setItem('foodease_theme', 'light');
   } catch (e) {}
 
@@ -56,16 +55,6 @@ $(function () {
       });
   }
 
-  function getCategoryEmoji(name) {
-    const n = (name || '').toLowerCase();
-    if (n.includes('kopi') || n.includes('coffee') || n.includes('espresso')) return '☕';
-    if (n.includes('smooth') || n.includes('shake') || n.includes('ice cream') || n.includes('milk')) return '🍦';
-    if (n.includes('side') || n.includes('camilan') || n.includes('snack') || n.includes('toast') || n.includes('pastry')) return '🍰';
-    if (n.includes('makan') || n.includes('food') || n.includes('meal') || n.includes('rice') || n.includes('dimsum')) return '🍱';
-    if (n.includes('tea') || n.includes('teh') || n.includes('non') || n.includes('beverage') || n.includes('juice')) return '🥤';
-    return '🍽️';
-  }
-
   function renderCategoryChips() {
     const $chipsContainer = $('#category-chips');
     // Hapus chip selain "Semua"
@@ -74,7 +63,6 @@ $(function () {
     allCategories.forEach(function (cat) {
       const catDisplayName = window.I18n ? window.I18n.translateCategory(cat.name) : cat.name;
       const isActive = String(cat.id) === String(currentCategoryId);
-      const emoji = getCategoryEmoji(cat.name);
       const activeClass = isActive
         ? 'is-active bg-blue-600 text-white shadow-sm font-semibold'
         : 'bg-[#F1F5F9] text-[#475569] hover:bg-gray-200 hover:text-gray-900 font-medium';
@@ -84,7 +72,6 @@ $(function () {
           class="category-chip h-10 px-5 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${activeClass} flex items-center gap-2 cursor-pointer"
           data-category-id="${cat.id}"
         >
-          <span class="text-sm">${emoji}</span>
           <span>${UI.escape(catDisplayName)}</span>
         </button>
       `;
@@ -252,7 +239,7 @@ $(function () {
       .then(function (res) {
         $('#menu-loading').addClass('hidden');
         allMenus = (res && res.data && res.data.data) ? res.data.data : [];
-        syncHeroMenus(allMenus);
+        // Sinkronisasi selesai
         renderMenuCatalog();
       })
       .catch(function (err) {
@@ -308,7 +295,7 @@ $(function () {
               <!-- Container Foto Menu Favorit (Foto Real, Bersih, Proporsional) -->
               <div class="relative w-full h-36 sm:h-40 rounded-2xl overflow-hidden bg-gray-100 mb-3">
                 <img
-                  src="${imgSrc}"
+                  src="${UI.escape(imgSrc)}"
                   alt="${UI.escape(menuName)}"
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                   onerror="this.src='${defaultPlaceholder}'"
@@ -455,7 +442,7 @@ $(function () {
             <!-- Area Foto Menu Vertikal Khas Calf (Foto Real Kopi Calf, Aspect Ratio 4:3, Object Cover Proporsional) -->
             <div class="relative w-full aspect-[4/3] bg-gray-100 overflow-hidden">
               <img
-                src="${imgSrc}"
+                src="${UI.escape(imgSrc)}"
                 alt="${UI.escape(menuName)}"
                 loading="lazy"
                 decoding="async"
@@ -664,256 +651,20 @@ $(function () {
     UI.toast('success', `${menuName} × ${totalQty}`, 'Berhasil Ditambahkan');
   });
 
-  // ============================================================
-  // KOPI NUSA HERO STAGE: 4 SIGNATURE DRINKS (FOTO PRODUK ASLI)
-  // ============================================================
-  const GLACE_SLIDES = [
-    {
-      index: 0,
-      ghostText: 'Kopi Susu Nusantara',
-      title1: 'Es Kopi Susu',
-      title2: '& Gula Aren',
-      desc: 'Espresso Robusta pilihan dengan gula aren asli, creamy dan manis alami — andalan kami.',
-      ctaText: 'Pesan Sekarang',
-      menuId: 0,
-      menuNameOriginal: 'Es Kopi Susu Regular',
-      menuName: 'Es Kopi Susu Regular',
-      menuPrice: 22000,
-      cupImage: 'uploads/menus/menu_iced_latte.jpg',
-      tagline: 'Diseduh Hati, Dinikmati Hati',
-      subDesc: 'Biji kopi nusantara pilihan, diproses dengan teliti dan disajikan segar setiap hari.'
-    },
-    {
-      index: 1,
-      ghostText: 'Smooth Cold Brew',
-      title1: 'Classic Cold Brew',
-      title2: '& Nitro Smooth',
-      desc: 'Kopi hitam direndam 12 jam dalam air dingin, smooth dan tidak pahit sama sekali.',
-      ctaText: 'Pesan Sekarang',
-      menuId: 0,
-      menuNameOriginal: 'Classic Cold Brew',
-      menuName: 'Classic Cold Brew',
-      menuPrice: 32000,
-      cupImage: 'uploads/menus/menu_iced_chocolate.jpg',
-      tagline: 'Slow Steeped, Served Bold',
-      subDesc: 'Cold brew 12 jam dengan biji kopi premium, lembut dan segar tanpa rasa pahit.'
-    },
-    {
-      index: 2,
-      ghostText: 'Matcha Ceremonial',
-      title1: 'Matcha Latte',
-      title2: '& Ceremonial Grade',
-      desc: 'Matcha ceremonial grade digiling halus, dikocok lalu disajikan dengan susu segar.',
-      ctaText: 'Pesan Sekarang',
-      menuId: 0,
-      menuNameOriginal: 'Matcha Latte',
-      menuName: 'Matcha Latte',
-      menuPrice: 28000,
-      cupImage: 'uploads/menus/menu_iced_matcha.jpg',
-      tagline: 'From Garden to Glass',
-      subDesc: 'Matcha upacara dengan susu lembut dan es, diseduh satu per satu dengan penuh perhatian.'
-    },
-    {
-      index: 3,
-      ghostText: 'Smooth Pistachio Dream',
-      title1: 'Smooth Series',
-      title2: '& Pistachio Dream',
-      desc: 'Es kopi susu premium dengan pasta pistachio Italia, kaya dan nutty.',
-      ctaText: 'Pesan Sekarang',
-      menuId: 0,
-      menuNameOriginal: 'Smooth Pistachio',
-      menuName: 'Smooth Pistachio',
-      menuPrice: 36000,
-      cupImage: 'uploads/menus/menu_iced_lemon_tea.jpg',
-      tagline: 'Premium Blends, Every Sip',
-      subDesc: 'Smooth series spesial kami — perpaduan kopi dengan cream premium yang memanjakan lidah.'
-    }
-  ];
-
-  let currentGlaceSlide = 0;
-  let glaceTimer = null;
-  let signatureMenus = [];
-
-  /**
-   * Cocokkan slide hero dengan data menu dari database.
-   * Foto, harga, dan ID yang dipakai selalu berasal dari server.
-   */
-  function syncHeroMenus(items) {
-    if (!Array.isArray(items) || items.length === 0) {
-      return;
-    }
-
-    GLACE_SLIDES.forEach(function (slide, index) {
-      const wanted = slide.menuNameOriginal.toLowerCase();
-      const menu = items.find(function (item) {
-        const originalName = String(item.name_original || item.name || '').trim().toLowerCase();
-        return originalName === wanted;
-      });
-
-      if (!menu) {
-        return;
-      }
-
-      signatureMenus[index] = menu;
-      slide.menuId = parseInt(menu.id, 10) || slide.menuId;
-      slide.menuPrice = parseInt(menu.price, 10) || slide.menuPrice;
-      slide.menuName = menu.name || slide.menuName;
-
-      if (menu.image_url) {
-        slide.cupImage = menu.image_url;
-      }
-
-      const $thumb = $('#glace-selectors-row .glace-thumb-card').filter(function () {
-        return String($(this).data('menu-name') || '').toLowerCase() === wanted;
-      });
-      if (menu.image_url && $thumb.length) {
-        $thumb.find('.glace-thumb-img').attr('src', menu.image_url);
-      }
-    });
-
-    showGlaceSlide(currentGlaceSlide, true);
-  }
-
-  function showGlaceSlide(index, instant) {
-    if (!$('#glace-hero-stage').length || !GLACE_SLIDES.length) return;
-    if (index >= GLACE_SLIDES.length) index = 0;
-    if (index < 0) index = GLACE_SLIDES.length - 1;
-    currentGlaceSlide = index;
-
-    const slide = GLACE_SLIDES[index];
-
-    // Update kontainer data-active-slide (memicu background gradient transition)
-    $('#glace-hero-stage').attr('data-active-slide', String(index));
-
-    // Update Ghost Typography Watermark di Belakang
-    $('#glace-ghost-text').text(slide.ghostText);
-
-    // Update Teks Headline Serif, Deskripsi, dan CTA Button
-    $('#glace-title-1').text(slide.title1);
-    $('#glace-title-2').text(slide.title2);
-    $('#glace-desc').text(slide.desc);
-    $('#glace-order-text').text(slide.ctaText);
-    $('#glace-order-btn')
-      .attr('data-menu-id', String(slide.menuId))
-      .attr('data-menu-name', slide.menuName)
-      .attr('data-menu-price', String(slide.menuPrice));
-
-    // Update Tagline Italic dan Sub-Deskripsi di Sisi Kanan
-    $('.glace-tagline-italic').text(slide.tagline);
-    $('#glace-sub-desc').text(slide.subDesc);
-
-    // Update Gambar Cup Minuman Tengah dengan transisi halus
-    const $cupImg = $('#glace-cup-img');
-    if ($cupImg.length && $cupImg.attr('src') !== slide.cupImage) {
-      if (instant) {
-        $cupImg.attr('src', slide.cupImage).attr('alt', slide.title1 + ' ' + slide.title2);
-      } else {
-        $cupImg.css({ opacity: 0, transform: 'scale(0.94) translateY(8px)' });
-        setTimeout(function () {
-          $cupImg
-            .attr('src', slide.cupImage)
-            .attr('alt', slide.title1 + ' ' + slide.title2)
-            .css({ opacity: 1, transform: 'scale(1) translateY(0)' });
-        }, 160);
-      }
-    }
-
-    // Update 4 Kartu Thumbnail Selector Horisontal
-    $('#glace-selectors-row .glace-thumb-card').each(function () {
-      const sIdx = parseInt($(this).data('slide'), 10);
-      const isActive = sIdx === index;
-      $(this)
-        .toggleClass('is-active', isActive)
-        .attr('aria-selected', isActive ? 'true' : 'false');
-    });
-  }
-
-  function startGlaceTimer() {
-    stopGlaceTimer();
-    if (!$('#glace-hero-stage').length) return;
-    glaceTimer = setInterval(function () {
-      showGlaceSlide(currentGlaceSlide + 1);
-    }, 6500);
-  }
-
-  function stopGlaceTimer() {
-    if (glaceTimer) {
-      clearInterval(glaceTimer);
-      glaceTimer = null;
-    }
-  }
-
-  // Event Klik Kartu Thumbnail Selector di Kanan
-  $(document).on('click', '.glace-thumb-card', function (e) {
+  // Quick-search dari kartu Menu Unggulan (menggantikan inline onclick)
+  $(document).on('click', '[data-quick-search]', function (e) {
     e.preventDefault();
-    const idx = parseInt($(this).data('slide'), 10) || 0;
-    showGlaceSlide(idx);
-    startGlaceTimer();
-  });
-
-  // Pause Timer saat Hover di Area Hero Stage
-  $('#glace-hero-stage')
-    .on('mouseenter', stopGlaceTimer)
-    .on('mouseleave', startGlaceTimer);
-
-  // Swipe Gesture di Layar Sentuh Mobile
-  let glaceTouchStartX = null;
-  $('#glace-hero-stage')
-    .on('touchstart', function (e) {
-      const touch = e.originalEvent.touches[0];
-      glaceTouchStartX = touch ? touch.clientX : null;
-    })
-    .on('touchend', function (e) {
-      if (glaceTouchStartX === null) return;
-      const touch = e.originalEvent.changedTouches[0];
-      const deltaX = touch ? touch.clientX - glaceTouchStartX : 0;
-      glaceTouchStartX = null;
-      if (Math.abs(deltaX) < 40) return;
-      showGlaceSlide(currentGlaceSlide + (deltaX < 0 ? 1 : -1));
-      startGlaceTimer();
-    });
-
-  // Tombol "Pesan Sekarang" langsung tambahkan menu terkait ke keranjang
-  $('#glace-order-btn').on('click', function (e) {
-    e.preventDefault();
-
-    const slide = GLACE_SLIDES[currentGlaceSlide];
-    const targetMenu = signatureMenus[currentGlaceSlide] || allMenus.find(function (m) {
-      return String(m.name_original || m.name || '').toLowerCase() === slide.menuNameOriginal.toLowerCase();
-    });
-    const menuName = (targetMenu && targetMenu.name) || slide.menuName || 'Minuman Kopi Nusa';
-
-    if (!targetMenu) {
-      UI.toast('danger', `Maaf, ${menuName} belum tersedia di menu.`, 'Menu Tidak Ditemukan');
-      return;
+    const query = String($(this).attr('data-quick-search') || '').trim();
+    if (query) {
+      $('#mobile-search-input, #global-search-input').val(query).trigger('input');
     }
-
-    if (!targetMenu.is_available) {
-      UI.toast('danger', `Maaf, ${menuName} baru saja habis!`, 'Stok Habis');
-      return;
-    }
-
-    if (window.CartStore) {
-      CartStore.add(targetMenu, 1);
-      const cartItem = CartStore.getItems().find(function (item) {
-        return Number(item.id) === Number(targetMenu.id);
-      });
-      const totalInCart = cartItem ? cartItem.qty : 1;
-      UI.toast('success', `${menuName} × ${totalInCart}`, 'Berhasil Ditambahkan');
-
-      // Animasi feedback pada tombol keranjang di navbar
-      $('#navbar-cart-btn, #btn-cart').addClass('scale-110');
-      setTimeout(function () {
-        $('#navbar-cart-btn, #btn-cart').removeClass('scale-110');
-      }, 300);
+    const target = document.getElementById('menu-catalog-section');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
     }
   });
 
-  // Inisialisasi slide pertama
-  showGlaceSlide(0, true);
-  startGlaceTimer();
-
-  // Tombol filter cepat kategori di dalam slide
+  // Tombol filter cepat kategori
   $(document).on('click', '.btn-filter-category-quick', function (e) {
     e.preventDefault();
     const catName = String($(this).data('cat-name') || '').toLowerCase();
@@ -949,27 +700,34 @@ $(function () {
   // ============================================================
   // INISIALISASI AWAL & CEK PESANAN AKTIF REAL-TIME
   // ============================================================
+  function clearLastOrderStorage() {
+    try {
+      localStorage.removeItem('foodease_last_order');
+      localStorage.removeItem('nola_last_order');
+      localStorage.removeItem('kopinusa_last_order');
+    } catch (e) {}
+  }
+
   function checkActiveOrder() {
     try {
-      const lastOrderCode = localStorage.getItem('nola_last_order') || localStorage.getItem('Kopi Nusa_last_order');
+      const lastOrderCode = localStorage.getItem('foodease_last_order')
+        || localStorage.getItem('nola_last_order')
+        || localStorage.getItem('kopinusa_last_order');
       if (!lastOrderCode) {
         $('#active-order-banner').addClass('hidden');
         return;
       }
 
-      // Verifikasi status pesanan langsung dari server
       Api.get('api/orders/track.php', { code: lastOrderCode })
         .then(function (res) {
           const order = (res && res.data) ? (res.data.order || res.data) : null;
           if (!order || !order.status) {
-            localStorage.removeItem('nola_last_order');
-            localStorage.removeItem('Kopi Nusa_last_order');
+            clearLastOrderStorage();
             $('#active-order-banner').addClass('hidden');
             return;
           }
 
           const status = String(order.status || '').toLowerCase();
-          // Hanya tampilkan jika status benar-benar aktif (belum selesai/batal)
           if (status === 'pending' || status === 'processing' || status === 'ready') {
             $('#active-order-code').text('#' + (order.order_code || lastOrderCode));
             $('#active-order-link').attr('href', 'track.php?code=' + encodeURIComponent(order.order_code || lastOrderCode));
@@ -983,16 +741,12 @@ $(function () {
             $('#active-order-status-desc').text(statusDesc);
             $('#active-order-banner').removeClass('hidden');
           } else {
-            // Pesanan sudah selesai (completed) atau dibatalkan (cancelled)
-            localStorage.removeItem('nola_last_order');
-            localStorage.removeItem('Kopi Nusa_last_order');
+            clearLastOrderStorage();
             $('#active-order-banner').addClass('hidden');
           }
         })
         .catch(function () {
-          // Jika pesanan tidak ditemukan atau otorisasi gagal, bersihkan
-          localStorage.removeItem('nola_last_order');
-          localStorage.removeItem('Kopi Nusa_last_order');
+          clearLastOrderStorage();
           $('#active-order-banner').addClass('hidden');
         });
     } catch (e) {
@@ -1000,22 +754,17 @@ $(function () {
     }
   }
 
-  // Dismiss notifikasi pesanan aktif
   $(document).on('click', '#btn-dismiss-active-order', function (e) {
     e.preventDefault();
-    try {
-      localStorage.removeItem('nola_last_order');
-      localStorage.removeItem('Kopi Nusa_last_order');
-    } catch (err) {}
+    clearLastOrderStorage();
     $('#active-order-banner').addClass('hidden');
   });
 
-  // Tanggapi perubahan bahasa in-place (tanpa reload, tetap di posisi dan halaman saat ini)
-  $(document).on('nola:lang-changed Kopi Nusa:lang-changed', function () {
-    renderCategoryChips();
-    renderMenuCatalog();
+  // Tanggapi perubahan bahasa in-place (muat ulang katalog dari server untuk terjemahan)
+  $(document).on('app:lang-changed', function () {
+    loadCategories();
+    loadMenus();
     checkActiveOrder();
-    showGlaceSlide(currentGlaceSlide, true);
     if (activeDetailMenu) {
       const menuName = window.I18n ? window.I18n.translateMenuName(activeDetailMenu.name) : activeDetailMenu.name;
       const menuCategory = window.I18n ? window.I18n.translateCategory(activeDetailMenu.category_name || 'Kafe') : (activeDetailMenu.category_name || 'Kafe');

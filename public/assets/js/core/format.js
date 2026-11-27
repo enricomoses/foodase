@@ -122,7 +122,9 @@ window.Fmt = (function () {
         }
       }
 
-      const escapedLabel = $('<div>').text(labelText).html();
+      const escapedLabel = window.UI ? window.UI.escape(labelText) : String(labelText).replace(/[&<>"']/g, function (c) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+      });
       return `<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${meta.cls}">${escapedLabel}</span>`;
     }
   };

@@ -360,7 +360,7 @@ window.UI = (function ($) {
     },
 
     /**
-     * Escape string untuk mencegah XSS.
+     * Escape string untuk mencegah XSS baik di teks maupun atribut HTML (termasuk " dan ').
      * @param {any} text
      * @returns {string}
      */
@@ -368,7 +368,16 @@ window.UI = (function ($) {
       if (text === null || text === undefined) {
         return '';
       }
-      return $('<div>').text(String(text)).html();
+      return String(text).replace(/[&<>"']/g, function (ch) {
+        switch (ch) {
+          case '&': return '&amp;';
+          case '<': return '&lt;';
+          case '>': return '&gt;';
+          case '"': return '&quot;';
+          case "'": return '&#39;';
+          default:  return ch;
+        }
+      });
     },
 
     /**
