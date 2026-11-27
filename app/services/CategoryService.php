@@ -3,33 +3,43 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Core\Exceptions\AppException;
+use App\Core\Exceptions\ConflictException;
+use App\Core\Exceptions\NotFoundException;
+use App\Core\Exceptions\ValidationException;
+use App\Core\I18n;
 use App\Models\Category;
-use RuntimeException;
 
 /**
- * Service untuk logika bisnis manajemen kategori (FR-CAT-01 s.d. FR-CAT-03, BR-14).
+ * Service untuk logika bisnis manajemen kategori (FR-CAT-01..03, BR-14).
  */
 final class CategoryService
 {
     /**
-     * Ambil seluruh daftar kategori beserta jumlah menu.
+     * @return array<int, array<string, mixed>>
      */
-    public static function list(): array
+    public static function list(bool $translate = true): array
     {
-        return Category::all();
+        $categories = Category::all();
+        if (!$translate) {
+            return $categories;
+        }
+
+        foreach ($categories as &$c) {
+            $c['name_original'] = (string) $c['name'];
+            $c['name']          = I18n::translateCategory((string) $c['name']);
+        }
+        unset($c);
+
+        return $categories;
     }
 
-    /**
-     * Ambil detail kategori berdasarkan ID.
-     */
     public static function get(int $id): ?array
     {
         return Category::find($id);
     }
 
     /**
-     * Tambah kategori baru.
-     *
      * @param array{name: string, sort_order?: int} $data
      * @return array<string, mixed>
      */
@@ -37,26 +47,25 @@ final class CategoryService
     {
         $name = trim((string) $data['name']);
         if (Category::findByName($name) !== null) {
-            throw new RuntimeException("Kategori dengan nama '{$name}' sudah ada.");
+            throw new ValidationException("Kategori dengan nama '{$name}' sudah ada.", [
+                'name' => "Kategori dengan nama '{$name}' sudah ada.",
+            ]);
         }
 
-        $sortOrder = isset($data['sort_order']) ? (int) $data['sort_order'] : 0;
         $id = Category::create([
             'name'       => $name,
-            'sort_order' => $sortOrder,
+            'sort_order' => isset($data['sort_order']) ? (int) $data['sort_order'] : 0,
         ]);
 
         $created = Category::find($id);
         if (!$created) {
-            throw new RuntimeException('Gagal membuat kategori.');
+            throw new AppException('Gagal membuat kategori.', 500);
         }
 
         return $created;
     }
 
     /**
-     * Perbarui kategori yang sudah ada.
-     *
      * @param array{name: string, sort_order?: int} $data
      * @return array<string, mixed>
      */
@@ -64,50 +73,40 @@ final class CategoryService
     {
         $existing = Category::find($id);
         if (!$existing) {
-            throw new RuntimeException('Kategori tidak ditemukan.');
+            throw new NotFoundException('Kategori tidak ditemukan.');
         }
 
         $name = trim((string) $data['name']);
         if (Category::findByName($name, $id) !== null) {
-            throw new RuntimeException("Kategori dengan nama '{$name}' sudah digunakan.");
+            throw new ValidationException("Kategori dengan nama '{$name}' sudah digunakan.", [
+                'name' => "Kategori dengan nama '{$name}' sudah digunakan.",
+            ]);
         }
 
         $sortOrder = isset($data['sort_order']) ? (int) $data['sort_order'] : (int) $existing['sort_order'];
-        $updated = Category::update($id, [
-            'name'       => $name,
-            'sort_order' => $sortOrder,
-        ]);
-
-        if (!$updated) {
-            throw new RuntimeException('Gagal memperbarui kategori.');
+        if (!Category::update($id, ['name' => $name, 'sort_order' => $sortOrder])) {
+            throw new AppException('Gagal memperbarui kategori.', 500);
         }
 
-        $category = Category::find($id);
-        if (!$category) {
-            throw new RuntimeException('Kategori tidak ditemukan setelah pembaruan.');
-        }
-
-        return $category;
+        return Category::find($id) ?? $existing;
     }
 
     /**
-     * Hapus kategori (Aturan BR-14: ditolak jika masih punya menu).
+     * Hapus kategori (BR-14: ditolak dengan 409 jika masih memiliki menu aktif maupun terhapus).
      */
     public static function delete(int $id): void
     {
-        $existing = Category::find($id);
-        if (!$existing) {
-            throw new RuntimeException('Kategori tidak ditemukan.');
+        if (Category::find($id) === null) {
+            throw new NotFoundException('Kategori tidak ditemukan.');
         }
 
         $menuCount = Category::countMenus($id);
         if ($menuCount > 0) {
-            // BR-14: Kategori tidak bisa dihapus bila masih memiliki menu (aktif maupun tidak).
-            throw new RuntimeException("Kategori tidak dapat dihapus karena masih memiliki {$menuCount} menu terkait.", 409);
+            throw new ConflictException("Kategori tidak dapat dihapus karena masih memiliki {$menuCount} menu terkait.");
         }
 
         if (!Category::delete($id)) {
-            throw new RuntimeException('Gagal menghapus kategori dari database.');
+            throw new AppException('Gagal menghapus kategori dari database.', 500);
         }
     }
 }
